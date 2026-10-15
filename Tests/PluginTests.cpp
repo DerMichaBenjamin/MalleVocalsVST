@@ -18,6 +18,20 @@ juce::TextButton *button(juce::Component &root, const juce::String &text) {
 int main() {
   juce::ScopedJuceInitialiser_GUI gui;
   try {
+    {
+      MalleProcessor catalog;
+      for (auto key : {"lock.key", "lock.input", "lock.routing"})
+        catalog.state.state.setProperty(key, false, nullptr);
+      for (int i=0;i<int(malle::presets().size());++i) {
+        catalog.applyPreset(i);
+        for (size_t j=0;j<malle::parameters().size();++j) {
+          float expected=malle::presets()[size_t(i)].values[j];
+          require(std::abs(catalog.getValue(malle::parameters()[j].id)-expected)
+                      < 1e-4f*(1+std::abs(expected)), "all global presets load actual values");
+        }
+        catalog.undo.clearUndoHistory();
+      }
+    }
     MalleProcessor p;
     p.prepareToPlay(48000, 256);
     p.setValue("tune.root", 7);
@@ -34,6 +48,20 @@ int main() {
     require(p.undo.redo(), "preset redo");
     require(p.getValue("druck.amount") == pressure,
             "preset redo restores macro");
+    auto originalRoute = p.routing();
+    p.moveModule(0, 8);
+    require(p.routing() != originalRoute, "routing moves");
+    require(p.undo.undo(), "routing undo");
+    require(p.routing() == originalRoute, "routing undo exact");
+    require(p.undo.redo(), "routing redo");
+    require(p.routing()[8] == 0, "routing redo exact");
+    p.deesserPreset(1);
+    require(p.getValue("deess.low") == 2200 && p.getValue("deess.high") == 6500,
+            "SCH preset band");
+    p.deesserPreset(2);
+    require(p.getValue("deess.mode") == 1, "wideband preset");
+    require(p.undo.undo(), "deesser preset undo");
+    require(p.getValue("deess.mode") == 0, "deesser undo mode");
     juce::MemoryBlock saved;
     p.getStateInformation(saved);
     MalleProcessor restored;
@@ -51,7 +79,9 @@ int main() {
     screenshots.createDirectory();
     auto saveImage = [&](juce::String name) {
       auto image = editor->createComponentSnapshot(editor->getLocalBounds());
-      juce::FileOutputStream stream(screenshots.getChildFile(name));
+      auto destination = screenshots.getChildFile(name);
+      destination.deleteFile();
+      juce::FileOutputStream stream(destination);
       juce::PNGImageFormat png;
       require(png.writeImageToStream(image, stream), "PNG snapshot");
     };

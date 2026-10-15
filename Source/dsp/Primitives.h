@@ -118,11 +118,54 @@ struct Delay {
 // Eight-line orthogonal feedback delay network. Normalised Hadamard mixing
 // keeps feedback energy bounded independently of room size and sample rate.
 struct Reverb {
- std::array<Delay,8> line;std::array<float,8> damping{},tap{},feedback{};float sr=48000,alpha=.5f;
- void prepare(float rate){sr=rate;for(auto&d:line)d.prepare(int(sr*.25f));damping.fill(0);configure(.5f,2,6500,.7f);}
- void reset(){for(auto&d:line){std::fill(d.data.begin(),d.data.end(),0);d.pos=0;}damping.fill(0);}
- void configure(float size,float decay,float high,float character){constexpr std::array<float,8> times{.0297f,.0371f,.0411f,.0437f,.0531f,.0617f,.0713f,.0799f};float scale=.45f+size*1.5f;alpha=1-std::exp(-2*pi*std::clamp(high,500.f,sr*.4f)/sr);for(int j=0;j<8;++j){tap[j]=times[j]*sr*scale;feedback[j]=std::pow(.001f,times[j]*scale/std::max(.1f,decay))*(.75f+.24f*character);}}
- float tick(float input){std::array<float,8>v{};for(int j=0;j<8;++j){float x=line[j].read(tap[j]);damping[j]+=alpha*(x-damping[j]);v[j]=damping[j];}float out=(v[0]-v[1]+v[2]+v[3]-v[4]+v[5]-v[6]+v[7])*.25f;for(int step=1;step<8;step*=2)for(int j=0;j<8;j+=step*2)for(int k=0;k<step;++k){float a=v[j+k],b=v[j+k+step];v[j+k]=a+b;v[j+k+step]=a-b;}for(int j=0;j<8;++j)line[j].push(input*(j%2?.3f:-.3f)+v[j]*.35355339f*feedback[j]);return out;}
+  std::array<Delay, 8> line;
+  std::array<float, 8> damping{}, tap{}, feedback{};
+  float sr = 48000, alpha = .5f;
+  void prepare(float rate) {
+    sr = rate;
+    for (auto &d : line)
+      d.prepare(int(sr * .25f));
+    damping.fill(0);
+    configure(.5f, 2, 6500, .7f);
+  }
+  void reset() {
+    for (auto &d : line) {
+      std::fill(d.data.begin(), d.data.end(), 0);
+      d.pos = 0;
+    }
+    damping.fill(0);
+  }
+  void configure(float size, float decay, float high, float character) {
+    constexpr std::array<float, 8> times{.0297f, .0371f, .0411f, .0437f,
+                                         .0531f, .0617f, .0713f, .0799f};
+    float scale = .45f + size * 1.5f;
+    alpha = 1 - std::exp(-2 * pi * std::clamp(high, 500.f, sr * .4f) / sr);
+    for (int j = 0; j < 8; ++j) {
+      tap[j] = times[j] * sr * scale;
+      feedback[j] = std::pow(.001f, times[j] * scale / std::max(.1f, decay)) *
+                    (.75f + .24f * character);
+    }
+  }
+  float tick(float input) {
+    std::array<float, 8> v{};
+    for (int j = 0; j < 8; ++j) {
+      float x = line[j].read(tap[j]);
+      damping[j] += alpha * (x - damping[j]);
+      v[j] = damping[j];
+    }
+    float out = (v[0] - v[1] + v[2] + v[3] - v[4] + v[5] - v[6] + v[7]) * .25f;
+    for (int step = 1; step < 8; step *= 2)
+      for (int j = 0; j < 8; j += step * 2)
+        for (int k = 0; k < step; ++k) {
+          float a = v[j + k], b = v[j + k + step];
+          v[j + k] = a + b;
+          v[j + k + step] = a - b;
+        }
+    for (int j = 0; j < 8; ++j)
+      line[j].push(input * (j % 2 ? .3f : -.3f) +
+                   v[j] * .35355339f * feedback[j]);
+    return out;
+  }
 };
 struct Sample {
   std::vector<float> left, right;

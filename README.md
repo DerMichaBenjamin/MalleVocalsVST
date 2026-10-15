@@ -1,4 +1,4 @@
-# Malle Vocals — 0.1.0 Alpha
+# Malle Vocals — 0.2.0 Alpha
 
 **Rohstoff Audio / Micha Benjamin.** Ein tatsächlich implementiertes C++/JUCE-Audioeffektplugin in Entwicklung. Noch keine verkaufsfertige Vollversion und keine bestätigte Klanggleichheit mit kommerziellen Referenzen.
 
@@ -35,7 +35,10 @@ Mac-Testbuilds sind nur ad hoc signiert, nicht mit Developer ID notarisiert. Das
 3. EQ-Punkte ziehen: Frequenz/Gain, Mausrad: Q. Alle Detailwerte im Bereich „Klang EQ“. Zahlen lassen sich direkt editieren; Doppelklick setzt den Regler zurück.
 4. Crowd über „Crowd laden“ oder Drag-and-drop auf Sample/Wellenform laden; vorhören. Bis eigene Samples vorliegen, erklingen ausdrücklich synthetische Testtexturen. Stadium selbst aktivieren und Menge dosieren.
 5. Für externe Lead-Steuerung im Host Sidechain anlegen und Ducking auf Extern stellen. Die Statuszeile meldet fehlendes Signal.
-6. Throw halten oder `throw.trigger` automatisieren. Das Fenster, Rhythmus, Feedback und Fades finden sich gemeinsam im Advanced-Bereich „throw“.
+6. Throw halten oder `throw.trigger` automatisieren. Loslassen schließt den latenzausgerichteten Send, spätestens endet er am Send-Fenster. Die Fahne läuft weiter. Throw-Mix ist der eigene Return; Gesamt-FX-Mix skaliert zusätzlich alle parallelen Effektreturns. Optionaler Throw-Hall folgt ausschließlich dem Throw-Delay.
 7. Eigene Presets speichern/laden; Tonart, Input und Routing werden standardmäßig geschützt. Undo/Redo, Presetsuche und Favoriten sind vorhanden.
+
+8. Advanced: Direktmodule links per Drag-and-drop umordnen; orange Linie markiert gültige Ziele. Parallelwege bleiben getrennte Returns; die Liste macht daraus keine serielle Kette.
+9. Die Bank umfasst 55 technische Ausgangspresets und 45 klar als Studien markierte Referenzansätze. Letztere beruhen auf echten Preview-/Vocal-Schätzmessungen; eine getrennte Rollen-Hörabnahme ist noch offen. [Song-Zuordnung und Methode](docs/SONG_REFERENCE_ANALYSIS.md).
 
 Siehe [Funktions- und Teststand](docs/STATUS.md), [Architektur und Automationsvertrag](docs/ARCHITECTURE.md), [Referenzprüfung](docs/REFERENCE_RESEARCH.md) und [Changelog](CHANGELOG.md).

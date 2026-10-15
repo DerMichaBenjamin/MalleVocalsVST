@@ -35,9 +35,9 @@ const std::vector<Param> &parameters() {
     add("tune.speed", "Retune", "Tune", 0, 300, 50, "ms");
     add("tune.amount", "Korrektur", "Tune", 0, 1, 1);
     add("tune.human", "Humanize", "Tune", 0, 1, .3);
-    add("pitch", "Pitch", "Tune", -24, 24, 0, "st");
-    add("formant", "Formant", "Tune", -12, 12, 0, "st");
-    add("formant.preserve", "Formant erhalten", "Tune", 0, 1, 1);
+    add("pitch", "Pitch", "Pitch/Formant", -24, 24, 0, "st");
+    add("formant", "Formant", "Pitch/Formant", -12, 12, 0, "st");
+    add("formant.preserve", "Formant erhalten", "Pitch/Formant", 0, 1, 1);
     for (int i = 0; i < 12; ++i)
       add("note." + std::to_string(i), "Note " + std::to_string(i), "Tune", 0,
           1, 1);
@@ -127,9 +127,10 @@ const std::vector<Param> &parameters() {
     add("stadium.level", "Sample Pegel", "Stadium", -24, 12, 0, "dB");
     for (auto s : {"room", "short", "long", "reverb", "throw"}) {
       std::string k = s;
-      on(k, k, (k == "throw" || k == "reverb" || k == "long") ? 1 : 0);
+      on(k, k, 1);
       add(k + ".send", "Send", k, 0, 1, k == "throw" ? .5 : 0);
-      add(k + ".return", "Return", k, 0, 1, 1);
+      add(k + ".return", k == "throw" ? "Throw-Mix" : "Return", k, 0, 1,
+          k == "throw" ? .25f : 1);
       add(k + ".time", "Zeit", k, 1, 2000,
           k == "room"    ? 35
           : k == "short" ? 100
@@ -171,6 +172,25 @@ const std::vector<Param> &parameters() {
     add("pump.ratio", "SC Ratio", "Bewegung", 1, 20, 4);
     add("pump.attack", "SC Attack", "Bewegung", .1, 100, 2, "ms");
     add("pump.release", "SC Release", "Bewegung", 10, 1500, 120, "ms");
+    for (auto section :
+         {"druck", "klang", "waerme", "breite", "raum", "bewegung"})
+      add(std::string(section) + ".on", "Sektion aktiv", section, 0, 1, 1);
+    add("creative.on", "Pitch/Formant aktiv", "Pitch/Formant", 0, 1, 1);
+    for (int i = 0; i < 11; ++i)
+      add("route." + std::to_string(i),
+          "Direktkette Position " + std::to_string(i + 1), "Routing", 0, 10,
+          float(i));
+    add("parallel.tap", "Abgriff: Input / Post-Direktkette", "Parallel", 0, 1,
+        0);
+    add("deess.mode", "Split / Wideband", "De-Esser", 0, 1, 0);
+    add("deess.preset", "S / SCH-SH / Breitband", "De-Esser", 0, 2, 0);
+    add("throw.type", "Mono / Stereo / Ping Pong", "throw", 0, 2, 1);
+    add("throw.feel", "Gerade / Punktiert / Triolisch", "throw", 0, 2, 0);
+    add("throw.verb.on", "Throw Hall aktiv", "throw", 0, 1, 0);
+    add("throw.verb.type", "Room / Plate / Hall", "throw", 0, 2, 1);
+    add("throw.verb.amount", "Throw Hall Menge", "throw", 0, 1, .2);
+    add("throw.kill", "Tail Kill", "throw", 0, 1, 0);
+    add("duck.on", "FX Ducking aktiv", "Ducking", 0, 1, 1);
     return v;
   }();
   return p;
@@ -187,8 +207,11 @@ bool discrete(std::string_view id) {
          id == "formant.preserve" || id == "double.voices" ||
          id == "stadium.root" || id == "stadium.loop" ||
          id == "stadium.texture" || id == "duck.source" || id == "pump.mode" ||
-         id == "pump.target" || id == "stutter" || id == "throw.trigger" ||
-         id.substr(0, 5) == "note." ||
+         id == "pump.target" || id == "throw.type" || id == "throw.feel" ||
+         id == "throw.kill" || id == "throw.verb.type" || id == "deess.mode" ||
+         id == "deess.preset" || id == "parallel.tap" ||
+         id.substr(0, 6) == "route." || id == "stutter" ||
+         id == "throw.trigger" || id.substr(0, 5) == "note." ||
          id.find(".on") != std::string_view::npos ||
          id.find(".type") != std::string_view::npos ||
          id.find(".sync") != std::string_view::npos ||
@@ -201,14 +224,427 @@ Values defaults() {
     v.push_back(p.def);
   return v;
 }
-const std::array<std::string, 20> &variants() {
-  static std::array<std::string, 20> v = {
-      "Main Direkt",    "Main Warm",     "Main Brillant", "Main Radio",
-      "Main Aggressiv", "Backing Soft",  "Backing Breit", "Harmony Klar",
-      "Harmony Warm",   "Backing Tight", "Chor Stadion",  "Chor Malle",
-      "Chor Rau",       "Chor Breit",    "Chor Dicht",    "Chor Hell",
-      "Chor Dunkel",    "Chor Gang",     "Chor Antwort",  "Chor Finale"};
+const std::array<VariantProfile, 20> &profiles() {
+  static const std::array<VariantProfile, 20> v{
+      {{"Main Direkt",
+        "Main",
+        "Fuehrende Einzelstimme: Spitzenkontrolle, deutliche Mitten, kleiner "
+        "Raum.",
+        12,
+        4,
+        .5f,
+        80,
+        -1,
+        3,
+        1,
+        5,
+        .2f,
+        .15f,
+        16,
+        3,
+        .55f,
+        .25f,
+        .2f,
+        .35f,
+        1},
+       {"Main Warm",
+        "Main",
+        "Weichere Stimme, weniger Schaerfe; kein Ersatz fuer eine warme "
+        "Aufnahme.",
+        8,
+        2,
+        2,
+        180,
+        1,
+        1,
+        -1,
+        7,
+        .45f,
+        .1f,
+        22,
+        2,
+        .4f,
+        .3f,
+        .15f,
+        .2f,
+        1.4f},
+       {"Main Air kontrolliert",
+        "Main",
+        "Helle Praesenz mit De-Esser-Reserve. Sibilanz vor mehr Air pruefen.",
+        10,
+        3,
+        .8f,
+        110,
+        -2,
+        4,
+        3,
+        3,
+        .1f,
+        .18f,
+        18,
+        3,
+        .65f,
+        .35f,
+        .25f,
+        .3f,
+        1},
+       {"Main Radio dicht",
+        "Main",
+        "Gleichmaessige dichte Leadstimme; Eingangspegel kalibrieren.",
+        17,
+        6,
+        .3f,
+        70,
+        -1,
+        2,
+        1,
+        6,
+        .3f,
+        .2f,
+        12,
+        4,
+        .6f,
+        .2f,
+        .3f,
+        .5f,
+        .8f},
+       {"Main Shout rau",
+        "Main",
+        "Raues Shouting mit kraeftiger Verdichtung; braucht energische "
+        "Performance.",
+        15,
+        8,
+        .2f,
+        55,
+        -3,
+        3,
+        0,
+        12,
+        .6f,
+        .25f,
+        15,
+        4,
+        .7f,
+        .25f,
+        .3f,
+        .55f,
+        .6f},
+       {"Backing weich",
+        "Harmony/Backing",
+        "Unter der Main bleiben; echte zusaetzliche Aufnahme oder Harmonie "
+        "einspeisen.",
+        8,
+        2,
+        8,
+        220,
+        -2,
+        -2,
+        -1,
+        3,
+        .15f,
+        .35f,
+        24,
+        4,
+        .8f,
+        .45f,
+        .25f,
+        .25f,
+        1.6f},
+       {"Backing breit",
+        "Harmony/Backing",
+        "Unisono-Doubles verbreitern. Der Doubler erfindet keine gesungenen "
+        "Harmonien.",
+        10,
+        3,
+        4,
+        160,
+        -2,
+        -1,
+        1,
+        4,
+        .2f,
+        .55f,
+        30,
+        6,
+        1,
+        .5f,
+        .35f,
+        .4f,
+        1.3f},
+       {"Harmony klar",
+        "Harmony/Backing",
+        "Bereits eingesungene mehrstimmige Harmonien, klare gemeinsame "
+        "Artikulation.",
+        9,
+        2,
+        6,
+        180,
+        -3,
+        1,
+        1,
+        2,
+        .1f,
+        .4f,
+        22,
+        4,
+        .9f,
+        .55f,
+        .3f,
+        .3f,
+        1.2f},
+       {"Harmony warm",
+        "Harmony/Backing",
+        "Weicher Hintergrund fuer reale Harmonien; wenig harte Hoehen.",
+        7,
+        2,
+        10,
+        240,
+        -1,
+        -2,
+        -2,
+        6,
+        .4f,
+        .4f,
+        28,
+        5,
+        .9f,
+        .6f,
+        .25f,
+        .3f,
+        1.8f},
+       {"Backing tight",
+        "Harmony/Backing",
+        "Kurze eng gefuehrte Unterstuetzung mit wenig Raum.",
+        13,
+        4,
+        1,
+        90,
+        -3,
+        1,
+        0,
+        4,
+        .2f,
+        .3f,
+        10,
+        3,
+        .65f,
+        .15f,
+        .1f,
+        .35f,
+        .8f},
+       {"Chor Unisono dicht",
+        "Chor/Crowd",
+        "Mehrere Unisono-Takes bevorzugt; synthetische Dopplung ergaenzt "
+        "Dichte.",
+        14,
+        5,
+        1,
+        130,
+        -2,
+        2,
+        0,
+        7,
+        .4f,
+        .55f,
+        21,
+        7,
+        .95f,
+        .5f,
+        .25f,
+        .4f,
+        1},
+       {"Chor Stadion weit",
+        "Chor/Crowd",
+        "Echte Gruppenrufe plus breiter Doubler; Stadium nur als Textur.",
+        15,
+        5,
+        2,
+        200,
+        -3,
+        1,
+        1,
+        6,
+        .3f,
+        .65f,
+        34,
+        8,
+        1,
+        .9f,
+        .4f,
+        .5f,
+        1.4f},
+       {"Chor Gang rau",
+        "Chor/Crowd",
+        "Raue dicht eingesungene Gang-Shouts; Saettigung unter Kontrolle "
+        "halten.",
+        18,
+        8,
+        .2f,
+        80,
+        -3,
+        3,
+        -1,
+        13,
+        .7f,
+        .55f,
+        18,
+        8,
+        1,
+        .45f,
+        .25f,
+        .6f,
+        .7f},
+       {"Chor Antwort tight",
+        "Chor/Crowd",
+        "Kurze Antwort-Rufe; wenig Dauerhall, Throw bei Bedarf separat.",
+        12,
+        4,
+        1,
+        100,
+        -3,
+        2,
+        0,
+        5,
+        .25f,
+        .45f,
+        13,
+        5,
+        .9f,
+        .2f,
+        .15f,
+        .45f,
+        .9f},
+       {"Chor Finale gross",
+        "Chor/Crowd",
+        "Finalrefrain mit echten mehreren Takes, breiten Antworten und "
+        "geduckten Tails.",
+        17,
+        6,
+        .7f,
+        180,
+        -2,
+        2,
+        2,
+        9,
+        .5f,
+        .7f,
+        38,
+        8,
+        1,
+        1,
+        .5f,
+        .65f,
+        1.2f},
+       {"Legacy Chor Hell",
+        "Chor/Crowd",
+        "Kompatibilitaetsprofil aus der ersten Alpha.",
+        12,
+        4,
+        1,
+        140,
+        -2,
+        3,
+        3,
+        5,
+        .2f,
+        .55f,
+        25,
+        6,
+        1,
+        .6f,
+        .3f,
+        .4f,
+        1},
+       {"Legacy Chor Dunkel",
+        "Chor/Crowd",
+        "Kompatibilitaetsprofil aus der ersten Alpha.",
+        12,
+        4,
+        3,
+        200,
+        0,
+        -2,
+        -3,
+        9,
+        .5f,
+        .55f,
+        28,
+        6,
+        1,
+        .6f,
+        .3f,
+        .4f,
+        1.6f},
+       {"Legacy Chor Gang",
+        "Chor/Crowd",
+        "Kompatibilitaetsprofil aus der ersten Alpha.",
+        18,
+        8,
+        .3f,
+        90,
+        -3,
+        3,
+        0,
+        12,
+        .7f,
+        .6f,
+        18,
+        8,
+        1,
+        .45f,
+        .25f,
+        .6f,
+        .8f},
+       {"Legacy Chor Antwort",
+        "Chor/Crowd",
+        "Kompatibilitaetsprofil aus der ersten Alpha.",
+        12,
+        4,
+        1,
+        100,
+        -3,
+        2,
+        0,
+        5,
+        .25f,
+        .4f,
+        13,
+        5,
+        .85f,
+        .2f,
+        .15f,
+        .4f,
+        .9f},
+       {"Legacy Chor Finale",
+        "Chor/Crowd",
+        "Kompatibilitaetsprofil aus der ersten Alpha.",
+        17,
+        6,
+        .7f,
+        180,
+        -2,
+        2,
+        2,
+        9,
+        .5f,
+        .7f,
+        38,
+        8,
+        1,
+        1,
+        .5f,
+        .65f,
+        1.2f}}};
   return v;
+}
+const std::array<std::string, 20> &variants() {
+  static const auto names = [] {
+    std::array<std::string, 20> n;
+    for (size_t i = 0; i < n.size(); ++i)
+      n[i] = profiles()[i].name;
+    return n;
+  }();
+  return names;
 }
 void resolveInto(const Values &b, Values &v) {
   v = b;
@@ -217,27 +653,69 @@ void resolveInto(const Values &b, Values &v) {
     auto i = size_t(index(id));
     v[i] = std::clamp(b[i] + d, parameters()[i].min, parameters()[i].max);
   };
-  float d = get("druck.amount") * (.7f + get("druck.variant") * .045f);
-  add("fet.threshold", -12 * d);
-  add("level.threshold", -8 * d);
-  add("fet.makeup", 4 * d);
-  add("level.makeup", 3 * d);
-  float k = get("klang.amount");
-  add("eq0.gain", -3 * k);
-  add("eq2.gain", 4 * k * (.7f + get("klang.variant") * .045f));
-  add("eq3.gain", 3 * k);
-  float w = get("waerme.amount");
-  add("sat.mix", w * .5f);
-  add("sat.drive", w * get("waerme.variant") * .25f);
-  float width = get("breite.amount");
-  add("double.mix", width * .6f);
-  add("double.time", width * (.7f + get("breite.variant") * .045f) * 10);
-  float room = get("raum.amount");
-  add("reverb.send", room * .3f * (.7f + get("raum.variant") * .045f));
-  add("long.send", room * .2f);
-  float move = get("bewegung.amount");
-  add("pump.depth", move * .5f);
-  add("pump.shape", move * get("bewegung.variant") * .04f);
+  auto enabled = [&](std::string_view id) { return get(id) > .5f; };
+  auto off = [&](std::string_view id) { v[size_t(index(id))] = 0; };
+  if (!enabled("druck.on")) {
+    for (auto id : {"fet.on", "level.on", "mb.on", "parallel.on"})
+      off(id);
+  }
+  if (!enabled("klang.on")) {
+    for (auto id : {"inputEQ.on", "eq.on", "res.on", "air.on"})
+      off(id);
+  }
+  if (!enabled("waerme.on"))
+    off("sat.on");
+  if (!enabled("breite.on"))
+    off("double.on");
+  if (!enabled("raum.on")) {
+    for (auto id :
+         {"room.on", "short.on", "long.on", "reverb.on", "room.return",
+          "short.return", "long.return", "reverb.return"})
+      off(id);
+  }
+  if (!enabled("bewegung.on"))
+    off("pump.on");
+  auto profile = [&](std::string_view id) -> const VariantProfile & {
+    return profiles()[size_t(std::clamp(int(get(id)), 0, 19))];
+  };
+  auto &d = profile("druck.variant");
+  float a = get("druck.amount");
+  add("fet.threshold", -d.compression * a);
+  add("level.threshold", -d.compression * .55f * a);
+  add("fet.makeup", d.compression * .25f * a);
+  add("level.makeup", d.compression * .15f * a);
+  add("fet.ratio", (d.ratio - 4) * a);
+  add("fet.attack", (d.attack - .5f) * a);
+  add("fet.release", (d.release - 80) * a);
+  auto &k = profile("klang.variant");
+  a = get("klang.amount");
+  add("eq0.gain", k.body * a);
+  add("eq1.gain", -.5f * k.presence * a);
+  add("eq2.gain", k.presence * a);
+  add("eq3.gain", k.air * a);
+  add("air.high", std::max(0.f, k.air) * .06f * a);
+  add("deess.threshold", -std::max(0.f, k.air) * a);
+  auto &w = profile("waerme.variant");
+  a = get("waerme.amount");
+  add("sat.mix", w.warmth * a);
+  add("sat.drive", w.drive * a);
+  auto &bwidth = profile("breite.variant");
+  a = get("breite.amount");
+  add("double.mix", bwidth.width * a);
+  add("double.time", (bwidth.time - 18) * a);
+  add("double.voices", (bwidth.voices - 4) * a);
+  add("double.width", (bwidth.stereo - 1) * a);
+  auto &r = profile("raum.variant");
+  a = get("raum.amount");
+  add("room.send", r.space * .12f * a);
+  add("short.send", r.space * .10f * a);
+  add("reverb.send", r.space * .38f * a);
+  add("long.send", r.space * .20f * a);
+  add("long.feedback", r.feedback * .25f * a);
+  auto &m = profile("bewegung.variant");
+  a = get("bewegung.amount");
+  add("pump.depth", m.pump * a);
+  add("pump.shape", (m.shape - 1) * a);
 }
 Values resolve(const Values &b) {
   Values v = b;
@@ -254,7 +732,7 @@ const std::vector<Preset> &presets() {
         auto v = defaults();
         auto s = [&](std::string id, float x) { v[index(id)] = x; };
         int variant = cat == "Main"   ? j % 5
-                      : cat == "Chor" ? 10 + j % 10
+                      : cat == "Chor" ? 10 + j % 5
                                       : 5 + j % 5;
         for (auto m :
              {"druck", "klang", "waerme", "breite", "raum", "bewegung"})
@@ -286,9 +764,14 @@ const std::vector<Preset> &presets() {
                                              "Comic Kind", "Stutter",
                                              "Hard Tune"}[j % 5]
                 : variants()[variant];
-        p.push_back({n + " " + std::to_string(j + 1), cat, v});
+        Preset preset{n + " " + std::to_string(j + 1), cat, v};
+        preset.description = profiles()[size_t(variant)].purpose +
+                             " Globaler technischer Ausgangspunkt, noch kein "
+                             "nachgehoertes Kuenstlerpreset.";
+        p.push_back(std::move(preset));
       }
     }
+#include "ReferencePresets.inc"
     return p;
   }();
   return ps;

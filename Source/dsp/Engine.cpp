@@ -3,18 +3,26 @@
 namespace malle {
 float Engine::value(const char *id) const { return p[size_t(index(id))]; }
 void Engine::prepare(double rate, int block, int channels) {
+  (void)profiles();
   sr = float(rate);
   chs = channels;
   p = defaults();
   pitchEngine.presetDefault(chs, sr);
-  latencySamples = pitchEngine.inputLatency() + pitchEngine.outputLatency();
+  creativeEngine.presetDefault(chs, sr);
+  latencySamples =
+      2 * (pitchEngine.inputLatency() + pitchEngine.outputLatency());
   for (int c = 0; c < 2; ++c) {
     pitchIn[c].assign(std::max(block, 64), 0);
     pitchOut[c].assign(std::max(block, 64), 0);
     rawInput[c].assign(std::max(block, 64), 0);
+    work[c].assign(std::max(block, 64), 0);
+    tapInput[c].assign(std::max(block, 64), 0);
     auto &x = channel[c];
     x.dry.prepare(latencySamples + 8);
     x.filteredDry.prepare(latencySamples + 8);
+    x.creativeDry.prepare(latencySamples + 8);
+    x.inputTap.prepare(latencySamples + 8);
+    x.throwReverb.prepare(sr);
     for (auto &r : x.reverbs)
       r.prepare(sr);
     x.side.prepare(latencySamples + 8);
@@ -65,6 +73,7 @@ void Engine::prepare(double rate, int block, int channels) {
 }
 void Engine::reset() {
   pitchEngine.reset();
+  creativeEngine.reset();
   for (auto &x : channel) {
     x.hp.reset();
     x.lp.reset();
@@ -74,6 +83,9 @@ void Engine::reset() {
     x.airLow.reset();
     x.airHigh.reset();
     x.satTone.reset();
+    x.airEnv = {};
+    x.airBroadEnv = {};
+    x.throwReverb.reset();
     for (auto &f : x.eq)
       f.reset();
     for (auto &f : x.eqDetect)
@@ -99,7 +111,8 @@ void Engine::reset() {
     }
     for (auto &r : x.reverbs)
       r.reset();
-    for (auto *d : {&x.dry, &x.filteredDry, &x.side, &x.doubler}) {
+    for (auto *d : {&x.dry, &x.filteredDry, &x.creativeDry, &x.inputTap,
+                    &x.side, &x.doubler}) {
       std::fill(d->data.begin(), d->data.end(), 0);
       d->pos = 0;
     }
@@ -114,8 +127,8 @@ void Engine::reset() {
   pitchLow = pitchMidi = pitchConfidence = correction = 0;
   samplePos = phase = freePpq = 0;
   clock = 0;
-  throwStart = -1;
-  throwRemaining = 0;
+  throwStart = throwEnd = -1;
+  throwLag = throwRemaining = 0;
   lastThrow = false;
   inactivity.fill(0);
   totalInactive = 0;
@@ -123,6 +136,14 @@ void Engine::reset() {
   smoothOut = gain(value("output"));
   smoothMix = value("mix");
   tuneMix = 0;
+  creativeMix = 0;
+  routeGain = 1;
+  routeChanging = false;
+  lastKill = false;
+  killedAt = -1000000000;
+  for (int i = 0; i < 11; ++i)
+    order[i] = i;
+  pendingOrder = order;
 }
 void Engine::setParameters(const Values &values) {
   p = values;
@@ -308,168 +329,154 @@ void Engine::process(float *const *data, int channels, int count,
       double atBeat = tr.ppq + delay * beatsPerSample;
       delay += (std::ceil(atBeat / q - 1e-9) * q - atBeat) / beatsPerSample;
     }
-    throwStart = clock + latencySamples + static_cast<long long>(delay);
+    throwLag = latencySamples + static_cast<long long>(delay);
+    throwStart = clock + throwLag;
+    throwEnd = -1;
     throwRemaining = static_cast<long long>(value("throw.window") * .001 * sr);
   }
+  if (!trigger && lastThrow)
+    throwEnd = clock + throwLag; // close aligned send only; never clear the tail
   lastThrow = trigger;
   const Sample *samp = sample.load(std::memory_order_acquire);
   if (!samp || samp->left.empty())
     samp = &synthetic[size_t(std::clamp(int(value("stadium.texture")), 0, 6))];
+
+  const bool creative = value("creative.on") > .5f,
+             wideDeess = value("deess.mode") > .5f,
+             duckOn = value("duck.on") > .5f;
+  const bool parInput = value("parallel.tap") < .5f;
+  const int throwType = int(value("throw.type")),
+            feel = int(value("throw.feel")),
+            verbType = int(value("throw.verb.type"));
+  const float throwFeel = feel == 1   ? 1.5f
+                          : feel == 2 ? 2.f / 3
+                                      : 1.f,
+              verbAmount = value("throw.verb.amount");
+  const bool verbOn = value("throw.verb.on") > .5f,
+             kill = value("throw.kill") > .5f, preview = audition.load();
+  if (kill && !lastKill) {
+    killedAt = clock;
+    throwRemaining = 0;
+    throwStart = -1;
+    for (auto &z : channel) {
+      z.throwReverb.reset();
+      z.delayHP[4].reset();
+      z.delayLP[4].reset();
+    }
+  }
+  lastKill = kill;
+  for (int c = 0; c < channels; ++c)
+    channel[c].throwReverb.configure(verbType == 0   ? .15f
+                                     : verbType == 1 ? .55f
+                                                     : .95f,
+                                     verbType == 0   ? 1.f
+                                     : verbType == 1 ? 2.5f
+                                                     : 5.f,
+                                     verbType == 1 ? 9000 : 5500, .8f);
+  std::array<int, 11> requested{};
+  std::array<bool, 11> seen{};
+  bool valid = true;
+  for (int i = 0; i < 11; ++i) {
+    int v = int(p[size_t(index("route.0") + i)]);
+    if (v < 0 || v >= 11 || seen[size_t(std::clamp(v, 0, 10))]) {
+      valid = false;
+      break;
+    }
+    seen[size_t(v)] = true;
+    requested[i] = v;
+  }
+  if (valid && routeChanging && requested == order)
+    routeChanging = false;
+  if (valid && requested != order) {
+    pendingOrder = requested;
+    routeChanging = true;
+  }
   float maxIn = 0, maxOut = 0, maxSC = 0;
-  int offset = 0;
-  while (offset < count) {
-    int n = std::min(count - offset, int(pitchIn[0].size()));
-    for (int i = 0; i < n; ++i) {
-      smoothIn = smoothing * smoothIn + (1 - smoothing) * inTarget;
-      float mono = 0;
-      for (int c = 0; c < channels; ++c) {
-        float x = data[c][offset + i];
-        if (!std::isfinite(x))
-          x = 0;
-        rawInput[c][i] = x;
-        auto &z = channel[c];
-        x *= smoothIn;
-        if (inputOn)
-          x = z.correct.tick(z.lp.tick(z.hp.tick(x)));
-        mono += x;
-        pitchIn[c][i] = x;
-      }
-      mono /= channels;
-      pitchLow += .35f * (mono - pitchLow);
-      if (++downCounter >= std::max(1, int(sr / 12000))) {
-        downCounter = 0;
-        pitchHistory[pitchPos] = pitchLow;
-        pitchPos = (pitchPos + 1) % 1024;
-        if (++pitchHop >= 128) {
-          pitchHop = 0;
-          detectPitch();
+  auto compress = [&](int k, float det) {
+    auto &q = cp[k];
+    return q.on ? comp[k].tickGain(det, q.t, q.r, q.a, q.rel, q.k, sr) * q.m
+                : 1.f;
+  };
+  auto direct = [&](int module, std::array<float, 2> &x) {
+    if (module == 0) {
+      if (inputOn)
+        for (int c = 0; c < channels; ++c) {
+          auto &z = channel[c];
+          x[c] = z.correct.tick(z.lp.tick(z.hp.tick(x[c])));
         }
-      }
+      return;
     }
-    float targetCorrection = 0;
-    if (tune && pitchConfidence > .75f) {
-      float bestDist = 100;
-      int target = int(std::round(pitchMidi));
-      for (int note = int(pitchMidi) - 12; note <= int(pitchMidi) + 12;
-           ++note) {
-        int degree = ((note - root) % 12 + 12) % 12;
-        bool ok = scale == 0 ||
-                  (scale == 1 &&
-                   (degree == 0 || degree == 2 || degree == 4 || degree == 5 ||
-                    degree == 7 || degree == 9 || degree == 11)) ||
-                  (scale == 2 &&
-                   (degree == 0 || degree == 2 || degree == 3 || degree == 5 ||
-                    degree == 7 || degree == 8 || degree == 10)) ||
-                  (scale == 3 && allowed[(note % 12 + 12) % 12]);
-        float dist = std::abs(note - pitchMidi);
-        if (ok && dist < bestDist) {
-          bestDist = dist;
-          target = note;
-        }
-      }
-      targetCorrection = (target - pitchMidi) * tuneAmount * (1 - human * .35f);
-    }
-    float tc = std::pow(coef(std::max(.01f, tuneSpeed), sr), float(n));
-    correction = tc * correction + (1 - tc) * targetCorrection;
-    pitchEngine.setTransposeSemitones(tune ? pitchShift + correction : 0);
-    pitchEngine.setFormantSemitones(tune ? formant : 0, preserve);
-    pitchEngine.setFormantBase(
-        pitchConfidence > .5f ? 440 * std::pow(2.f, (pitchMidi - 69) / 12) / sr
-                              : 200 / sr);
-    float *ins[] = {pitchIn[0].data(), pitchIn[1].data()};
-    float *outs[] = {pitchOut[0].data(), pitchOut[1].data()};
-    pitchEngine.process(ins, n, outs, n);
-    for (int i = 0; i < n; ++i, ++clock) {
-      int atSample = offset + i;
-      smoothOut = smoothing * smoothOut + (1 - smoothing) * outTarget;
-      smoothMix = smoothing * smoothMix + (1 - smoothing) * mixTarget;
-      tuneMix = smoothing * tuneMix + (1 - smoothing) * (tune ? 1.f : 0.f);
-      std::array<float, 2> dry{}, x{}, ds{};
-      float detector = 0, scDet = 0;
-      for (int c = 0; c < channels; ++c) {
-        auto &z = channel[c];
-        dry[c] = z.dry.read(float(latencySamples));
-        z.dry.push(rawInput[c][i]);
-        float filtered = z.filteredDry.read(float(latencySamples));
-        z.filteredDry.push(pitchIn[c][i]);
-        x[c] = filtered * (1 - tuneMix) + pitchOut[c][i] * tuneMix;
-        detector = std::max(detector, std::abs(x[c]));
-        float s = 0;
-        if (scChannels > 0 && sc)
-          s = sc[std::min(c, scChannels - 1)][atSample];
-        float delayedSC = z.side.read(float(latencySamples));
-        z.side.push(s);
-        scDet = std::max(scDet, std::abs(delayedSC));
-      }
-      maxIn = std::max(maxIn, detector);
-      maxSC = std::max(maxSC, scDet);
-      auto compress = [&](int k, float det) {
-        auto &q = cp[k];
-        return q.on ? comp[k].tickGain(det, q.t, q.r, q.a, q.rel, q.k, sr) * q.m
-                    : 1.f;
-      };
-      float parallelGain = compress(2, detector);
-      std::array<float, 2> par = x;
+    if (module == 2 || module == 3) {
+      int k = module - 2;
+      float det = 0;
       for (int c = 0; c < channels; ++c)
-        par[c] *= parallelGain;
-      for (int k = 0; k < 2; ++k) {
-        float det = 0;
-        for (int c = 0; c < channels; ++c)
-          det = std::max(det, std::abs(x[c]));
-        float g = compress(k, det);
-        for (int c = 0; c < channels; ++c)
-          x[c] *= 1 + cp[k].mix * (g - 1);
-      }
-      float dsDet = 0;
+        det = std::max(det, std::abs(x[c]));
+      float g = compress(k, det);
+      for (int c = 0; c < channels; ++c)
+        x[c] *= 1 + cp[k].mix * (g - 1);
+      return;
+    }
+    if (module == 4) {
+      std::array<float, 2> ds{};
+      float det = 0;
       for (int c = 0; c < channels; ++c) {
         ds[c] = channel[c].dsHigh.tick(channel[c].dsLow.tick(x[c]));
-        dsDet = std::max(dsDet, std::abs(ds[c]));
+        det = std::max(det, std::abs(ds[c]));
       }
-      float dsOver = std::max(
-                0.f, db(deessEnv.tick(dsDet, coef(1, sr), coef(70, sr))) -
-                         dsThreshold),
-            dsRed = std::min(15.f, dsOver * dsAmount);
-      meters.deess.store(dsRed);
-      for (int c = 0; c < channels; ++c) {
-        if (dsOn)
-          x[c] -= ds[c] * (1 - gain(-dsRed));
-        if (dsOn && dsListen > .5f)
-          x[c] = ds[c];
-      }
-      std::array<std::array<float, 4>, 2> bands{};
-      for (int c = 0; c < channels; ++c) {
-        auto &z = channel[c];
-        if (eqOn)
+      float over = std::max(
+          0.f, db(deessEnv.tick(det, coef(1, sr), coef(70, sr))) - dsThreshold);
+      float red = std::min(15.f, over * dsAmount);
+      meters.deess.store(dsOn ? red : 0);
+      if (dsOn)
+        for (int c = 0; c < channels; ++c) {
+          if (dsListen > .5f)
+            x[c] = ds[c];
+          else if (wideDeess)
+            x[c] *= gain(-red);
+          else
+            x[c] -= ds[c] * (1 - gain(-red));
+        }
+      return;
+    }
+    if (module == 5) {
+      if (eqOn)
+        for (int c = 0; c < channels; ++c)
           for (int b = 0; b < 4; ++b) {
-            float band = z.eqDetect[b].tick(x[c]);
-            float env = z.eqEnv[b].tick(band, coef(5, sr), coef(120, sr));
+            auto &z = channel[c];
+            float band = z.eqDetect[b].tick(x[c]),
+                  env = z.eqEnv[b].tick(band, coef(5, sr), coef(120, sr));
             x[c] = z.eq[b].tick(x[c]) +
                    band * (gain(eqDynamic[b] *
                                 std::clamp((db(env) - eqThreshold[b]) / 12, 0.f,
                                            1.f)) -
                            1);
           }
+      return;
+    }
+    if (module == 6) {
+      if (!cp[3].on)
+        return;
+      std::array<std::array<float, 4>, 2> bands{};
+      for (int c = 0; c < channels; ++c) {
         float low[3];
         for (int b = 0; b < 3; ++b)
-          low[b] = z.cross[b].tick(x[c]);
+          low[b] = channel[c].cross[b].tick(x[c]);
         bands[c] = {low[0], low[1] - low[0], low[2] - low[1], x[c] - low[2]};
+        x[c] = 0;
       }
-      if (cp[3].on)
-        for (int b = 0; b < 4; ++b) {
-          float det = 0;
-          for (int c = 0; c < channels; ++c)
-            det = std::max(det, std::abs(bands[c][b]));
-          float g = compress(3 + b, det);
-          for (int c = 0; c < channels; ++c)
-            bands[c][b] *= g;
-        }
+      for (int b = 0; b < 4; ++b) {
+        float det = 0;
+        for (int c = 0; c < channels; ++c)
+          det = std::max(det, std::abs(bands[c][b]));
+        float g = compress(3 + b, det);
+        for (int c = 0; c < channels; ++c)
+          x[c] += bands[c][b] * g;
+      }
+      return;
+    }
+    if (module == 7) {
       for (int c = 0; c < channels; ++c) {
         auto &z = channel[c];
-        if (cp[3].on) {
-          x[c] = 0;
-          for (float v : bands[c])
-            x[c] += v;
-        }
         std::array<float, 32> rb{}, env{};
         for (int b = 0; b < 32; ++b) {
           rb[b] = z.reson[b].tick(x[c]);
@@ -479,11 +486,13 @@ void Engine::process(float *const *data, int channels, int count,
         }
         float delta = 0, maxRed = 0;
         for (int b = 1; b < 31; ++b) {
-          float neighborhood = (env[b - 1] + env[b + 1]) * .5f;
-          float prominence = db(env[b] / std::max(1e-7f, neighborhood));
-          float weight = std::clamp(1 + resFocus * (b / 15.f - 1), 0.f, 2.f);
-          float red = std::clamp((prominence - resSelect) * resAmount * weight,
-                                 0.f, resMax);
+          float neighbor = (env[b - 1] + env[b + 1]) * .5f,
+                prominence = db(env[b] / std::max(1e-7f, neighbor)),
+                weight = std::clamp(1 + resFocus * (b / 15.f - 1), 0.f, 2.f);
+          float red =
+              resOn ? std::clamp((prominence - resSelect) * resAmount * weight,
+                                 0.f, resMax)
+                    : 0;
           if (env[b] < 1e-5f)
             red = 0;
           float target = 1 - gain(-red),
@@ -494,32 +503,172 @@ void Engine::process(float *const *data, int channels, int count,
           if (c == 0)
             meters.reduction[b].store(red);
         }
-        if (resOn) {
+        if (resOn)
           x[c] = resDelta > .5f ? delta : x[c] - delta;
-          meters.resonance.store(maxRed);
-        }
-        if (airOn) {
+        meters.resonance.store(maxRed);
+      }
+      return;
+    }
+    if (module == 8) {
+      if (airOn)
+        for (int c = 0; c < channels; ++c) {
+          auto &z = channel[c];
           float a = z.airLow.tick(x[c]), h = z.airHigh.tick(x[c]);
-          float guard = 1 - airGuard * std::clamp(dsOver / 12, 0.f, 1.f);
+          float over =
+              std::max(0.f, db(z.airEnv.tick(h, coef(2, sr), coef(80, sr))) -
+                                dsThreshold);
+          float noise = std::clamp(
+              (db(z.airBroadEnv.tick(x[c], coef(3, sr), coef(100, sr))) + 65) /
+                  20,
+              0.f, 1.f);
+          float guard = (1 - airGuard * std::clamp(over / 12, 0.f, 1.f)) *
+                        (1 - airGuard + airGuard * noise);
           x[c] += guard * (a * airP * .7f + h * airH);
         }
-        if (satOn) {
-          float driven = x[c] * drive;
-          float y = satType < .5f    ? std::tanh(driven)
+      return;
+    }
+    if (module == 9) {
+      if (satOn)
+        for (int c = 0; c < channels; ++c) {
+          float driven = x[c] * drive,
+                y = satType < .5f    ? std::tanh(driven)
                     : satType < 1.5f ? std::tanh(driven + .2f) - std::tanh(.2f)
                                      : std::clamp(driven, -1.f, 1.f);
-          y = z.satTone.tick(y / std::max(1.f, std::sqrt(drive)));
+          y = channel[c].satTone.tick(y / std::max(1.f, std::sqrt(drive)));
           x[c] = (x[c] * (1 - satMix) + y * satMix) * satOut;
         }
-        if (cp[2].on)
-          x[c] += par[c] * cp[2].mix;
+      return;
+    }
+  };
+  int offset = 0;
+  while (offset < count) {
+    int n = std::min(count - offset, int(work[0].size()));
+    for (int i = 0; i < n; ++i) {
+      smoothIn = smoothing * smoothIn + (1 - smoothing) * inTarget;
+      for (int c = 0; c < channels; ++c) {
+        float x = data[c][offset + i];
+        if (!std::isfinite(x))
+          x = 0;
+        rawInput[c][i] = x;
+        work[c][i] = tapInput[c][i] = x * smoothIn;
+        maxIn = std::max(maxIn, std::abs(x * smoothIn));
       }
-      float vocalEnv = stadiumEnv.tick(detector, stadiumA, stadiumR);
-      float duck = duckEnv.tick(external ? scDet : detector, duckA, duckR);
-      float duckG = 1 / (1 + duck * 12 * duckAmount),
-            dryDuck = 1 / (1 + duck * 12 * duckDry);
-      if (sampleLoop < .5f && vocalEnv < 1e-5f)
-        samplePos = 0;
+    }
+    for (int module : order) {
+      if (module == 1 || module == 10) {
+        bool tuningNode = module == 1, enabled = tuningNode ? tune : creative;
+        auto &pitch = tuningNode ? pitchEngine : creativeEngine;
+        for (int i = 0; i < n; ++i) {
+          float mono = 0;
+          for (int c = 0; c < channels; ++c) {
+            pitchIn[c][i] = work[c][i];
+            mono += work[c][i];
+          }
+          if (tuningNode) {
+            mono /= channels;
+            pitchLow += .35f * (mono - pitchLow);
+            if (++downCounter >= std::max(1, int(sr / 12000))) {
+              downCounter = 0;
+              pitchHistory[pitchPos] = pitchLow;
+              pitchPos = (pitchPos + 1) % 1024;
+              if (++pitchHop >= 128) {
+                pitchHop = 0;
+                detectPitch();
+              }
+            }
+          }
+        }
+        float targetCorrection = 0;
+        if (tuningNode && tune && pitchConfidence > .75f) {
+          float best = 100;
+          int target = int(std::round(pitchMidi));
+          for (int note = int(pitchMidi) - 12; note <= int(pitchMidi) + 12;
+               ++note) {
+            int degree = ((note - root) % 12 + 12) % 12;
+            bool ok =
+                scale == 0 ||
+                (scale == 1 &&
+                 (degree == 0 || degree == 2 || degree == 4 || degree == 5 ||
+                  degree == 7 || degree == 9 || degree == 11)) ||
+                (scale == 2 &&
+                 (degree == 0 || degree == 2 || degree == 3 || degree == 5 ||
+                  degree == 7 || degree == 8 || degree == 10)) ||
+                (scale == 3 && allowed[(note % 12 + 12) % 12]);
+            float dist = std::abs(note - pitchMidi);
+            if (ok && dist < best) {
+              best = dist;
+              target = note;
+            }
+          }
+          targetCorrection =
+              (target - pitchMidi) * tuneAmount * (1 - human * .35f);
+        }
+        if (tuningNode) {
+          float tc = std::pow(coef(std::max(.01f, tuneSpeed), sr), float(n));
+          correction = tc * correction + (1 - tc) * targetCorrection;
+        }
+        pitch.setTransposeSemitones(
+            enabled ? (tuningNode ? correction : pitchShift) : 0);
+        pitch.setFormantSemitones(enabled && !tuningNode ? formant : 0,
+                                  preserve);
+        pitch.setFormantBase(pitchConfidence > .5f
+                                 ? 440 * std::pow(2.f, (pitchMidi - 69) / 12) /
+                                       sr
+                                 : 200 / sr);
+        float *ins[] = {pitchIn[0].data(), pitchIn[1].data()};
+        float *outs[] = {pitchOut[0].data(), pitchOut[1].data()};
+        pitch.process(ins, n, outs, n);
+        float &blend = tuningNode ? tuneMix : creativeMix;
+        for (int i = 0; i < n; ++i) {
+          blend = smoothing * blend + (1 - smoothing) * (enabled ? 1.f : 0.f);
+          for (int c = 0; c < channels; ++c) {
+            auto &delay =
+                tuningNode ? channel[c].filteredDry : channel[c].creativeDry;
+            float dry = delay.read(float(latencySamples / 2));
+            delay.push(pitchIn[c][i]);
+            work[c][i] = dry * (1 - blend) + pitchOut[c][i] * blend;
+          }
+        }
+      } else
+        for (int i = 0; i < n; ++i) {
+          std::array<float, 2> x{};
+          for (int c = 0; c < channels; ++c)
+            x[c] = work[c][i];
+          direct(module, x);
+          for (int c = 0; c < channels; ++c)
+            work[c][i] = x[c];
+        }
+    }
+    for (int i = 0; i < n; ++i, ++clock) {
+      int atSample = offset + i;
+      smoothOut = smoothing * smoothOut + (1 - smoothing) * outTarget;
+      smoothMix = smoothing * smoothMix + (1 - smoothing) * mixTarget;
+      std::array<float, 2> x{}, dry{}, tap{};
+      float detector = 0, scDet = 0;
+      for (int c = 0; c < channels; ++c) {
+        auto &z = channel[c];
+        dry[c] = z.dry.read(float(latencySamples));
+        z.dry.push(rawInput[c][i]);
+        tap[c] = z.inputTap.read(float(latencySamples));
+        z.inputTap.push(tapInput[c][i]);
+        x[c] = work[c][i];
+        detector = std::max(detector, std::abs(x[c]));
+        float scIn =
+            scChannels && sc ? sc[std::min(c, scChannels - 1)][atSample] : 0;
+        float delayed = z.side.read(float(latencySamples));
+        z.side.push(scIn);
+        scDet = std::max(scDet, std::abs(delayed));
+      }
+      maxSC = std::max(maxSC, scDet);
+      float parDet = 0;
+      for (int c = 0; c < channels; ++c)
+        parDet = std::max(parDet, std::abs(parInput ? tap[c] : x[c]));
+      float parGain = compress(2, parDet);
+      auto source = x;
+      float env = stadiumEnv.tick(detector, stadiumA, stadiumR),
+            duck = duckEnv.tick(external ? scDet : detector, duckA, duckR);
+      float duckG = duckOn ? 1 / (1 + duck * 12 * duckAmount) : 1,
+            dryDuck = duckOn ? 1 / (1 + duck * 12 * duckDry) : 1;
       double beat = tr.hasPosition
                         ? tr.ppq + (atSample - latencySamples) * beatsPerSample
                         : freePpq;
@@ -529,15 +678,15 @@ void Engine::process(float *const *data, int channels, int count,
         ph += 1;
       float pump = 1;
       if (pumpOn) {
-        float shape = std::pow(.5f - .5f * std::cos(2 * pi * ph), pumpShape);
-        pump = 1 - pumpDepth *
-                       (1 - (pumpSC ? pumpComp.tickGain(scDet, pumpThreshold,
-                                                        pumpRatio, pumpAttack,
-                                                        pumpRelease, 6, sr)
-                                    : shape));
+        float shape = std::pow(.5f - .5f * std::cos(2 * pi * ph), pumpShape),
+              scGain = pumpSC
+                           ? pumpComp.tickGain(scDet, pumpThreshold, pumpRatio,
+                                               pumpAttack, pumpRelease, 6, sr)
+                           : shape;
+        pump = 1 - pumpDepth * (1 - scGain);
       }
       if (stutter > .5f)
-        pump *= ph < .5f ? 1.f : 0.f;
+        pump *= ph < .5f ? 1 : 0;
       if (detector > 1e-5f)
         totalInactive = 0;
       else
@@ -545,6 +694,8 @@ void Engine::process(float *const *data, int channels, int count,
       float globalGate =
           std::clamp((globalTail - totalInactive) / globalFade, 0.f, 1.f);
       float carrierL = 0, carrierR = 0;
+      if (sampleLoop < .5f && env < 1e-5f)
+        samplePos = 0;
       if (!samp->left.empty()) {
         size_t len = samp->left.size();
         if (samplePos >= len && sampleLoop > .5f)
@@ -567,86 +718,129 @@ void Engine::process(float *const *data, int channels, int count,
       }
       phase += 1 / sr;
       bool sendThrow =
-          throwStart >= 0 && clock >= throwStart && throwRemaining > 0;
+          throwStart >= 0 && clock >= throwStart && throwRemaining > 0 &&
+          (throwEnd < 0 || clock < throwEnd);
       if (sendThrow)
         --throwRemaining;
       for (int c = 0; c < channels; ++c) {
         auto &z = channel[c];
-        float doubled = 0;
-        z.doubler.push(x[c]);
+        if (cp[2].on)
+          x[c] += (parInput ? tap[c] : source[c]) * parGain * cp[2].mix;
+        z.doubler.push(source[c]);
         if (doubleOn) {
+          float doubled = 0;
           for (int v = 0; v < voices; ++v) {
-            float sign = v % 2 ? 1.f : -1.f;
-            float pan = channels == 1 ? 1.f
-                                      : (c == 0 ? 1 - sign * doubleWidth
-                                                : 1 + sign * doubleWidth);
-            float omega = 2 * pi * (.6f + v * .13f);
-            float modulationMs =
-                (std::pow(2.f, doublePitch / 1200) - 1) * 1000 / omega;
-            float centsMod = std::min(doubleTime * .6f, modulationMs) *
-                             std::sin(float(phase) * omega);
-            float delay = (doubleTime + v * 2 + centsMod) * sr * .001f;
-            doubled += z.doubler.read(delay) * pan / voices;
+            float sign = v % 2 ? 1.f : -1.f, pan = channels == 1 ? 1.f
+                                                   : c == 0
+                                                       ? 1 - sign * doubleWidth
+                                                       : 1 + sign * doubleWidth;
+            float omega = 2 * pi * (.6f + v * .13f),
+                  amplitude = std::min(doubleTime * .6f,
+                                       (std::pow(2.f, doublePitch / 1200) - 1) *
+                                           1000 / omega);
+            float dt = (doubleTime + v * 2 +
+                        amplitude * std::sin(float(phase) * omega)) *
+                       sr * .001f;
+            doubled += z.doubler.read(dt) * pan / voices;
           }
           x[c] += doubled * doubleMix;
         }
         if (stadiumOn) {
-          float carrier = c == 0 ? carrierL : carrierR;
-          carrier = carrier * stadiumWidth +
-                    (carrierL + carrierR) * .5f * (1 - stadiumWidth);
-          float voc = 0;
+          float carrier = (c == 0 ? carrierL : carrierR) * stadiumWidth +
+                          (carrierL + carrierR) * .5f * (1 - stadiumWidth),
+                voc = 0;
           for (int b = 0; b < 16; ++b) {
-            float env =
-                z.vocEnv[b].tick(z.voice[b].tick(x[c]), stadiumA, stadiumR);
-            voc += z.carrier[b].tick(carrier) * std::min(8.f, env * 35);
+            float ve = z.vocEnv[b].tick(z.voice[b].tick(source[c]), stadiumA,
+                                        stadiumR);
+            voc += z.carrier[b].tick(carrier) * std::min(8.f, ve * 35);
           }
-          float crowd =
-              carrier * vocalEnv * 3 * (1 - stadiumVoc) + voc * stadiumVoc;
+          float crowd = carrier * env * 3 * (1 - stadiumVoc) + voc * stadiumVoc;
           crowd = std::tanh(crowd * (1 + stadiumRough * 8)) /
                   (1 + stadiumRough * 2);
           x[c] += crowd * stadiumMix;
         }
-        float wet = 0, delayFeed = 0;
-        for (int b = 0; b < 5; ++b) {
-          auto &q = fx[b];
-          float input = x[c] * q.send * (q.on ? 1.f : 0.f);
-          if (b == 4)
-            input *= sendThrow ? 1.f : 0.f;
-          if (b == 3)
-            input += delayFeed * delayToVerb;
-          float dt =
-              q.sync ? float(60 / bpm) * q.beats * sr : q.time * .001f * sr;
-          float spread = 1 + (c == 1 ? .035f : -.035f) * q.width;
+      }
+      std::array<float, 2> wet{}, delayFeed{};
+      for (int b = 0; b < 5; ++b) {
+        auto &q = fx[b];
+        std::array<float, 2> filtered{}, send{};
+        float dt =
+            q.sync ? float(60 / bpm) * q.beats * (b == 4 ? throwFeel : 1) * sr
+                   : q.time * .001f * sr;
+        for (int c = 0; c < channels; ++c) {
+          auto &z = channel[c];
+          float spread = (b == 4 && throwType != 1)
+                             ? 1
+                             : 1 + (c == 1 ? .035f : -.035f) * q.width;
           float r = z.delays[b].read(dt * spread);
-          float filtered = z.delayLP[b].tick(z.delayHP[b].tick(r));
+          if (b == 4 && clock - killedAt < dt * spread)
+            r = 0;
+          filtered[c] = z.delayLP[b].tick(z.delayHP[b].tick(r));
           if (b == 0 || b == 3)
-            filtered = z.reverbs[b == 0 ? 0 : 1].tick(filtered);
-          if (std::abs(input) > 1e-5f)
-            inactivity[b] = 0;
-          else if (c == 0)
-            inactivity[b] += 1 / sr;
-          float fade = std::clamp((q.tail - inactivity[b]) / q.fade, 0.f, 1.f);
-          z.delays[b].push(input +
-                           ((b == 0 || b == 3) ? 0 : filtered * q.fb * fade));
-          float ret = filtered * q.ret * fade;
-          if (b == 1 || b == 2)
-            delayFeed += ret;
-          wet += ret;
+            filtered[c] = z.reverbs[b == 0 ? 0 : 1].tick(filtered[c]);
+          send[c] = x[c] * q.send * (q.on ? 1.f : 0.f);
+          if (b == 4)
+            send[c] *= sendThrow ? 1.f : 0.f;
+          if (b == 3)
+            send[c] += delayFeed[c] * delayToVerb;
         }
-        float d = x[c] * dryDuck, w = wet * fxMix * duckG * globalGate;
+        if (b == 4 && channels == 2) {
+          float mono = (send[0] + send[1]) * .5f;
+          if (throwType == 0)
+            send[0] = send[1] = mono;
+          if (throwType == 2) {
+            send[0] = mono;
+            send[1] = 0;
+          }
+        }
+        float sendPeak = 0;
+        for (int c = 0; c < channels; ++c)
+          sendPeak = std::max(sendPeak, std::abs(send[c]));
+        if (sendPeak > 1e-5f)
+          inactivity[b] = 0;
+        else
+          inactivity[b] += 1 / sr;
+        float fade = std::clamp((q.tail - inactivity[b]) / q.fade, 0.f, 1.f);
+        for (int c = 0; c < channels; ++c) {
+          auto &z = channel[c];
+          float feedback =
+              filtered[(b == 4 && throwType == 2 && channels == 2) ? 1 - c : c];
+          z.delays[b].push(send[c] +
+                           ((b == 0 || b == 3) ? 0 : feedback * q.fb * fade));
+          float ret = filtered[c];
+          if (b == 4) {
+            float verb = z.throwReverb.tick(filtered[c] * (verbOn ? 1.f : 0.f));
+            ret += verb * verbAmount;
+          }
+          ret *= q.ret * fade;
+          if (b == 1 || b == 2)
+            delayFeed[c] += ret;
+          wet[c] += ret;
+        }
+      }
+      if (routeChanging)
+        routeGain = std::max(0.f, routeGain - 1 / (sr * .01f));
+      else
+        routeGain = std::min(1.f, routeGain + 1 / (sr * .01f));
+      for (int c = 0; c < channels; ++c) {
+        float d = x[c] * dryDuck, w = wet[c] * fxMix * duckG * globalGate;
         if (pumpTarget < .5f || pumpTarget > 1.5f)
           d *= pump;
         if (pumpTarget > .5f)
           w *= pump;
-        float result =
-            ((d + w) * smoothMix + dry[c] * (1 - smoothMix)) * smoothOut;
-        if (audition.load(std::memory_order_relaxed))
+        float result = ((d + w) * smoothMix + dry[c] * (1 - smoothMix)) *
+                       smoothOut * routeGain;
+        if (preview)
           result += (c == 0 ? carrierL : carrierR) * .25f;
         if (bypass)
           result = dry[c];
         data[c][atSample] = std::isfinite(result) ? result : 0;
         maxOut = std::max(maxOut, std::abs(data[c][atSample]));
       }
+    }
+    if (routeChanging && routeGain <= 0) {
+      order = pendingOrder;
+      routeChanging = false;
     }
     offset += n;
   }

@@ -3,7 +3,7 @@ from pathlib import Path
 import hashlib, platform, shutil, subprocess, zipfile
 root=Path(__file__).resolve().parent.parent
 system=platform.system()
-name=f'MalleVocals-0.1.0-{system}'
+name=f'MalleVocals-0.2.0-{system}'
 stage=root/'packages'/name
 if stage.exists():shutil.rmtree(stage)
 stage.mkdir(parents=True)
@@ -14,7 +14,7 @@ for file in ('README.md','CHANGELOG.md'):
     shutil.copy2(root/file,stage/file)
 shutil.copytree(root/'docs',stage/'docs')
 if (root/'build'/'screenshots').exists():shutil.copytree(root/'build'/'screenshots',stage/'screenshots')
-archive=stage.with_suffix('.zip')
+archive=stage.parent/(stage.name+'.zip')
 if archive.exists():archive.unlink()
 if system=='Darwin':subprocess.run(['ditto','-c','-k','--sequesterRsrc','--keepParent',str(stage),str(archive)],check=True)
 else:

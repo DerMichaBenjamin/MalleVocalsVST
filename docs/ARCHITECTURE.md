@@ -1,8 +1,10 @@
 # Architektur und Automationsvertrag
 
-`Source/dsp` kennt JUCE und die UI nicht. `Parameters` definiert stabile IDs, Defaultwerte, 20 gemeinsame Varianten und 55 globale Ausgangspresets. Der JUCE-Adapter enthält Buses, APVTS, State und Import; der Editor bindet sich an dieselben Parameter.
+`Source/dsp` kennt JUCE und die UI nicht. `Parameters` definiert stabile IDs, Defaultwerte, 15 aktive gemeinsame Rollenvarianten plus fünf kompatible Legacy-IDs, 55 globale Ausgangspresets und 45 experimentelle Referenzstudien. Der JUCE-Adapter enthält Buses, APVTS, State und Import; der Editor bindet sich an dieselben Parameter.
 
-Signalfluss: Input Gain → Low/High-Cut + Korrektur → Pitch/Formant → FET-orientierte Spitzenkompression → weichere Leveling-Stufe → Splitband-De-Esser → 4-Band parametrischer/dynamischer EQ → 4-Band Kompressor → Resonanzbank → Presence/Air → Sättigung → parallele Verdichtung + Doubler + Stadium → Dry/FX Ducking und Shaping → Mix/Output. Parallelkompression erhält den Signalabgriff vor der seriellen Kompression. FET/Leveling sind eigene Hüllkurvenkompressoren, keine emulierten Originalschaltungen.
+Standard-Direktkette: Eingangs-EQ → monophones Tuning → FET → Leveling → De-Esser → Klang-EQ → Multiband → Resonanzen → Air → Sättigung → kreative Pitch/Formant-Stufe. Die elf Direktmodule sind als vollständige Permutation in `route.0` bis `route.10` gespeichert. Ungültige Permutationen werden nicht übernommen. Ein 10-ms-Aus-/Einblenden begrenzt Übergangsartefakte beim Umordnen. Es entstehen keine Routing-Schleifen.
+
+Parallele Verdichtung nimmt wahlweise den latenzkompensierten Input oder Post-Direct ab. Doubler/Stadium und die fünf FX-Wege erhalten den Vocalbus und führen getrennt zurück. Listenpositionen sind keine seriellen Verbindungen. Ducking/Pumpen sind Steuerungen mit eigener Quelle und Ziel. Output bildet den Abschluss. FET/Leveling sind eigene Hüllkurvenkompressoren, keine emulierten Originalschaltungen.
 
 ## Makros
 
@@ -12,9 +14,9 @@ Die Makroformeln stehen in `resolveInto`. Sechs Sektionen teilen dieselbe Varian
 
 ## Timing
 
-Die Pitch-Engine läuft dauerhaft; Tuning-Bypass und globaler Bypass bleiben deshalb latenzstabil. Die Summe aus Signalsmith-Eingangs-/Ausgangslatenz wird an den Host gemeldet. Unbearbeiteter Mix und Sidechain werden passend verzögert. Die Latenz wird nur in `prepareToPlay` gesetzt.
+Zwei getrennte Signalsmith-Instanzen für Tune und kreative Bearbeitung laufen dauerhaft; Tuning-Bypass und globaler Bypass bleiben deshalb latenzstabil. Die Summe beider Signalsmith-Eingangs-/Ausgangslatenzen wird an den Host gemeldet. Unbearbeiteter Mix und Sidechain werden passend verzögert. Die Latenz wird nur in `prepareToPlay` gesetzt.
 
-JUCE stellt Parameteränderungen in diesem Adapter blockweise bereit. Throw startet an einer steigenden `throw.trigger`-Flanke, verzögert um interne Latenz, optionalen Startversatz und nächste quantisierte Beatgrenze. `throw.window` bestimmt das Send-Fenster. Ein gehaltenes Trigger-Signal retriggert nicht. Automation muss zum erneuten Triggern erst auf 0 zurückgehen. Nach Schließen des Sends läuft der Delay-Ring weiter. Auf Samplepositionen innerhalb eines großen Hostblocks kann diese Version noch nicht getrennt reagieren: zeitliche Genauigkeit ist durch die Host-Puffergröße begrenzt.
+JUCE stellt Parameteränderungen in diesem Adapter blockweise bereit. Throw startet an einer steigenden `throw.trigger`-Flanke, verzögert um interne Latenz, optionalen Startversatz und nächste quantisierte Beatgrenze. `throw.window` begrenzt das Send-Fenster. Die fallende Triggerflanke schließt es nach derselben Latenz-/Offset-/Quantisierungsausrichtung wie die steigende Flanke früher. Ein gehaltenes Trigger-Signal retriggert nicht. Automation muss zum erneuten Triggern erst auf 0 zurückgehen. Nach Schließen des Sends läuft der Delay-Ring weiter. `throw.kill` löscht nur die eigene Throw-Fahne; normale Delays laufen unabhängig. Throw-Hall wird vom Delay-Ausgang gespeist. Alle internen parallelen FX sind vollständig wet: `throw.return` ist der Throw-Return zum trockenen Signal, `fx.mix` skaliert sämtliche FX-Returns einschließlich Throw und dessen Hall einmal gemeinsam. Auf Samplepositionen innerhalb eines großen Hostblocks kann diese Version noch nicht getrennt reagieren: zeitliche Genauigkeit ist durch die Host-Puffergröße begrenzt.
 
 Pumpen folgt bei vorhandenem PPQ jedem Block neu und berücksichtigt Sprünge/Loops/Tempoänderungen. Ohne PPQ läuft ein interner Zähler. Externes Ducking benutzt ausschließlich den gemeldeten externen Bus; fehlendes Signal wird angezeigt und nicht heimlich intern ersetzt.
 
@@ -31,3 +33,9 @@ DSP-Puffer werden beim Prepare angelegt; `resolveInto`, Parameterkonfiguration u
 ## Stadium
 
 Sieben eigene synthetische Testtexturen. Import ersetzt die Testtextur. Envelope-Following plus 16-Band-Vocoder übertragen Energie und grobe Artikulation, nicht automatisch die Wörter/Melodie eines echten Chors. Sample-Grundton bewirkt Carrier-Transposition, keine polyphone Melodieanalyse. Samplefades wirken an den Dateikanten; Loop-Crossfade und natürlichere Artikulation bleiben Verfeinerungsbedarf.
+
+## State / gemeinsame Presetdaten
+
+Schema 2 speichert sämtliche Parameter einschließlich Reihenfolge, Makro-Basiswerte und Intensitäten, Sampledaten, Locks und Preset-Baseline. Schema-1-Projekte erhalten die damalige Reihenfolge und den kompatiblen Creative-Bypass. Keine alten IDs werden entfernt; eine bitidentische alte DSP-Ausgabe wird wegen Engine-Weiterentwicklung nicht behauptet.
+
+`profiles()` ist die einzige Variantenquelle für beide Ansichten. `ReferencePresets.inc` wird aus Messdaten mit `scripts/generate_reference_presets.py` reproduziert. Manuelle Detailwerte bleiben Basiswerte, Makrobeiträge werden bei jeder Auflösung neu berechnet. Globaler CUSTOM-Status wird über den Vergleich zur gespeicherten Preset-Baseline ermittelt. Momentane Audiospeicher (Delay-Fahnen) werden nicht im State gespeichert oder durch Undo rekonstruiert.

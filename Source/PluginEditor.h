@@ -1,5 +1,50 @@
 #pragma once
 #include "PluginProcessor.h"
+class GraphiteLook final : public juce::LookAndFeel_V4 {
+public:
+  void drawRotarySlider(juce::Graphics &, int, int, int, int, float, float,
+                        float, juce::Slider &) override;
+  void drawButtonBackground(juce::Graphics &, juce::Button &,
+                            const juce::Colour &, bool, bool) override;
+};
+class ValueControl : public juce::Component {
+public:
+  ValueControl(MalleProcessor &, std::string, juce::String title = {},
+               bool teal = false);
+  void resized() override;
+  juce::Slider slider;
+  juce::Label label;
+
+private:
+  std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> attach;
+};
+class ParamChoice : public juce::Component {
+public:
+  ParamChoice(MalleProcessor &, std::string, juce::String, juce::StringArray,
+              std::vector<float> values = {});
+  void resized() override;
+
+private:
+  juce::Label label;
+  juce::ComboBox box;
+  std::vector<float> values;
+  std::unique_ptr<juce::ParameterAttachment> attach;
+};
+class ParamToggle : public juce::TextButton {
+public:
+  ParamToggle(MalleProcessor &, std::string, juce::String);
+
+private:
+  std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> attach;
+};
+class Card : public juce::Component {
+public:
+  explicit Card(juce::String title = {}, bool teal = false)
+      : title(title), teal(teal) {}
+  void paint(juce::Graphics &) override;
+  juce::String title;
+  bool teal;
+};
 class EqView : public juce::Component {
 public:
   explicit EqView(MalleProcessor &p) : proc(p) {}
@@ -23,9 +68,56 @@ public:
 private:
   MalleProcessor &proc;
 };
+class MacroCard : public Card {
+public:
+  MacroCard(MalleProcessor &, int);
+  void resized() override;
+
+private:
+  MalleProcessor &proc;
+  int slot;
+  std::unique_ptr<ValueControl> amount;
+  std::unique_ptr<ParamToggle> on, resOn, airOn;
+  std::unique_ptr<ParamChoice> variant, mode, rate;
+  std::unique_ptr<ValueControl> res, air;
+};
+class ThrowPanel : public Card {
+public:
+  explicit ThrowPanel(MalleProcessor &);
+  void setAdvanced(bool);
+  void resized() override;
+
+private:
+  MalleProcessor &proc;
+  bool advanced = false;
+  juce::TextButton trigger{"THROW\nSend oeffnen"}, kill{"TAIL KILL"};
+  std::unique_ptr<ParamChoice> type, grid, feel, verbType;
+  std::unique_ptr<ParamToggle> on, verbOn, sync;
+  std::vector<std::unique_ptr<ValueControl>> primary, detail;
+};
+class RoutingView : public juce::Component, public juce::DragAndDropTarget {
+public:
+  RoutingView(MalleProcessor &p, std::function<void(juce::String)> select)
+      : proc(p), select(select) {}
+  void paint(juce::Graphics &) override;
+  void mouseDown(const juce::MouseEvent &) override;
+  void mouseDrag(const juce::MouseEvent &) override;
+  void mouseWheelMove(const juce::MouseEvent &,
+                      const juce::MouseWheelDetails &) override;
+  bool isInterestedInDragSource(const SourceDetails &) override;
+  void itemDragMove(const SourceDetails &) override;
+  void itemDragExit(const SourceDetails &) override;
+  void itemDropped(const SourceDetails &) override;
+
+private:
+  MalleProcessor &proc;
+  std::function<void(juce::String)> select;
+  int from = -1, drop = -1, scroll = 0;
+};
 class MalleEditor final : public juce::AudioProcessorEditor,
                           private juce::Timer,
-                          public juce::FileDragAndDropTarget {
+                          public juce::FileDragAndDropTarget,
+                          public juce::DragAndDropContainer {
 public:
   explicit MalleEditor(MalleProcessor &);
   ~MalleEditor() override;
@@ -37,40 +129,37 @@ public:
   void filesDropped(const juce::StringArray &, int, int) override;
 
 private:
-  struct Control : juce::Component {
-    juce::Label label;
-    juce::Slider slider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment>
-        attachment;
-    Control(MalleProcessor &, const malle::Param &);
-    void resized() override;
-  };
   MalleProcessor &proc;
-  juce::LookAndFeel_V4 look;
+  GraphiteLook look;
   juce::TooltipWindow tips{this, 700};
-  juce::TextButton mode{"Advanced"}, undo{"Undo"}, redo{"Redo"},
-      import{"Crowd laden / Drop"}, preview{"Vorhoeren"},
-      throwButton{"THROW (halten)"}, save{"Preset speichern"},
-      load{"Preset laden"}, favorite{"Favorit"};
-  juce::ToggleButton lockKey{"Tonart Lock"}, lockInput{"Input Lock"},
-      lockRouting{"Routing Lock"};
+  bool advanced = false;
+  bool ready = false;
+  juce::TextButton simple{"Simple"}, advancedButton{"Advanced"}, undo{"Undo"},
+      redo{"Redo"}, save{"Speichern"}, load{"Laden"}, favorite{"*"},
+      import{"Sample laden"}, preview{"Vorhoeren"};
+  juce::ToggleButton lockKey{"Tonart"}, lockInput{"Input"},
+      lockRouting{"Routing"};
+  juce::ComboBox preset, section, deessPresets;
   juce::TextEditor search;
-  juce::ComboBox preset, section;
-  juce::Label status, sample;
+  juce::Label status, sourceInfo;
+  std::array<juce::TextButton, 5> tabs;
+  std::array<std::unique_ptr<MacroCard>, 6> macros;
+  ThrowPanel throws;
+  Card stadium{"STADIUM"}, tuning{"TUNING & TONART"},
+      io{"INPUT / FX-MIX / OUTPUT", true}, detailCard{"KLANG & DYNAMIK"};
+  WaveView wave;
+  EqView eq;
+  RoutingView routing;
   juce::Viewport viewport;
   juce::Component content;
-  EqView eq;
-  WaveView wave;
-  std::vector<std::unique_ptr<Control>> controls;
-  std::array<juce::ComboBox, 6> variants;
-  std::array<
-      std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment>,
-      6>
-      variantAttachments;
+  std::unique_ptr<ParamToggle> stadiumOn, tuneOn;
+  std::unique_ptr<ParamChoice> texture, root, scale, sectionVariant;
+  std::unique_ptr<ValueControl> stadiumAmount, tuneAmount, input, output, fxMix;
+  std::vector<std::unique_ptr<ValueControl>> controls;
   std::unique_ptr<juce::FileChooser> chooser;
-  bool advanced = false;
-  void rebuild();
   void populatePresets();
+  void rebuild();
+  void selectModule(juce::String);
+  void choose(bool);
   void timerCallback() override;
-  void choose(bool saving);
 };

@@ -1,4 +1,4 @@
-# Ehrlicher Funktionsstand — 0.1.0 Alpha
+# Ehrlicher Funktionsstand — 0.2.0 Alpha
 
 Diese Version ist eine erste native Entwicklungsfassung. Der vollständige Auftrag ist noch nicht abgeschlossen.
 
@@ -10,18 +10,22 @@ Diese Version ist eine erste native Entwicklungsfassung. Der vollständige Auftr
 - Unabhängiger Parallel-Kompressor, zeit-/pitchmodulierter Doubler.
 - Sieben eigene synthetische Testcarrier; Import, Vorhören, Wellenform/Drop, eingebetteter Sample-Recall und 16-Band-Cross-Synthesis.
 - Separate Delay-/Raum-/Hall-/Throwwege; internes/externes Ducking; tempoabhängiges Pumpen und echte externe Kompression.
-- Simple/Advanced, Makros, 55 globale Ausgangspresets und 20 gemeinsame Varianten, Userpresets, Locks, Suche, Favoriten, Undo/Redo.
+- Simple/Advanced, Makros, 55 globale Ausgangspresets, 45 experimentelle Referenzstudien und ein gemeinsamer Fünfer-Baukasten pro Rolle (zusätzlich fünf erhaltene Legacy-IDs), Userpresets, Locks, Suche, Favoriten, Undo/Redo.
+
+- Tatsächlich reorderbare Direktkette mit sicherem Fade-Übergang, Undo/Redo und versioniertem Routing-Recall.
+- De-Esser-Startabstimmungen S / SCH-SH / Breitband; Mono/Stereo/Ping-Pong-Throw mit eigener Hallstufe, Tail-Kill und unabhängigem Return.
+- Tatsächliche Messung von 42 Preview-Dateien; genaue Grenzen und Zuordnung in SONG_REFERENCE_ANALYSIS.md. Keine subjektive Höranalyse behauptet.
 
 ## Noch nicht als fertig freigegeben
 
-- Design-Mockups und endgültige Crowd-Aufnahmen stehen aus.
+- Modular-Graphite-Designrichtung ist in der nativen Oberfläche umgesetzt; finales visuelles Feintuning bleibt offen. Die Crowd-ZIP war nicht zugänglich; bisher ausschließlich klar bezeichnete synthetische Testtexturen.
 - Presets sind technische Startpunkte. Keine 55 professionell gehörten/abgenommenen Klangabstimmungen.
 - Tuning-Qualität an realem Sprech-/Gesangsmaterial, Stimmwechseln, tiefen Stimmen, Vibrato und Atemgeräuschen benötigt Hörtests. Spektrale Formantkompensation ist keine perfekte monophone Formantrekonstruktion.
 - Der Doubler besitzt noch keine echte individuelle Formantverschiebung pro Stimme. Der gemeinsame Pitch/Formant-Prozessor ist getrennt davon vorhanden. Dafür wurde kein Dummy-Regler eingebaut.
 - Resonanzbank und Air sind eigene erste Algorithmen; nicht gleichwertig zu soothe/Fresh Air nachgewiesen. Noch kein vollständiges Aliasing-/Rausch-/Phasen-Messprogramm, kein Stereo-Link für die Resonanzbank.
 - Stadium übernimmt grobe Artikulation. Natürliche Wörter/Melodie eines Stadionchors sind nicht nachgewiesen. Sample-Loop-Crossfade und feinere Carrier-Pitchführung fehlen noch.
 - Detailparameter/Filterwechsel sind noch nicht umfassend gegen schnelle Automation geglättet. Throw-Automation ist blockgenau, nicht unabhängig von der Host-Puffergröße samplegenau.
-- GUI ist funktional und vorläufig; noch kein finales plastisches Design, kein auditierter vollständiger Tastatur-/Screenreader-Workflow.
+- Graphite-GUI mit plastischen Reglern ist eine Entwicklungsfassung; kein auditierter vollständiger Tastatur-/Screenreader-Workflow.
 - Undo/Redo über JUCE-State ist implementiert; Routing bezieht sich auf Pluginparameter. Host-eigene Bus-/Spurzuordnungen kann ein Plugin nicht im eigenen Undo-Verlauf zurücknehmen.
 - Signierungs-/Notarisierungsskript vorbereitet; Developer-ID-Signierung und Notarisierung nicht erfolgt. macOS-CI benutzt ad-hoc Signierung.
 
@@ -39,7 +43,7 @@ Diese Version ist eine erste native Entwicklungsfassung. Der vollständige Auftr
 
 ## Reproduzierbare Prüfungen
 
-`malle_tests`: 55 Presets/20 Varianten, Wertebereiche, 44.1/48/96 kHz × Mono/Stereo × 1/64/257/1024 Samples, latenzkorrigierter Bypass, finite/beschränkte Presetausgaben, monophone 220-Hz-Erkennung, kein C++-Heap im konfigurierten DSP-Prozessdurchlauf, maßgeblicher Detail-Bypass trotz Makro.
+`malle_tests`: 100 Presets/20 kompatible Varianten-IDs, Wertebereiche, 44.1/48/96 kHz × Mono/Stereo × 1/64/257/1024 Samples, latenzkorrigierter Bypass, finite/beschränkte Presetausgaben, monophone 220-Hz-Erkennung, kein C++-Heap im konfigurierten DSP-Prozessdurchlauf, maßgeblicher Detail-Bypass trotz Makro.
 
 `malle_integration`: Tonart-/Input-Locks, Preset Undo/Redo, kompletter Parameter-Recall, identischer State beim Ansichtswechsel, PNG-Screenshots, eingebetteter Sample-Recall nach Löschen der Originaldatei, Offline-Ausgabe nach Recall.
 
@@ -50,3 +54,13 @@ Tests sind keine menschlichen Hörtests und ersetzen keine DAW-/Gatekeeper-Prüf
 `malle_analysis` hat Oktav-Pitch-Shift 220→440 Hz, Hard-Tune 224→220 Hz, lokale Resonanzabsenkung, Air-Hochtonanhebung, externe Sidechain-Kompression sowie das latenzausgerichtete Throw-Send-Fenster inklusive weiterlaufender Fahne bestanden. `malle_integration` bestand lokal unter einem virtuellen X-Display. Das bestätigt State-/Audiologik und gerenderte UI; noch keinen Cubase-Test und keinen menschlichen Hörtest.
 
 Gemessene Werte des lokalen Analyselaufs: Hard-Tune 224 Hz → 221,14 Hz (Ziel 220 Hz; Toleranz 2 Hz), Resonanztest 1355,59 Hz → −2,04 dB, Air bei 10 kHz → +2,88 dB. Das sind synthetische Messsignale, keine Aussage über die Wahrnehmungsqualität realer Stimmen.
+
+## Referenzbank 0.2
+
+45 neue Studienpresets sind echte unterschiedliche Engine-Einstellungen, aber noch keine nachgehörten Künstlerrekonstruktionen. Die gemeinsamen Varianten sind funktionale Engineering-Profile. Nicht belegt sind die getrennten Original-Rollen, genaue Originaleffektzeiten, Strophen/Refrainunterschiede und die musikalische Eignung nach menschlicher Hörabnahme. Mix-/Stem-Messwerte ersetzen diese Prüfungen nicht.
+
+## Objektive Referenz-Renderprüfung (0.2.0)
+
+70 Offline-Render aus den tatsächlich erzeugten Vocal-Schätzdateien: alle 45 Studien, fünf verschiedene Stimmen mit zusätzlichen Eingangspegeln −36/−18 dBFS RMS sowie alle 15 Main-Studien auf derselben Referenz. Alle Ausgaben endlich; höchster Peak −13,32 dBFS, keine Ausgabe über 0 dBFS; größter Mono-Fold-RMS-Verlust 2,33 dB. Alle 15 Main-Studien lieferten unterschiedliche, RMS-normalisierte Spektralmerkmalsvektoren auf identischem Eingang. Das belegt numerische Unterschiede, noch keine wahrnehmbare/musikalisch gute Differenz.
+
+Die Vergleichsspektren sind auf RMS angeglichen; dies ist keine gehörte oder wahrnehmungsbasierte LUFS-Abnahme. Die Eingangsaudios sind bereits produzierte, artefaktbehaftete Vocal-Schätzungen und keine trockenen Sängeraufnahmen. Ergebnisse: `assets/references/render_verification.json`; ausführbares Verfahren: `scripts/verify_reference_renders.py`. Keine urheberrechtlich geschützten Audiodateien im Repository oder Pluginpaket.

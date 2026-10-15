@@ -40,6 +40,7 @@ private:
     Biquad hp, lp, correct, dsLow, dsHigh, airLow, airHigh, satTone;
     std::array<Biquad, 4> eq, eqDetect;
     std::array<Envelope, 4> eqEnv;
+    Envelope airEnv, airBroadEnv;
     std::array<Biquad, 3> cross;
     std::array<Biquad, 32> reson;
     std::array<Envelope, 32> resonEnv;
@@ -48,15 +49,16 @@ private:
     std::array<Envelope, 16> vocEnv;
     std::array<Delay, 5> delays;
     std::array<Biquad, 5> delayHP, delayLP;
-    Delay dry, filteredDry, side, doubler;
+    Delay dry, filteredDry, creativeDry, inputTap, side, doubler;
     std::array<Reverb, 2> reverbs;
+    Reverb throwReverb;
   };
   std::array<Channel, 2> channel;
   std::array<Compressor, 7> comp;
   Envelope deessEnv, duckEnv, stadiumEnv;
   Compressor pumpComp;
-  signalsmith::stretch::SignalsmithStretch<float> pitchEngine;
-  std::array<std::vector<float>, 2> pitchIn, pitchOut, rawInput;
+  signalsmith::stretch::SignalsmithStretch<float> pitchEngine, creativeEngine;
+  std::array<std::vector<float>, 2> pitchIn, pitchOut, rawInput, work, tapInput;
   std::array<float, 1024> pitchHistory{};
   int pitchPos = 0, pitchHop = 0, downCounter = 0;
   float pitchLow = 0, pitchMidi = 0, pitchConfidence = 0, correction = 0;
@@ -64,10 +66,16 @@ private:
   std::array<Sample, 7> synthetic;
   double samplePos = 0, phase = 0, freePpq = 0;
   bool lastThrow = false;
-  long long throwStart = -1, throwRemaining = 0, clock = 0;
+  long long throwStart = -1, throwRemaining = 0, throwEnd = -1, throwLag = 0, clock = 0;
   std::array<float, 5> inactivity{};
   float totalInactive = 0, smoothIn = 1, smoothOut = 1, smoothMix = 1,
         tuneMix = 0;
+  std::array<int, 11> order{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+      pendingOrder = order;
+  float routeGain = 1, creativeMix = 0;
+  bool routeChanging = false;
+  bool lastKill = false;
+  long long killedAt = -1000000000;
   void detectPitch();
 };
 } // namespace malle

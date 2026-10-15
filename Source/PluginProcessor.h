@@ -25,6 +25,9 @@ public:
   void getStateInformation(juce::MemoryBlock &) override;
   void setStateInformation(const void *, int) override;
   void applyPreset(int);
+  std::array<int, 11> routing() const;
+  void moveModule(int from, int to);
+  void deesserPreset(int n);
   bool importSample(const juce::File &, juce::String &error);
   void setValue(const std::string &, float);
   float getValue(const std::string &) const;

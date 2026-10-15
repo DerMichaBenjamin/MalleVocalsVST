@@ -4,3 +4,5 @@ build*/
 
 /packages/
 /screenshots/
+
+__pycache__/

@@ -1,0 +1,1274 @@
+{
+  "method": "Objective offline rendering only. Demucs combined-vocal estimates are processed references, not dry isolated singers. No human listening/role approval. RMS normalisation is not a perceptual LUFS match. Last 250 ms is measured, not required silent because reverb may continue.",
+  "renders": [
+    {
+      "preset": "Peter Wackel - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.69448178572491,
+      "output_rms_dbfs": -31.793865472522445,
+      "mono_fold_rms_relative_db": -1.200807626057673,
+      "tail_last_250ms_rms_dbfs": -166.28660491468298,
+      "equal_rms_spectral_energy_fractions": [
+        0.059805263529811706,
+        0.4782721321551216,
+        0.36911545686174246,
+        0.048896711021422304,
+        0.04300604661001145
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Peter Wackel - Harmony/Backing Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -18.10531622977565,
+      "output_rms_dbfs": -32.23714773047053,
+      "mono_fold_rms_relative_db": -1.2362470558840057,
+      "tail_last_250ms_rms_dbfs": -119.45530237959964,
+      "equal_rms_spectral_energy_fractions": [
+        0.05913878106063578,
+        0.5007583178679047,
+        0.34814943198374715,
+        0.046940762372093464,
+        0.04407117939098886
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Peter Wackel - Chor/Crowd Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -19.197617205578815,
+      "output_rms_dbfs": -33.86202141228652,
+      "mono_fold_rms_relative_db": -1.278495438426472,
+      "tail_last_250ms_rms_dbfs": -110.07795161483011,
+      "equal_rms_spectral_energy_fractions": [
+        0.056006588888193196,
+        0.5007028265936341,
+        0.3533704645779831,
+        0.047442092464651996,
+        0.04160838948269864
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Mickie Krause - Main Studie",
+      "source_track_id": 1827029538,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.098429452049107,
+      "output_rms_dbfs": -31.868118768350435,
+      "mono_fold_rms_relative_db": -1.3855744155764484,
+      "tail_last_250ms_rms_dbfs": -166.61273806539708,
+      "equal_rms_spectral_energy_fractions": [
+        0.005755985064310034,
+        0.2863330563302965,
+        0.6314061696046822,
+        0.0561568840422535,
+        0.01999707333718008
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Mickie Krause - Harmony/Backing Studie",
+      "source_track_id": 1827029538,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.342638927294047,
+      "output_rms_dbfs": -32.29651669437652,
+      "mono_fold_rms_relative_db": -1.3546979975131657,
+      "tail_last_250ms_rms_dbfs": -121.54182500409638,
+      "equal_rms_spectral_energy_fractions": [
+        0.005814186501216134,
+        0.33513877653242885,
+        0.5842798756301434,
+        0.055176536998613246,
+        0.019230394046655466
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Mickie Krause - Chor/Crowd Studie",
+      "source_track_id": 1827029538,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -19.214251747163175,
+      "output_rms_dbfs": -33.92104856586472,
+      "mono_fold_rms_relative_db": -1.4451012280636675,
+      "tail_last_250ms_rms_dbfs": -117.41898877124969,
+      "equal_rms_spectral_energy_fractions": [
+        0.00551971966271536,
+        0.29275675648432,
+        0.6299013581516507,
+        0.053522256879882026,
+        0.01797654155811735
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Julian Sommer - Main Studie",
+      "source_track_id": 1883026809,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.542326249497567,
+      "output_rms_dbfs": -31.824129646625497,
+      "mono_fold_rms_relative_db": -1.378541903575391,
+      "tail_last_250ms_rms_dbfs": -170.74672716825575,
+      "equal_rms_spectral_energy_fractions": [
+        0.027772637603050432,
+        0.38928432294312687,
+        0.434714065916734,
+        0.09932625830326366,
+        0.048649754544719245
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Julian Sommer - Harmony/Backing Studie",
+      "source_track_id": 1883026809,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.768135724734144,
+      "output_rms_dbfs": -32.30570877291554,
+      "mono_fold_rms_relative_db": -1.432410977919908,
+      "tail_last_250ms_rms_dbfs": -121.99092453798951,
+      "equal_rms_spectral_energy_fractions": [
+        0.028035420174422135,
+        0.4283376543709546,
+        0.40246073170583346,
+        0.09365794683016537,
+        0.04725312311012635
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Julian Sommer - Chor/Crowd Studie",
+      "source_track_id": 1883026809,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -18.800902466505303,
+      "output_rms_dbfs": -33.99471761781389,
+      "mono_fold_rms_relative_db": -1.4563370143341516,
+      "tail_last_250ms_rms_dbfs": -112.63038345463127,
+      "equal_rms_spectral_energy_fractions": [
+        0.02554937180963102,
+        0.40676576139788834,
+        0.4255132386674669,
+        0.09575130933112354,
+        0.046174344639223625
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Calvin Kleinen - Main Studie",
+      "source_track_id": 1884982689,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -15.418623951276476,
+      "output_rms_dbfs": -32.131609332771546,
+      "mono_fold_rms_relative_db": -1.1000830753405753,
+      "tail_last_250ms_rms_dbfs": -171.81463924657177,
+      "equal_rms_spectral_energy_fractions": [
+        0.0784733686751762,
+        0.481405538819599,
+        0.2975689082060675,
+        0.07927044247134853,
+        0.06300087855675844
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Calvin Kleinen - Harmony/Backing Studie",
+      "source_track_id": 1884982689,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.187534399615092,
+      "output_rms_dbfs": -32.55889486760288,
+      "mono_fold_rms_relative_db": -1.1375569270082135,
+      "tail_last_250ms_rms_dbfs": -123.23622242709617,
+      "equal_rms_spectral_energy_fractions": [
+        0.07398545339994851,
+        0.5159214479993175,
+        0.2747276293962942,
+        0.07472273440362331,
+        0.06036278416058653
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Calvin Kleinen - Chor/Crowd Studie",
+      "source_track_id": 1884982689,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.14101989878475,
+      "output_rms_dbfs": -34.27233107682738,
+      "mono_fold_rms_relative_db": -1.182420239623357,
+      "tail_last_250ms_rms_dbfs": -113.83197972821618,
+      "equal_rms_spectral_energy_fractions": [
+        0.08028444587641435,
+        0.49094781350792943,
+        0.28822067486548253,
+        0.07767513613873996,
+        0.06260271017534279
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Frenzy - Main Studie",
+      "source_track_id": 1830252378,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.73466116463294,
+      "output_rms_dbfs": -31.906719641384868,
+      "mono_fold_rms_relative_db": -0.9956563520332656,
+      "tail_last_250ms_rms_dbfs": -166.12870164669954,
+      "equal_rms_spectral_energy_fractions": [
+        0.038605457887511054,
+        0.6978291891131966,
+        0.20292275873815604,
+        0.023466420368551483,
+        0.03590170197285793
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Frenzy - Harmony/Backing Studie",
+      "source_track_id": 1830252378,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.61239028017932,
+      "output_rms_dbfs": -32.219928674484315,
+      "mono_fold_rms_relative_db": -1.077777668521568,
+      "tail_last_250ms_rms_dbfs": -118.77392761434116,
+      "equal_rms_spectral_energy_fractions": [
+        0.03438959772157445,
+        0.722427223242071,
+        0.1884445330615966,
+        0.02139158448709928,
+        0.03226635435626707
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Frenzy - Chor/Crowd Studie",
+      "source_track_id": 1830252378,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -18.064140664446715,
+      "output_rms_dbfs": -33.97452100161154,
+      "mono_fold_rms_relative_db": -1.1005058854908174,
+      "tail_last_250ms_rms_dbfs": -109.68856373580283,
+      "equal_rms_spectral_energy_fractions": [
+        0.035514756388277925,
+        0.7081040336117015,
+        0.19837346307375436,
+        0.02315488632734642,
+        0.0337079941830518
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Mia Julia - Main Studie",
+      "source_track_id": 1687094815,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -14.667407110194393,
+      "output_rms_dbfs": -32.84766076722585,
+      "mono_fold_rms_relative_db": -1.1793505500808243,
+      "tail_last_250ms_rms_dbfs": -166.4543202355783,
+      "equal_rms_spectral_energy_fractions": [
+        0.022119773986556217,
+        0.3899270008640783,
+        0.427895989221046,
+        0.07713722097338858,
+        0.08265123775596814
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Mia Julia - Harmony/Backing Studie",
+      "source_track_id": 1687094815,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.258695038397104,
+      "output_rms_dbfs": -33.01046839495709,
+      "mono_fold_rms_relative_db": -1.177185992930772,
+      "tail_last_250ms_rms_dbfs": -121.16388642405597,
+      "equal_rms_spectral_energy_fractions": [
+        0.02228274351981573,
+        0.4260232584184365,
+        0.40301687369359424,
+        0.07189470745344229,
+        0.07651489633987615
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Mia Julia - Chor/Crowd Studie",
+      "source_track_id": 1687094815,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.46803051161147,
+      "output_rms_dbfs": -34.930993625368444,
+      "mono_fold_rms_relative_db": -1.2430382425873368,
+      "tail_last_250ms_rms_dbfs": -117.39905854677349,
+      "equal_rms_spectral_energy_fractions": [
+        0.02281625454772375,
+        0.4000552235354284,
+        0.4302888711625362,
+        0.07413483898840509,
+        0.07246159651477758
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Tream - Main Studie",
+      "source_track_id": 1689250851,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.87988820627401,
+      "output_rms_dbfs": -31.035900573785113,
+      "mono_fold_rms_relative_db": -0.7116189741143254,
+      "tail_last_250ms_rms_dbfs": -165.42409144568023,
+      "equal_rms_spectral_energy_fractions": [
+        0.3811338533530038,
+        0.4726966017582777,
+        0.06257423302106875,
+        0.0625280764926607,
+        0.02087278868792505
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Tream - Harmony/Backing Studie",
+      "source_track_id": 1689250851,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.464385453134014,
+      "output_rms_dbfs": -31.67718283858864,
+      "mono_fold_rms_relative_db": -0.7562329145845059,
+      "tail_last_250ms_rms_dbfs": -120.90321156594547,
+      "equal_rms_spectral_energy_fractions": [
+        0.3760738147431582,
+        0.4822672868499981,
+        0.0618847666509027,
+        0.05983924300041513,
+        0.019758409077263426
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Tream - Chor/Crowd Studie",
+      "source_track_id": 1689250851,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -19.51541068090832,
+      "output_rms_dbfs": -34.077426312442405,
+      "mono_fold_rms_relative_db": -0.8035123459978817,
+      "tail_last_250ms_rms_dbfs": -112.4776066730577,
+      "equal_rms_spectral_energy_fractions": [
+        0.35631944669244686,
+        0.47265318765971737,
+        0.06700965875875714,
+        0.0744846831948071,
+        0.029264753157629518
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "2 Engel & Charlie - Main Studie",
+      "source_track_id": 1722555306,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.884168324959347,
+      "output_rms_dbfs": -31.63544732198488,
+      "mono_fold_rms_relative_db": -2.303322352833796,
+      "tail_last_250ms_rms_dbfs": -165.2780059610147,
+      "equal_rms_spectral_energy_fractions": [
+        0.024381816643251605,
+        0.3424773134702498,
+        0.5113092459673935,
+        0.07636364462640818,
+        0.0449296638801627
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "2 Engel & Charlie - Harmony/Backing Studie",
+      "source_track_id": 1722555306,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -18.29588357734966,
+      "output_rms_dbfs": -33.03973726432432,
+      "mono_fold_rms_relative_db": -2.3061457342205154,
+      "tail_last_250ms_rms_dbfs": -134.72427841024376,
+      "equal_rms_spectral_energy_fractions": [
+        0.024795704601110812,
+        0.3863434863436527,
+        0.4778127364139742,
+        0.07260114146201736,
+        0.03785476914093769
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "2 Engel & Charlie - Chor/Crowd Studie",
+      "source_track_id": 1722555306,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -18.918268228336576,
+      "output_rms_dbfs": -33.817395549558626,
+      "mono_fold_rms_relative_db": -2.3246849919028265,
+      "tail_last_250ms_rms_dbfs": -127.98729630434921,
+      "equal_rms_spectral_energy_fractions": [
+        0.024709359934511742,
+        0.3720229923945816,
+        0.4928643818107709,
+        0.07326140029841831,
+        0.03659563530524003
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Tobee - Main Studie",
+      "source_track_id": 1884609038,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -15.948007427295373,
+      "output_rms_dbfs": -31.90972097221248,
+      "mono_fold_rms_relative_db": -1.966374855706165,
+      "tail_last_250ms_rms_dbfs": -163.59170277975733,
+      "equal_rms_spectral_energy_fractions": [
+        0.024742703995811008,
+        0.39872700826493934,
+        0.4766877536876774,
+        0.06731747476542543,
+        0.032194574336002535
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Tobee - Harmony/Backing Studie",
+      "source_track_id": 1884609038,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -15.924835445851183,
+      "output_rms_dbfs": -32.57725014335954,
+      "mono_fold_rms_relative_db": -1.967972966778217,
+      "tail_last_250ms_rms_dbfs": -119.84191622603544,
+      "equal_rms_spectral_energy_fractions": [
+        0.023185474320757345,
+        0.42905970626486506,
+        0.452576591591317,
+        0.0651318122497537,
+        0.02973448045984144
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Tobee - Chor/Crowd Studie",
+      "source_track_id": 1884609038,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -19.796371341159432,
+      "output_rms_dbfs": -34.77235620017173,
+      "mono_fold_rms_relative_db": -1.9914832027782736,
+      "tail_last_250ms_rms_dbfs": -119.57694185229074,
+      "equal_rms_spectral_energy_fractions": [
+        0.0248976235639237,
+        0.4229292244315951,
+        0.4690961398431436,
+        0.059514276058351356,
+        0.02327929884852802
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Kings of Günter - Main Studie",
+      "source_track_id": 1890134077,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.360041255899084,
+      "output_rms_dbfs": -31.863680082652387,
+      "mono_fold_rms_relative_db": -1.710570950132386,
+      "tail_last_250ms_rms_dbfs": -162.97483408283026,
+      "equal_rms_spectral_energy_fractions": [
+        0.01055790960381927,
+        0.43727510281781207,
+        0.4140188034821231,
+        0.06990385545641718,
+        0.0672151067176886
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Kings of Günter - Harmony/Backing Studie",
+      "source_track_id": 1890134077,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.346464052015097,
+      "output_rms_dbfs": -32.52224604915544,
+      "mono_fold_rms_relative_db": -1.695542819033745,
+      "tail_last_250ms_rms_dbfs": -118.9572435096823,
+      "equal_rms_spectral_energy_fractions": [
+        0.010122567073335361,
+        0.4667056692233198,
+        0.39386790743971145,
+        0.06757231321979942,
+        0.060744177935900034
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Kings of Günter - Chor/Crowd Studie",
+      "source_track_id": 1890134077,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -19.56745569026548,
+      "output_rms_dbfs": -34.2317232590073,
+      "mono_fold_rms_relative_db": -1.8226576045076646,
+      "tail_last_250ms_rms_dbfs": -108.83922999527445,
+      "equal_rms_spectral_energy_fractions": [
+        0.010893248884431815,
+        0.4715596925822042,
+        0.3922395567117845,
+        0.0663536303905365,
+        0.05803502499863752
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Malle Anja - Main Studie",
+      "source_track_id": 1887328977,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -15.714028582132292,
+      "output_rms_dbfs": -33.15184756312735,
+      "mono_fold_rms_relative_db": -0.11902938046512063,
+      "tail_last_250ms_rms_dbfs": -220.49076074419457,
+      "equal_rms_spectral_energy_fractions": [
+        0.06143648401517678,
+        0.5247714373243269,
+        0.23039892663967945,
+        0.10178852743564586,
+        0.079426085504617
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Malle Anja - Harmony/Backing Studie",
+      "source_track_id": 1887328977,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -15.74095597020121,
+      "output_rms_dbfs": -33.31730881665907,
+      "mono_fold_rms_relative_db": -0.12977387572548674,
+      "tail_last_250ms_rms_dbfs": -175.76910962896056,
+      "equal_rms_spectral_energy_fractions": [
+        0.058779981339266554,
+        0.5541042692996538,
+        0.22103676244863824,
+        0.09292231064765599,
+        0.07112690240123384
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Malle Anja - Chor/Crowd Studie",
+      "source_track_id": 1887328977,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.611952344573186,
+      "output_rms_dbfs": -35.16428189984716,
+      "mono_fold_rms_relative_db": -0.19786716468477455,
+      "tail_last_250ms_rms_dbfs": -170.19118891898285,
+      "equal_rms_spectral_energy_fractions": [
+        0.06041599769859233,
+        0.5405454311388721,
+        0.23022669192009887,
+        0.09696533144343111,
+        0.06987580639403483
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Lorenz Büffel - Main Studie",
+      "source_track_id": 1882766670,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.99771048312783,
+      "output_rms_dbfs": -32.933494102346174,
+      "mono_fold_rms_relative_db": -1.5558559565387653,
+      "tail_last_250ms_rms_dbfs": -167.6336472797163,
+      "equal_rms_spectral_energy_fractions": [
+        0.03172508084741025,
+        0.5548381874186863,
+        0.41112827395867013,
+        0.0020176280406450867,
+        0.00022843856072229298
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Lorenz Büffel - Harmony/Backing Studie",
+      "source_track_id": 1882766670,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.782845095943152,
+      "output_rms_dbfs": -33.947765812342624,
+      "mono_fold_rms_relative_db": -1.5800070207324994,
+      "tail_last_250ms_rms_dbfs": -134.05767401139752,
+      "equal_rms_spectral_energy_fractions": [
+        0.02952940640444327,
+        0.5616906172218709,
+        0.40650685918903146,
+        0.0019809406662930347,
+        0.00022429552559655275
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Lorenz Büffel - Chor/Crowd Studie",
+      "source_track_id": 1882766670,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -18.699537216768004,
+      "output_rms_dbfs": -34.786873523431986,
+      "mono_fold_rms_relative_db": -1.6078041255342135,
+      "tail_last_250ms_rms_dbfs": -127.13570976876528,
+      "equal_rms_spectral_energy_fractions": [
+        0.0292064375409536,
+        0.557219246872519,
+        0.41131397381591217,
+        0.001982350744504547,
+        0.000215383547365679
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Ikke Hüftgold - Main Studie",
+      "source_track_id": 1889201536,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -15.787551500332604,
+      "output_rms_dbfs": -30.716779321382255,
+      "mono_fold_rms_relative_db": -0.4025362010590655,
+      "tail_last_250ms_rms_dbfs": -165.05728867615227,
+      "equal_rms_spectral_energy_fractions": [
+        0.05416126610318576,
+        0.6326769499587358,
+        0.23002824558654736,
+        0.04815950849032873,
+        0.03443660649770841
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Ikke Hüftgold - Harmony/Backing Studie",
+      "source_track_id": 1889201536,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.513863332656737,
+      "output_rms_dbfs": -31.32407811138382,
+      "mono_fold_rms_relative_db": -0.43831835681861747,
+      "tail_last_250ms_rms_dbfs": -118.9005591289949,
+      "equal_rms_spectral_energy_fractions": [
+        0.04843596493863629,
+        0.6382169194282309,
+        0.22965150063679357,
+        0.04786398700702889,
+        0.03526609039611693
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Ikke Hüftgold - Chor/Crowd Studie",
+      "source_track_id": 1889201536,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.843719044543512,
+      "output_rms_dbfs": -33.41682537228329,
+      "mono_fold_rms_relative_db": -0.45876226171496864,
+      "tail_last_250ms_rms_dbfs": -117.68777462484864,
+      "equal_rms_spectral_energy_fractions": [
+        0.05574261319552263,
+        0.6228968323022618,
+        0.23191664487758717,
+        0.0513768289687003,
+        0.037508581762496634
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Rumbombe - Main Studie",
+      "source_track_id": 1882994210,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.22326480817357,
+      "output_rms_dbfs": -32.35899890895216,
+      "mono_fold_rms_relative_db": -1.9490562235830673,
+      "tail_last_250ms_rms_dbfs": -166.13116633592426,
+      "equal_rms_spectral_energy_fractions": [
+        0.0719478934897355,
+        0.46793787645969587,
+        0.304283105625215,
+        0.1074560795462077,
+        0.04813889381603262
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Rumbombe - Harmony/Backing Studie",
+      "source_track_id": 1882994210,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.403238513911898,
+      "output_rms_dbfs": -32.57121817029011,
+      "mono_fold_rms_relative_db": -1.95996132637771,
+      "tail_last_250ms_rms_dbfs": -121.02549202929752,
+      "equal_rms_spectral_energy_fractions": [
+        0.06677542906367633,
+        0.5129877550395263,
+        0.27932410037306554,
+        0.09799788624356941,
+        0.04268984385910258
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Rumbombe - Chor/Crowd Studie",
+      "source_track_id": 1882994210,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -19.195235519653338,
+      "output_rms_dbfs": -34.38515507732677,
+      "mono_fold_rms_relative_db": -2.009036081089916,
+      "tail_last_250ms_rms_dbfs": -117.17635886079341,
+      "equal_rms_spectral_energy_fractions": [
+        0.07005885946628908,
+        0.4835999955519433,
+        0.2994718825938281,
+        0.10325672269345161,
+        0.04339499138899723
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Carolina - Main Studie",
+      "source_track_id": 1677670955,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.62518025350961,
+      "output_rms_dbfs": -31.454317252949323,
+      "mono_fold_rms_relative_db": -1.898651198976466,
+      "tail_last_250ms_rms_dbfs": -162.85087318888617,
+      "equal_rms_spectral_energy_fractions": [
+        0.02292303559244146,
+        0.35175038471138764,
+        0.480762986671643,
+        0.08848021231652972,
+        0.055228418853992774
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Carolina - Harmony/Backing Studie",
+      "source_track_id": 1677670955,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.2335410953753,
+      "output_rms_dbfs": -32.1604983260849,
+      "mono_fold_rms_relative_db": -1.9039994732070342,
+      "tail_last_250ms_rms_dbfs": -118.53067302485114,
+      "equal_rms_spectral_energy_fractions": [
+        0.023269950183693957,
+        0.3901826763005431,
+        0.45443453354709656,
+        0.08364338514430988,
+        0.04770229196983288
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Carolina - Chor/Crowd Studie",
+      "source_track_id": 1677670955,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -20.01491197985966,
+      "output_rms_dbfs": -33.942336282799516,
+      "mono_fold_rms_relative_db": -1.9467160252735318,
+      "tail_last_250ms_rms_dbfs": -110.03468289884475,
+      "equal_rms_spectral_energy_fractions": [
+        0.021761902576117573,
+        0.38495924463553527,
+        0.45653064092174056,
+        0.0856796077507159,
+        0.05027730198874131
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Peter Wackel - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -36,
+      "finite": true,
+      "peak_dbfs": -24.09896537499428,
+      "output_rms_dbfs": -37.7818143070728,
+      "mono_fold_rms_relative_db": -1.1080640439845437,
+      "tail_last_250ms_rms_dbfs": -171.04393742714993,
+      "equal_rms_spectral_energy_fractions": [
+        0.04824550063890748,
+        0.4887841225756486,
+        0.37854037139028035,
+        0.04718097773955329,
+        0.03645972437208022
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Peter Wackel - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -18,
+      "finite": true,
+      "peak_dbfs": -14.863699434899381,
+      "output_rms_dbfs": -30.981393990628284,
+      "mono_fold_rms_relative_db": -1.2291063560084827,
+      "tail_last_250ms_rms_dbfs": -165.4892677212918,
+      "equal_rms_spectral_energy_fractions": [
+        0.060001989785399674,
+        0.47961024532553675,
+        0.3678054881277997,
+        0.047742607706732554,
+        0.043920818188719214
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Mia Julia - Main Studie",
+      "source_track_id": 1687094815,
+      "calibrated_input_rms_dbfs": -36,
+      "finite": true,
+      "peak_dbfs": -23.762569481065896,
+      "output_rms_dbfs": -37.94785664758712,
+      "mono_fold_rms_relative_db": -1.1857269374127475,
+      "tail_last_250ms_rms_dbfs": -170.2746048960717,
+      "equal_rms_spectral_energy_fractions": [
+        0.016122284190034017,
+        0.39002171477959197,
+        0.4456547353937595,
+        0.06936423294460974,
+        0.07857387437170535
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Mia Julia - Main Studie",
+      "source_track_id": 1687094815,
+      "calibrated_input_rms_dbfs": -18,
+      "finite": true,
+      "peak_dbfs": -13.31726972983953,
+      "output_rms_dbfs": -32.01542870286578,
+      "mono_fold_rms_relative_db": -1.1825908899109796,
+      "tail_last_250ms_rms_dbfs": -165.7056685062146,
+      "equal_rms_spectral_energy_fractions": [
+        0.02214397443953004,
+        0.3891934551052978,
+        0.43044507059777215,
+        0.07709049757945355,
+        0.08086131230345844
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Tream - Main Studie",
+      "source_track_id": 1689250851,
+      "calibrated_input_rms_dbfs": -36,
+      "finite": true,
+      "peak_dbfs": -25.277162761047137,
+      "output_rms_dbfs": -37.938619466517856,
+      "mono_fold_rms_relative_db": -0.7849991576549047,
+      "tail_last_250ms_rms_dbfs": -173.38605823575023,
+      "equal_rms_spectral_energy_fractions": [
+        0.3757832116552039,
+        0.5073403518383257,
+        0.05816264718523281,
+        0.04641178297050862,
+        0.01219933113579843
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Tream - Main Studie",
+      "source_track_id": 1689250851,
+      "calibrated_input_rms_dbfs": -18,
+      "finite": true,
+      "peak_dbfs": -15.860895959058466,
+      "output_rms_dbfs": -30.08370080016599,
+      "mono_fold_rms_relative_db": -0.7051757202643263,
+      "tail_last_250ms_rms_dbfs": -164.6030026150957,
+      "equal_rms_spectral_energy_fractions": [
+        0.38426769057426746,
+        0.46624399489872576,
+        0.06297699767461444,
+        0.06282239257889738,
+        0.02343989589375869
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "2 Engel & Charlie - Main Studie",
+      "source_track_id": 1722555306,
+      "calibrated_input_rms_dbfs": -36,
+      "finite": true,
+      "peak_dbfs": -22.131456281725658,
+      "output_rms_dbfs": -37.924553875523685,
+      "mono_fold_rms_relative_db": -2.2367759371987197,
+      "tail_last_250ms_rms_dbfs": -173.46913745463328,
+      "equal_rms_spectral_energy_fractions": [
+        0.0164480861545309,
+        0.3496754795209612,
+        0.5348421721358555,
+        0.06962924424338578,
+        0.029151204356318978
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "2 Engel & Charlie - Main Studie",
+      "source_track_id": 1722555306,
+      "calibrated_input_rms_dbfs": -18,
+      "finite": true,
+      "peak_dbfs": -14.490902488130388,
+      "output_rms_dbfs": -30.596398769330722,
+      "mono_fold_rms_relative_db": -2.334638264659551,
+      "tail_last_250ms_rms_dbfs": -164.38305925091456,
+      "equal_rms_spectral_energy_fractions": [
+        0.025995586960061854,
+        0.3425107600986691,
+        0.5088837646506247,
+        0.0767372127057722,
+        0.045246877546779043
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Carolina - Main Studie",
+      "source_track_id": 1677670955,
+      "calibrated_input_rms_dbfs": -36,
+      "finite": true,
+      "peak_dbfs": -23.498497554365002,
+      "output_rms_dbfs": -37.85768909482497,
+      "mono_fold_rms_relative_db": -1.8927578632479072,
+      "tail_last_250ms_rms_dbfs": -167.78995838561082,
+      "equal_rms_spectral_energy_fractions": [
+        0.017980603088991205,
+        0.37908483431388384,
+        0.4992751318888813,
+        0.07040272939250344,
+        0.03272695395883653
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Carolina - Main Studie",
+      "source_track_id": 1677670955,
+      "calibrated_input_rms_dbfs": -18,
+      "finite": true,
+      "peak_dbfs": -16.321542454755736,
+      "output_rms_dbfs": -30.563972422534107,
+      "mono_fold_rms_relative_db": -1.8956666123838928,
+      "tail_last_250ms_rms_dbfs": -162.05234554405348,
+      "equal_rms_spectral_energy_fractions": [
+        0.02349654547406527,
+        0.347528754426257,
+        0.4816478631009254,
+        0.0901329759455698,
+        0.05630937398354879
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Peter Wackel - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.69448178572491,
+      "output_rms_dbfs": -31.793865472522445,
+      "mono_fold_rms_relative_db": -1.200807626057673,
+      "tail_last_250ms_rms_dbfs": -166.28660491468298,
+      "equal_rms_spectral_energy_fractions": [
+        0.059805263529811706,
+        0.4782721321551216,
+        0.36911545686174246,
+        0.048896711021422304,
+        0.04300604661001145
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Mickie Krause - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.51033400781654,
+      "output_rms_dbfs": -31.470429437803624,
+      "mono_fold_rms_relative_db": -1.1984880756970515,
+      "tail_last_250ms_rms_dbfs": -166.0299433243333,
+      "equal_rms_spectral_energy_fractions": [
+        0.05654770290004471,
+        0.45666828349642924,
+        0.3920426807885185,
+        0.0507178484452173,
+        0.04314280612177609
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Julian Sommer - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.400678052957073,
+      "output_rms_dbfs": -31.620493253689908,
+      "mono_fold_rms_relative_db": -1.1997848730429952,
+      "tail_last_250ms_rms_dbfs": -166.18753872107163,
+      "equal_rms_spectral_energy_fractions": [
+        0.05664378759875169,
+        0.45563467074539166,
+        0.39007010726389274,
+        0.051636771109893564,
+        0.045102205872491065
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Calvin Kleinen - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.511406877602603,
+      "output_rms_dbfs": -31.79234189944576,
+      "mono_fold_rms_relative_db": -1.1991205091200765,
+      "tail_last_250ms_rms_dbfs": -166.303331514508,
+      "equal_rms_spectral_energy_fractions": [
+        0.05958574325077387,
+        0.4760988465264095,
+        0.36780528992435413,
+        0.05065996278013774,
+        0.04492391227413058
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Frenzy - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.553869121207047,
+      "output_rms_dbfs": -31.531878360218926,
+      "mono_fold_rms_relative_db": -1.197878582573873,
+      "tail_last_250ms_rms_dbfs": -166.03730077228167,
+      "equal_rms_spectral_energy_fractions": [
+        0.05824370103882961,
+        0.46882119516352755,
+        0.3804526775421137,
+        0.04873985750251543,
+        0.042855122822841665
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Mia Julia - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.422067824706367,
+      "output_rms_dbfs": -32.1009638017964,
+      "mono_fold_rms_relative_db": -1.2014951413847301,
+      "tail_last_250ms_rms_dbfs": -166.6039486816706,
+      "equal_rms_spectral_energy_fractions": [
+        0.06209233409319471,
+        0.4919467053578254,
+        0.34694927593615943,
+        0.05051916301336072,
+        0.047515227916873994
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Tream - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.487640456701612,
+      "output_rms_dbfs": -31.14883366875555,
+      "mono_fold_rms_relative_db": -1.179028967709041,
+      "tail_last_250ms_rms_dbfs": -164.23202663321848,
+      "equal_rms_spectral_energy_fractions": [
+        0.06616582937631786,
+        0.5212504994291424,
+        0.3388739983189228,
+        0.04115240153546698,
+        0.03182678835412311
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "2 Engel & Charlie - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.184071201868356,
+      "output_rms_dbfs": -30.87582011800951,
+      "mono_fold_rms_relative_db": -1.1790721124476498,
+      "tail_last_250ms_rms_dbfs": -162.24037767664834,
+      "equal_rms_spectral_energy_fractions": [
+        0.0495131027503121,
+        0.418950907738137,
+        0.4220665120961872,
+        0.054618895533795925,
+        0.053817398646120895
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Tobee - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.556021418534325,
+      "output_rms_dbfs": -31.573010826342788,
+      "mono_fold_rms_relative_db": -1.1902467300593438,
+      "tail_last_250ms_rms_dbfs": -162.879750708079,
+      "equal_rms_spectral_energy_fractions": [
+        0.054594411149362164,
+        0.4514422775409023,
+        0.38415554525302087,
+        0.054094693585971174,
+        0.054645950763693864
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Kings of Günter - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.341938113253548,
+      "output_rms_dbfs": -31.670085110199892,
+      "mono_fold_rms_relative_db": -1.1877688501322226,
+      "tail_last_250ms_rms_dbfs": -162.98515218586272,
+      "equal_rms_spectral_energy_fractions": [
+        0.05523763271505478,
+        0.45571212633662717,
+        0.374751486610406,
+        0.05479934521959447,
+        0.05837043664948061
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Malle Anja - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.70327837026755,
+      "output_rms_dbfs": -31.514231062249053,
+      "mono_fold_rms_relative_db": -1.1879200992599377,
+      "tail_last_250ms_rms_dbfs": -165.95538998315413,
+      "equal_rms_spectral_energy_fractions": [
+        0.06153069855621266,
+        0.492199813331837,
+        0.355452121729065,
+        0.04759736016430169,
+        0.04230840062968123
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Lorenz Büffel - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.411999500722565,
+      "output_rms_dbfs": -31.054165702208362,
+      "mono_fold_rms_relative_db": -1.1821823449648383,
+      "tail_last_250ms_rms_dbfs": -165.48403083276156,
+      "equal_rms_spectral_energy_fractions": [
+        0.0587291441922367,
+        0.4766766812987079,
+        0.37679529257244476,
+        0.046983096712978456,
+        0.03996089066522187
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Ikke Hüftgold - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.312194245198473,
+      "output_rms_dbfs": -30.998357268795655,
+      "mono_fold_rms_relative_db": -1.1763670593567035,
+      "tail_last_250ms_rms_dbfs": -164.0482835195884,
+      "equal_rms_spectral_energy_fractions": [
+        0.06574430651708653,
+        0.5210775067901142,
+        0.3416741013786879,
+        0.040538777609968726,
+        0.03025130152770076
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Rumbombe - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -17.041489724077547,
+      "output_rms_dbfs": -31.627306866641746,
+      "mono_fold_rms_relative_db": -1.1922688920415483,
+      "tail_last_250ms_rms_dbfs": -166.1593976757121,
+      "equal_rms_spectral_energy_fractions": [
+        0.059477900216370755,
+        0.4754357083237865,
+        0.3640026983180545,
+        0.05121636442912167,
+        0.04888798645547746
+      ],
+      "latency_samples": 10584
+    },
+    {
+      "preset": "Carolina - Main Studie",
+      "source_track_id": 1677745293,
+      "calibrated_input_rms_dbfs": -24,
+      "finite": true,
+      "peak_dbfs": -16.178950269412898,
+      "output_rms_dbfs": -31.332849950605684,
+      "mono_fold_rms_relative_db": -1.1873517523401966,
+      "tail_last_250ms_rms_dbfs": -162.6805411081354,
+      "equal_rms_spectral_energy_fractions": [
+        0.0526858956922569,
+        0.43840838006255684,
+        0.39554726915559263,
+        0.05463098288948289,
+        0.057647001101930696
+      ],
+      "latency_samples": 10584
+    }
+  ],
+  "summary": {
+    "count": 70,
+    "finite": true,
+    "max_peak_dbfs": -13.31726972983953,
+    "peak_above_0dbfs_count": 0,
+    "max_mono_fold_loss_db": -2.334638264659551,
+    "same_source_main_studies_distinct_spectral_vectors": 15,
+    "minimum_pairwise_equal_rms_band_vector_distance": 0.0031068151128197563
+  }
+}

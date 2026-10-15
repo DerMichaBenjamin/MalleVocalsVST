@@ -57,11 +57,47 @@ float frequency(const std::vector<float> &v) {
       ++count;
   return count * 48000.f / (v.size() - start);
 }
+void checkThrowStereo() {
+  auto p = neutral();
+  p[index("throw.on")] = 1; p[index("throw.send")] = 1;
+  p[index("throw.return")] = 1; p[index("throw.sync")] = 0;
+  p[index("throw.time")] = 100; p[index("throw.feedback")] = .7f;
+  p[index("throw.type")] = 2; p[index("throw.window")] = 1000;
+  p[index("throw.low")] = 20; p[index("throw.high")] = 18000;
+  Engine e; e.prepare(48000,256,2);
+  std::array<float,256> l{}, r{}; float* channels[]{l.data(),r.data()};
+  std::vector<float> a,b;
+  for (int t=0;t<48000;t+=256) {
+    p[index("throw.trigger")] = t==0 ? 1.f : 0.f;
+    e.setParameters(p);
+    for(int i=0;i<256;++i) l[i]=r[i]=(t+i==0 || t+i==2400) ? .5f : 0.f;
+    e.process(channels,2,256,nullptr,0,{120,t/24000.,true,true});
+    a.insert(a.end(),l.begin(),l.end()); b.insert(b.end(),r.begin(),r.end());
+  }
+  auto energy = [](const std::vector<float>& v,int at) {
+    double sum=0; for(int i=at;i<at+500;++i)sum+=v[size_t(i)]*v[size_t(i)]; return sum;
+  };
+  int first=e.latency()+4800, second=first+4800;
+  require(energy(a,first)>energy(b,first)*100, "ping pong first echo left");
+  require(energy(b,second)>energy(a,second)*100, "ping pong second echo right");
+  require(energy(a,first+2400)+energy(b,first+2400)<1e-6,
+          "release closes aligned send before second syllable");
+  p[index("throw.kill")]=1; e.setParameters(p);
+  double tail=0;
+  for(int t=0;t<12000;t+=256) {
+    l.fill(0);r.fill(0);e.process(channels,2,256,nullptr,0,{});
+    for(int i=0;i<256;++i)tail+=l[i]*l[i]+r[i]*r[i];
+  }
+  require(tail<1e-6,"throw tail kill");
+  std::cout << "Ping pong/release/tail kill: PASS\n";
+}
 int main() {
   try {
+    checkThrowStereo();
     auto p = neutral();
     p[index("tune.on")] = 1;
     p[index("pitch")] = 12;
+    p[index("creative.on")] = 1;
     p[index("tune.amount")] = 0;
     auto shifted = render(p, 220);
     float f = frequency(shifted);
@@ -120,6 +156,20 @@ int main() {
       late += std::abs(thrown[size_t(i)]);
     require(early < 1e-6f && late > .1f,
             "latency-aligned throw and continuing tail");
+    auto routeBefore = neutral();
+    routeBefore[index("fet.on")] = 1;
+    routeBefore[index("fet.threshold")] = -26;
+    routeBefore[index("fet.ratio")] = 8;
+    routeBefore[index("eq.on")] = 1;
+    routeBefore[index("eq0.freq")] = 220;
+    routeBefore[index("eq0.gain")] = 12;
+    routeBefore[index("eq0.q")] = 2;
+    float a = rms(render(routeBefore, 220));
+    routeBefore[index("route.2")] = 5;
+    routeBefore[index("route.5")] = 2;
+    float b = rms(render(routeBefore, 220));
+    require(std::abs(db(a / b)) > 1, "module order changes audio");
+    std::cout << "Routing EQ/FET order difference: " << db(a / b) << " dB\n";
     std::cout << "Throw delay: correct latency/window, tail energy " << late
               << "\nPASS: measured DSP behaviour\n";
     return 0;

@@ -25,7 +25,7 @@ void check(bool b, const char *msg) {
 }
 int main() {
   try {
-    check(presets().size() == 55, "55 global presets");
+    check(presets().size() == 100, "55 factory + 45 experimental presets");
     check(variants().size() == 20, "20 shared variants");
     for (auto &pr : presets()) {
       auto v = resolve(pr.values);
@@ -51,7 +51,8 @@ int main() {
           for (int pos = 0; pos < total; pos += block) {
             for (int c = 0; c < nc; ++c)
               for (int i = 0; i < block; ++i)
-                a[c][i] = .1f * std::sin(2 * malle::pi * 220 * (pos + i) / rate);
+                a[c][i] =
+                    .1f * std::sin(2 * malle::pi * 220 * (pos + i) / rate);
             e.process(ptr, nc, block, nullptr, 0, {});
             for (int c = 0; c < nc; ++c)
               for (int i = 0; i < block; ++i) {
@@ -74,7 +75,8 @@ int main() {
       for (int n = 0; n < 80; ++n) {
         for (int c = 0; c < 2; ++c)
           for (int i = 0; i < 256; ++i)
-            a[c][i] = .15f * std::sin(2 * malle::pi * 220 * (n * 256 + i) / 48000);
+            a[c][i] =
+                .15f * std::sin(2 * malle::pi * 220 * (n * 256 + i) / 48000);
         e.process(ptr, 2, 256, nullptr, 0,
                   {128, n * 256 * 128. / (48000 * 60), true, true});
         for (auto &v : a)
@@ -100,7 +102,7 @@ int main() {
     base[index("sat.on")] = 0;
     resolved = resolve(base);
     check(resolved[index("sat.on")] == 0, "detail bypass overrides macro");
-    std::cout << "PASS: 55 presets, 20 variants, 24 rate/channel/buffer "
+    std::cout << "PASS: 100 presets, 20 variants, 24 rate/channel/buffer "
                  "configurations, exact latency/bypass, finite outputs, pitch "
                  "detection\n";
     return 0;

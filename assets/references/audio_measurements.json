@@ -1,0 +1,2281 @@
+[
+  {
+    "requested_act": "Peter Wackel",
+    "track_id": 1677745293,
+    "credited_artists": "Peter Wackel",
+    "title": "Inselfieber",
+    "edition": "Inselfieber - Single",
+    "catalog_release_date": "2023-03-31T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/inselfieber/1677745286?i=1677745293&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/peter-wackel/74332714?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "295cb5f158cf3e3968184dbbba3b35fa74e07eda8c2399fdaec86c9739b3bdaf",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -6.857921830655048,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 6.857921830663736,
+        "spectral_centroid_hz": 1283.0189299551241,
+        "band_energy_fraction": {
+          "80-250": 0.20105893176157402,
+          "250-1000": 0.21860926492556254,
+          "1000-4000": 0.18585141084873277,
+          "4000-8000": 0.0378076555099662,
+          "8000-16000": 0.04736467217347304
+        },
+        "side_mid_db": -6.844506493277711,
+        "stereo_correlation": 0.6572979289606633
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -11.773698255350002,
+        "peak_dbfs": 1.221442773546356,
+        "crest_db": 12.995141028896358,
+        "spectral_centroid_hz": 1693.446102505436,
+        "band_energy_fraction": {
+          "80-250": 0.048145644553840065,
+          "250-1000": 0.5051765691139752,
+          "1000-4000": 0.36052783692631635,
+          "4000-8000": 0.047010743314285425,
+          "8000-16000": 0.03773736054815493
+        },
+        "side_mid_db": -5.400131351697399,
+        "stereo_correlation": 0.552276734988774
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Peter Wackel",
+    "track_id": 1018286172,
+    "credited_artists": "Peter Wackel",
+    "title": "Die Nacht von Freitag auf Montag",
+    "edition": "Die Nacht von Freitag auf Montag - Single",
+    "catalog_release_date": "2015-01-01T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/die-nacht-von-freitag-auf-montag/1018285407?i=1018286172&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/peter-wackel/74332714?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "64b93b34d8664e701be750c412d49b02c9a08799998f37b041a07a737e70c1e1",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -7.110486874235628,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 7.110486874244314,
+        "spectral_centroid_hz": 914.5575347722573,
+        "band_energy_fraction": {
+          "80-250": 0.30316124013658974,
+          "250-1000": 0.1980658451125114,
+          "1000-4000": 0.1084487100534649,
+          "4000-8000": 0.02804117848207225,
+          "8000-16000": 0.032384959618573676
+        },
+        "side_mid_db": -10.352269230961948,
+        "stereo_correlation": 0.8311646075419346
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -13.01843260770806,
+        "peak_dbfs": 0.9052926418592834,
+        "crest_db": 13.923725249567344,
+        "spectral_centroid_hz": 1650.4393299147189,
+        "band_energy_fraction": {
+          "80-250": 0.048734650899721246,
+          "250-1000": 0.5824928229507007,
+          "1000-4000": 0.2810754768310754,
+          "4000-8000": 0.036719850306875364,
+          "8000-16000": 0.04999762059877581
+        },
+        "side_mid_db": -8.16207678852024,
+        "stereo_correlation": 0.7350966932216946
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Mickie Krause",
+    "track_id": 1827029538,
+    "credited_artists": "Mickie Krause, Lorenz Büffel, Kings of Günter & Immer Hansi",
+    "title": "Baila Baila",
+    "edition": "Baila Baila - Single",
+    "catalog_release_date": "2025-07-18T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/baila-baila/1827029536?i=1827029538&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/mickie-krause/16339718?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "fd1528582bcbd2cf540d69cd1d58e8603e4147f53bb44d97f1695da86c8f9e29",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -5.795435233478474,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 5.795435233487161,
+        "spectral_centroid_hz": 1274.8263060075067,
+        "band_energy_fraction": {
+          "80-250": 0.3306934934221719,
+          "250-1000": 0.13748078462269084,
+          "1000-4000": 0.16527446383799269,
+          "4000-8000": 0.04658125232249558,
+          "8000-16000": 0.04881358095319522
+        },
+        "side_mid_db": -7.426537350273172,
+        "stereo_correlation": 0.693678966693285
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.085296849464886,
+        "peak_dbfs": 2.1668191334857907,
+        "crest_db": 14.252115982950677,
+        "spectral_centroid_hz": 1897.7120532380256,
+        "band_energy_fraction": {
+          "80-250": 0.006162830896447782,
+          "250-1000": 0.3380287478847874,
+          "1000-4000": 0.5703144573837484,
+          "4000-8000": 0.06432193828126431,
+          "8000-16000": 0.019532829117588704
+        },
+        "side_mid_db": -4.502148431378355,
+        "stereo_correlation": 0.47643885306110273
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Mickie Krause",
+    "track_id": 1742172007,
+    "credited_artists": "Mickie Krause & Julian Sommer",
+    "title": "Handwerker",
+    "edition": "Handwerker - Single",
+    "catalog_release_date": "2024-05-03T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/handwerker/1742172001?i=1742172007&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/mickie-krause/16339718?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "6f3cee01b9f0d6277b9b9b48fcec38af7e53d0de4426b2710ca666d730ccff3e",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -6.955036117605379,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 6.955036117614068,
+        "spectral_centroid_hz": 834.7030569044291,
+        "band_energy_fraction": {
+          "80-250": 0.3037769816440462,
+          "250-1000": 0.19228223696656513,
+          "1000-4000": 0.1257255720931743,
+          "4000-8000": 0.02742103221392326,
+          "8000-16000": 0.025066435543133956
+        },
+        "side_mid_db": -11.187092190329487,
+        "stereo_correlation": 0.8585852567506924
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -13.240220675304927,
+        "peak_dbfs": 0.144503401642757,
+        "crest_db": 13.384724076947684,
+        "spectral_centroid_hz": 1527.1290396658683,
+        "band_energy_fraction": {
+          "80-250": 0.1508745268522165,
+          "250-1000": 0.44579348951936776,
+          "1000-4000": 0.3205094698414632,
+          "4000-8000": 0.052429047401656735,
+          "8000-16000": 0.028926222034384896
+        },
+        "side_mid_db": -23.735624868849253,
+        "stereo_correlation": 0.991577365940348
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Julian Sommer",
+    "track_id": 1883026809,
+    "credited_artists": "Julian Sommer",
+    "title": "Dachdecker",
+    "edition": "Dachdecker - Single",
+    "catalog_release_date": "2026-03-13T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/dachdecker/1883026808?i=1883026809&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/julian-sommer/1464952631?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "6b7a157c93bee7008e1283b395be1b6ce904f65cefe6d219a9376f83a72678f9",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -7.609576177339983,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 7.60957617734867,
+        "spectral_centroid_hz": 1121.3010986070337,
+        "band_energy_fraction": {
+          "80-250": 0.17593278028330955,
+          "250-1000": 0.2207780791844677,
+          "1000-4000": 0.19837649710335867,
+          "4000-8000": 0.04632839422618166,
+          "8000-16000": 0.026782843229170034
+        },
+        "side_mid_db": -5.776224651176202,
+        "stereo_correlation": 0.5816889363969853
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.756616146149213,
+        "peak_dbfs": 0.7559726945793298,
+        "crest_db": 13.512588840728544,
+        "spectral_centroid_hz": 1882.2602498521956,
+        "band_energy_fraction": {
+          "80-250": 0.02060905353895391,
+          "250-1000": 0.44497377398709037,
+          "1000-4000": 0.42692254599294144,
+          "4000-8000": 0.07456904231900013,
+          "8000-16000": 0.03249890471054389
+        },
+        "side_mid_db": -4.872603307480789,
+        "stereo_correlation": 0.5087386024084292
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Julian Sommer",
+    "track_id": 1873934764,
+    "credited_artists": "Julian Sommer & Luca-Dante Spadafora",
+    "title": "WENN ICH NÜCHTERN WÄR",
+    "edition": "WENN ICH NÜCHTERN WÄR - Single",
+    "catalog_release_date": "2026-02-06T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/wenn-ich-n%C3%BCchtern-w%C3%A4r/1873934754?i=1873934764&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/julian-sommer/1464952631?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "09d4f34921827c4f0e8f32e679f1b29a1bca4bd53f74ae6170b41c4f6eb0067d",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -11.435282861827476,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 11.435282861836162,
+        "spectral_centroid_hz": 1280.6084809393676,
+        "band_energy_fraction": {
+          "80-250": 0.3170720600477508,
+          "250-1000": 0.2807586798558231,
+          "1000-4000": 0.16540771873999477,
+          "4000-8000": 0.04930271989666971,
+          "8000-16000": 0.042038423455330216
+        },
+        "side_mid_db": -8.508926470136885,
+        "stereo_correlation": 0.7529104886620769
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -15.872182934533196,
+        "peak_dbfs": 0.6573795892581877,
+        "crest_db": 16.529562523791384,
+        "spectral_centroid_hz": 1913.438603492786,
+        "band_energy_fraction": {
+          "80-250": 0.07932680746437681,
+          "250-1000": 0.5029117080786248,
+          "1000-4000": 0.2848157137678463,
+          "4000-8000": 0.062197713296605596,
+          "8000-16000": 0.06995767499328169
+        },
+        "side_mid_db": -8.95601156858876,
+        "stereo_correlation": 0.7744567135184748
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Julian Sommer",
+    "track_id": 1610640063,
+    "credited_artists": "Julian Sommer",
+    "title": "Dicht im Flieger",
+    "edition": "Dicht im Flieger - Single",
+    "catalog_release_date": "2022-03-18T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/dicht-im-flieger/1610640059?i=1610640063&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/julian-sommer/1464952631?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "7ae8d0246e50b8f8f1c5bcae8992f6ef3b402ed578161fa463412038258bad49",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -5.326045045132492,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 5.3260450451411785,
+        "spectral_centroid_hz": 834.1407139325091,
+        "band_energy_fraction": {
+          "80-250": 0.20214472232128497,
+          "250-1000": 0.21618508643991532,
+          "1000-4000": 0.16652001903482738,
+          "4000-8000": 0.02327977702326142,
+          "8000-16000": 0.019284883619757113
+        },
+        "side_mid_db": -6.05380325911896,
+        "stereo_correlation": 0.6024417683997381
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -9.977391732453263,
+        "peak_dbfs": 2.1800636768177446,
+        "crest_db": 12.157455409271009,
+        "spectral_centroid_hz": 1369.3965558312439,
+        "band_energy_fraction": {
+          "80-250": 0.05271189054666906,
+          "250-1000": 0.49151905658582856,
+          "1000-4000": 0.41636849901510664,
+          "4000-8000": 0.019728391499083467,
+          "8000-16000": 0.01698521292565677
+        },
+        "side_mid_db": -3.822156438772368,
+        "stereo_correlation": 0.4137240003796778
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Calvin Kleinen",
+    "track_id": 1884982689,
+    "credited_artists": "Calvin Kleinen, Malin Brown, Specktakel & Honk!",
+    "title": "Bauhaus",
+    "edition": "Bauhaus - Single",
+    "catalog_release_date": "2026-03-27T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/bauhaus/1884982688?i=1884982689&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/calvin-kleinen/1541201164?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "ca527a430df59b4d1404a4df1174a72ab0819aba3683dca65f808a070e02d91b",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -6.4819955746728315,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 6.481995574681518,
+        "spectral_centroid_hz": 1497.6885716473605,
+        "band_energy_fraction": {
+          "80-250": 0.17647121693945073,
+          "250-1000": 0.20242234437633738,
+          "1000-4000": 0.13565651238646806,
+          "4000-8000": 0.05534449940206078,
+          "8000-16000": 0.05157361053253513
+        },
+        "side_mid_db": -6.836476819178316,
+        "stereo_correlation": 0.6567539343336567
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.614918370809141,
+        "peak_dbfs": 1.710451561328639,
+        "crest_db": 14.325369932137782,
+        "spectral_centroid_hz": 1733.1108946062452,
+        "band_energy_fraction": {
+          "80-250": 0.05520869143969996,
+          "250-1000": 0.5321955033348332,
+          "1000-4000": 0.3114586174120612,
+          "4000-8000": 0.06216195990742946,
+          "8000-16000": 0.038409773957697284
+        },
+        "side_mid_db": -5.442260947190971,
+        "stereo_correlation": 0.5556809611894953
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Calvin Kleinen",
+    "track_id": 6795123032,
+    "credited_artists": "Julian Sommer, FRENZY & Calvin Kleinen",
+    "title": "3 x KO",
+    "edition": "3 x KO - Single",
+    "catalog_release_date": "2026-07-31T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/3-x-ko/6795123030?i=6795123032&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/julian-sommer/1464952631?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "5dd492f6064916be777fe63e70ac91460695e4888cece12f18159b40210de7b7",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -7.167038447099588,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 7.167038447108275,
+        "spectral_centroid_hz": 1341.9085356558223,
+        "band_energy_fraction": {
+          "80-250": 0.12142350979414264,
+          "250-1000": 0.22655867397170468,
+          "1000-4000": 0.20985949359200173,
+          "4000-8000": 0.04366642103194584,
+          "8000-16000": 0.04758367718835082
+        },
+        "side_mid_db": -7.800990056334259,
+        "stereo_correlation": 0.7154066892151494
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -10.986207727829584,
+        "peak_dbfs": 2.0534355582328727,
+        "crest_db": 13.039643286062457,
+        "spectral_centroid_hz": 2170.000511976286,
+        "band_energy_fraction": {
+          "80-250": 0.0036206991411723032,
+          "250-1000": 0.45785662213043443,
+          "1000-4000": 0.4064472312444211,
+          "4000-8000": 0.05589642258959593,
+          "8000-16000": 0.07473161033333052
+        },
+        "side_mid_db": -7.771921145511183,
+        "stereo_correlation": 0.7137632303501603
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Calvin Kleinen",
+    "track_id": 1878178688,
+    "credited_artists": "Breitner & Calvin Kleinen",
+    "title": "Malle Maus",
+    "edition": "Malle Maus - Single",
+    "catalog_release_date": "2026-02-27T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/malle-maus/1878178547?i=1878178688&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/breitner/1797055027?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "64fd054dc0279517dae23d2b2edf0588bfad2440dcc1b7285bbcc5b841087c93",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -6.9529652338544965,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 6.952965233863184,
+        "spectral_centroid_hz": 697.248034715161,
+        "band_energy_fraction": {
+          "80-250": 0.20565833324331614,
+          "250-1000": 0.17289456697816968,
+          "1000-4000": 0.07882893817707261,
+          "4000-8000": 0.02278966652635929,
+          "8000-16000": 0.024740480915583615
+        },
+        "side_mid_db": -5.902487190892847,
+        "stereo_correlation": 0.5913336783626977
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -11.589020057832693,
+        "peak_dbfs": 1.9116051386348019,
+        "crest_db": 13.500625196467496,
+        "spectral_centroid_hz": 1476.838109931937,
+        "band_energy_fraction": {
+          "80-250": 0.08708756237074744,
+          "250-1000": 0.5849855807741788,
+          "1000-4000": 0.23429408958503653,
+          "4000-8000": 0.052026491023637586,
+          "8000-16000": 0.04069611225991498
+        },
+        "side_mid_db": -1.5405289194789893,
+        "stereo_correlation": 0.17564277196064915
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Frenzy",
+    "track_id": 1830252378,
+    "credited_artists": "Frenzy",
+    "title": "Lampen an",
+    "edition": "Ballermann - Die Mallorca Hits 2025",
+    "catalog_release_date": "2025-05-23T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/lampen-an/1830251614?i=1830252378&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/frenzy/1368158348?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "899afa2e5496af870f260baf923f16ed1580910e43de26520413273e115aaf45",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -7.356788014553734,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 7.3567880145624205,
+        "spectral_centroid_hz": 533.9490316257087,
+        "band_energy_fraction": {
+          "80-250": 0.36970986700432024,
+          "250-1000": 0.2578242311730132,
+          "1000-4000": 0.07652111008976736,
+          "4000-8000": 0.01403549852087973,
+          "8000-16000": 0.010047282202220663
+        },
+        "side_mid_db": -8.612225991799512,
+        "stereo_correlation": 0.7581897924631757
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.49246892177107,
+        "peak_dbfs": 1.411338443932294,
+        "crest_db": 13.903807365703365,
+        "spectral_centroid_hz": 1077.9838205714964,
+        "band_energy_fraction": {
+          "80-250": 0.022332827568612035,
+          "250-1000": 0.7562573435633123,
+          "1000-4000": 0.1796977866925759,
+          "4000-8000": 0.01780764418040622,
+          "8000-16000": 0.023107399634650725
+        },
+        "side_mid_db": -6.17507074923764,
+        "stereo_correlation": 0.6113166323684466
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Frenzy",
+    "track_id": 1886090009,
+    "credited_artists": "FRENZY & CubaAusLibre",
+    "title": "Party an der Playa",
+    "edition": "Party an der Playa - Single",
+    "catalog_release_date": "2026-03-27T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/party-an-der-playa/1886090008?i=1886090009&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/frenzy/269191205?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "6a81ecf6db730c416fc1dba109e26babed7effb9e64094ab1b09fbd3aa10088b",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -7.328179208418758,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 7.328179208427445,
+        "spectral_centroid_hz": 1194.7561079710981,
+        "band_energy_fraction": {
+          "80-250": 0.1667809965652461,
+          "250-1000": 0.27281815901035666,
+          "1000-4000": 0.24515965737564194,
+          "4000-8000": 0.05098189000444274,
+          "8000-16000": 0.021775794679048513
+        },
+        "side_mid_db": -5.467019390036613,
+        "stereo_correlation": 0.5577255826531019
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -11.019400218914374,
+        "peak_dbfs": 2.1853532681528027,
+        "crest_db": 13.204753487067178,
+        "spectral_centroid_hz": 1593.5721075088,
+        "band_energy_fraction": {
+          "80-250": 0.012282770069410866,
+          "250-1000": 0.47254247279216255,
+          "1000-4000": 0.44029031193566515,
+          "4000-8000": 0.0621424349132562,
+          "8000-16000": 0.012466258739311733
+        },
+        "side_mid_db": -4.527221295755207,
+        "stereo_correlation": 0.4788775061678234
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Frenzy",
+    "track_id": 6789638532,
+    "credited_artists": "FRENZY, CubaAusLibre & NOISETIME",
+    "title": "Party an der Playa (Hardstyle Remix)",
+    "edition": "Party an der Playa (Hardstyle Remix) - Single",
+    "catalog_release_date": "2026-07-17T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/party-an-der-playa-hardstyle-remix/6789638529?i=6789638532&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/frenzy/269191205?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "09272d0a17a902f109d4be9afcb5f041e85a0c91b14ca98a0b2a95e50d143c40",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -8.189117725670913,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 8.1891177256796,
+        "spectral_centroid_hz": 1255.766305625039,
+        "band_energy_fraction": {
+          "80-250": 0.33021779609344026,
+          "250-1000": 0.3061846047014836,
+          "1000-4000": 0.20606023519925373,
+          "4000-8000": 0.047191254267043806,
+          "8000-16000": 0.03156451539104086
+        },
+        "side_mid_db": -3.2508244467160226,
+        "stereo_correlation": 0.35785991107892495
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.8340594107306,
+        "peak_dbfs": 1.585010054962046,
+        "crest_db": 14.419069465692647,
+        "spectral_centroid_hz": 1668.6610625147243,
+        "band_energy_fraction": {
+          "80-250": 0.013414435511749288,
+          "250-1000": 0.5104602732392206,
+          "1000-4000": 0.3956088322429879,
+          "4000-8000": 0.058014332236061235,
+          "8000-16000": 0.021902129627360985
+        },
+        "side_mid_db": -6.213960261009401,
+        "stereo_correlation": 0.6145520045103743
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Mia Julia",
+    "track_id": 1687094815,
+    "credited_artists": "Mia Julia",
+    "title": "Bring mich nach Hause",
+    "edition": "Schlechte Manieren",
+    "catalog_release_date": "2023-08-18T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/bring-mich-nach-hause/1687094812?i=1687094815&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/mia-julia/156419383?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "69e20c26e9a2d95ea5f018aa8dde12f3b4d7eee5cc8a823916701b9b274907e6",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -7.559189968617538,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 7.5591899686262245,
+        "spectral_centroid_hz": 993.5916423558973,
+        "band_energy_fraction": {
+          "80-250": 0.2435771441802818,
+          "250-1000": 0.17349324627956023,
+          "1000-4000": 0.1495049610295615,
+          "4000-8000": 0.037651365669037505,
+          "8000-16000": 0.032702601208385904
+        },
+        "side_mid_db": -7.496582664961583,
+        "stereo_correlation": 0.6978432199396719
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -13.565340651886924,
+        "peak_dbfs": 0.7116149712078385,
+        "crest_db": 14.276955623094763,
+        "spectral_centroid_hz": 2230.1644543299517,
+        "band_energy_fraction": {
+          "80-250": 0.014995349224465267,
+          "250-1000": 0.388926185568042,
+          "1000-4000": 0.4522295463621541,
+          "4000-8000": 0.06943491297521479,
+          "8000-16000": 0.07391910549228134
+        },
+        "side_mid_db": -5.027152055419213,
+        "stereo_correlation": 0.5217830564239376
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Mia Julia",
+    "track_id": 1788864046,
+    "credited_artists": "Tream & Mia Julia",
+    "title": "HERZBLATT (AUA AUA)",
+    "edition": "HERZBLATT (AUA AUA) - Single",
+    "catalog_release_date": "2025-01-17T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/herzblatt-aua-aua/1788864045?i=1788864046&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/tream/1289843142?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "42f293c851752802f7078b71eeb040bad39827af8a3619ca9acc7e3a146706f4",
+    "measurements": {
+      "preview_duration_s": 29.952290249433105,
+      "analysis_window_preview_s": [
+        10.976,
+        18.976
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -10.988895080929048,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 10.988895080937734,
+        "spectral_centroid_hz": 903.8220605446619,
+        "band_energy_fraction": {
+          "80-250": 0.04745624667913728,
+          "250-1000": 0.6126091890217105,
+          "1000-4000": 0.16060118293274991,
+          "4000-8000": 0.017320577342429654,
+          "8000-16000": 0.012208233989648168
+        },
+        "side_mid_db": -6.982960580763029,
+        "stereo_correlation": 0.666268703564473
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -13.185566904970212,
+        "peak_dbfs": -0.17820892343625822,
+        "crest_db": 13.007357981533952,
+        "spectral_centroid_hz": 1123.498855920932,
+        "band_energy_fraction": {
+          "80-250": 0.008291541633280098,
+          "250-1000": 0.7587179336013511,
+          "1000-4000": 0.19267394133763652,
+          "4000-8000": 0.02294792963324071,
+          "8000-16000": 0.01704341478041271
+        },
+        "side_mid_db": -13.174207651490576,
+        "stereo_correlation": 0.9081786458880883
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Mia Julia",
+    "track_id": 6790488128,
+    "credited_artists": "Mia Julia & Maxwell",
+    "title": "Wir sind zuhause",
+    "edition": "Wir sind zuhause - Single",
+    "catalog_release_date": "2026-07-24T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/wir-sind-zuhause/6790488127?i=6790488128&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/mia-julia/156419383?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "b34918d8858aec9757f81b7b17f15edc8cbf218b1e3541bc39db370568e0e320",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -8.088594983212491,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 8.088594983221178,
+        "spectral_centroid_hz": 955.2858267977127,
+        "band_energy_fraction": {
+          "80-250": 0.1946198048576604,
+          "250-1000": 0.23859933588141508,
+          "1000-4000": 0.09721056873946178,
+          "4000-8000": 0.03973685320195012,
+          "8000-16000": 0.03438033070799176
+        },
+        "side_mid_db": -12.782567392155377,
+        "stereo_correlation": 0.9000103379375624
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.60767929298386,
+        "peak_dbfs": -0.19115346333181069,
+        "crest_db": 12.41652582965205,
+        "spectral_centroid_hz": 1715.8900374158081,
+        "band_energy_fraction": {
+          "80-250": 0.08675417679326801,
+          "250-1000": 0.5861839453345582,
+          "1000-4000": 0.19479832420180662,
+          "4000-8000": 0.07169389644853566,
+          "8000-16000": 0.05905592331520688
+        },
+        "side_mid_db": -12.703800523657815,
+        "stereo_correlation": 0.8982025114243188
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Tream",
+    "track_id": 1689250851,
+    "credited_artists": "FiNCH & Tream",
+    "title": "LiEBE AUF DER RÜCKBANK",
+    "edition": "DORFDiSKO ZWEi",
+    "catalog_release_date": "2023-04-20T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/liebe-auf-der-r%C3%BCckbank/1689249353?i=1689250851&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/finch/1321868415?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "ab6186fd40a2508296d54c30805969995ed6dff030559c33ccaafcb2ca4db10f",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -12.37028520074367,
+        "peak_dbfs": -0.08845286425857918,
+        "crest_db": 12.28183233648509,
+        "spectral_centroid_hz": 500.78793580457307,
+        "band_energy_fraction": {
+          "80-250": 0.3364010471574504,
+          "250-1000": 0.22191781274371758,
+          "1000-4000": 0.045887561372911265,
+          "4000-8000": 0.024652736150869263,
+          "8000-16000": 0.009082449895944247
+        },
+        "side_mid_db": -8.981050244282038,
+        "stereo_correlation": 0.7755010451700859
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -17.038600195371895,
+        "peak_dbfs": -4.595879396504378,
+        "crest_db": 12.442720798867517,
+        "spectral_centroid_hz": 944.7938848655431,
+        "band_energy_fraction": {
+          "80-250": 0.3680910904811392,
+          "250-1000": 0.4939628383562807,
+          "1000-4000": 0.06340512510819357,
+          "4000-8000": 0.05615310771777206,
+          "8000-16000": 0.018093623208988087
+        },
+        "side_mid_db": -7.014105356671284,
+        "stereo_correlation": 0.669036802256559
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Tream",
+    "track_id": 1891323779,
+    "credited_artists": "Tream & Blümchen",
+    "title": "K2",
+    "edition": "K2 - Single",
+    "catalog_release_date": "2026-04-09T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/k2/1891323774?i=1891323779&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/tream/1289843142?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "64de6a6aa8cfb3f1924a2bc1f463851f42bf29cef71d2acb602eac8cdd4327d2",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -6.898218178425547,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 6.898218178434234,
+        "spectral_centroid_hz": 891.2573396315424,
+        "band_energy_fraction": {
+          "80-250": 0.22187372205936876,
+          "250-1000": 0.2675748242259251,
+          "1000-4000": 0.14017162266792904,
+          "4000-8000": 0.030696991306244578,
+          "8000-16000": 0.02511867912580923
+        },
+        "side_mid_db": -6.372955616897422,
+        "stereo_correlation": 0.6254182405511662
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -11.51460914769294,
+        "peak_dbfs": 1.8953818029678282,
+        "crest_db": 13.409990950660768,
+        "spectral_centroid_hz": 1551.5767930998404,
+        "band_energy_fraction": {
+          "80-250": 0.008838711107329781,
+          "250-1000": 0.6116816152080898,
+          "1000-4000": 0.2959005727527127,
+          "4000-8000": 0.033914179779571764,
+          "8000-16000": 0.048425374407892394
+        },
+        "side_mid_db": -6.563522204535862,
+        "stereo_correlation": 0.6399411186995582
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Tream",
+    "track_id": 1883045464,
+    "credited_artists": "Tream & treamiboii",
+    "title": "HASENJAGD",
+    "edition": "HASENJAGD - Single",
+    "catalog_release_date": "2026-03-12T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/hasenjagd/1883045461?i=1883045464&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/tream/1289843142?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "df39667242e3ddab446f71774c6aa3c5dc26fae11c973a6704c6ba558d65b953",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -8.747154867614965,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 8.747154867623651,
+        "spectral_centroid_hz": 676.3853793912706,
+        "band_energy_fraction": {
+          "80-250": 0.36233135871447847,
+          "250-1000": 0.2810737988241893,
+          "1000-4000": 0.10414345159674065,
+          "4000-8000": 0.020706427538955487,
+          "8000-16000": 0.011747799377551936
+        },
+        "side_mid_db": -9.139361671649294,
+        "stereo_correlation": 0.7827827606167234
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.373261343504439,
+        "peak_dbfs": 0.8590267178166817,
+        "crest_db": 13.232288061321118,
+        "spectral_centroid_hz": 1192.4674141392368,
+        "band_energy_fraction": {
+          "80-250": 0.17486925753079133,
+          "250-1000": 0.5495309264096533,
+          "1000-4000": 0.22193346223867033,
+          "4000-8000": 0.03315147821001318,
+          "8000-16000": 0.020099171150502432
+        },
+        "side_mid_db": -8.275257383230793,
+        "stereo_correlation": 0.7412484193021943
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "2 Engel & Charlie",
+    "track_id": 1722555306,
+    "credited_artists": "HBz & 2 Engel & Charlie",
+    "title": "Erinner mich",
+    "edition": "Erinner mich - Single",
+    "catalog_release_date": "2024-01-12T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/erinner-mich/1722555305?i=1722555306&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/hbz/264615801?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "1995ccc68a205afc2da016ad5b1db89b03a3ec57f385a9fea8e3a56cd2a5ff4e",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -10.339358777371315,
+        "peak_dbfs": -0.514046585710891,
+        "crest_db": 9.825312191660425,
+        "spectral_centroid_hz": 712.061891739793,
+        "band_energy_fraction": {
+          "80-250": 0.2731760406048412,
+          "250-1000": 0.15361554211802997,
+          "1000-4000": 0.13094446183929176,
+          "4000-8000": 0.029076768796701038,
+          "8000-16000": 0.012493846744141042
+        },
+        "side_mid_db": -7.80243544140955,
+        "stereo_correlation": 0.7156653388329557
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -15.34557750063658,
+        "peak_dbfs": 0.01962009667760391,
+        "crest_db": 15.365197597314184,
+        "spectral_centroid_hz": 1819.4484332284615,
+        "band_energy_fraction": {
+          "80-250": 0.019363257337108808,
+          "250-1000": 0.4331790166098116,
+          "1000-4000": 0.45939637770795927,
+          "4000-8000": 0.06276337784338408,
+          "8000-16000": 0.0244442765355075
+        },
+        "side_mid_db": -1.764086199447237,
+        "stereo_correlation": 0.2008492201497904
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "2 Engel & Charlie",
+    "track_id": 6764323980,
+    "credited_artists": "2 Engel & Charlie",
+    "title": "tanz tanz tanz",
+    "edition": "tanz tanz tanz - Single",
+    "catalog_release_date": "2026-05-08T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/tanz-tanz-tanz/1895733115?i=6764323980&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/2-engel-charlie/1614933873?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "f5f16e70fe84384c3baa2758c10282c9af4130720ed0a33d656c53df8dc77ff4",
+    "measurements": {
+      "preview_duration_s": 29.952290249433105,
+      "analysis_window_preview_s": [
+        10.976,
+        18.976
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -10.430584256875242,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 10.430584256883929,
+        "spectral_centroid_hz": 1064.6750170826133,
+        "band_energy_fraction": {
+          "80-250": 0.31239438215090604,
+          "250-1000": 0.26032626828034394,
+          "1000-4000": 0.1271519939280177,
+          "4000-8000": 0.04515393956837556,
+          "8000-16000": 0.030406090163055084
+        },
+        "side_mid_db": -3.8381684538322776,
+        "stereo_correlation": 0.41540313885884933
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -15.938493550924491,
+        "peak_dbfs": -2.2310102180144114,
+        "crest_db": 13.70748333291008,
+        "spectral_centroid_hz": 2256.001829790853,
+        "band_energy_fraction": {
+          "80-250": 0.009440325288077912,
+          "250-1000": 0.4542492798169642,
+          "1000-4000": 0.3631742114484073,
+          "4000-8000": 0.12141199509794216,
+          "8000-16000": 0.05105021144838868
+        },
+        "side_mid_db": -2.9401696340370598,
+        "stereo_correlation": 0.32652337898937384
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "2 Engel & Charlie",
+    "track_id": 1885994957,
+    "credited_artists": "2 Engel & Charlie",
+    "title": "Zukunft",
+    "edition": "Zukunft - Single",
+    "catalog_release_date": "2026-03-20T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/zukunft/1885994955?i=1885994957&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/2-engel-charlie/1614933873?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "295eea4c45d4e419eadfb2cce625b0090411e1b0589df51a7e582399fe6a3006",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -6.573037969750418,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 6.5730379697591035,
+        "spectral_centroid_hz": 358.329781493611,
+        "band_energy_fraction": {
+          "80-250": 0.2926438747527086,
+          "250-1000": 0.07878317578844708,
+          "1000-4000": 0.0487370824188052,
+          "4000-8000": 0.01636217661344093,
+          "8000-16000": 0.00523421498440111
+        },
+        "side_mid_db": -11.608833342592389,
+        "stereo_correlation": 0.870833527328069
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -29.439828211046063,
+        "peak_dbfs": -4.475935717701912,
+        "crest_db": 24.96389249334415,
+        "spectral_centroid_hz": 2212.2173121502938,
+        "band_energy_fraction": {
+          "80-250": 0.000558533704564915,
+          "250-1000": 0.3268605570201533,
+          "1000-4000": 0.5922230097732482,
+          "4000-8000": 0.06128439547826266,
+          "8000-16000": 0.018369794524436198
+        },
+        "side_mid_db": -2.1796758481158354,
+        "stereo_correlation": 0.2457089901623623
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Tobee",
+    "track_id": 1884609038,
+    "credited_artists": "Tobee",
+    "title": "Mon Amour (So lang ich noch Luft in meiner Lunge hab) [Party Version]",
+    "edition": "Mon Amour (So lang ich noch Luft in meiner Lunge hab) [Party Version] - Single",
+    "catalog_release_date": "2026-03-13T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/mon-amour-so-lang-ich-noch-luft-in-meiner-lunge-hab/1884609034?i=1884609038&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/tobee/261297894?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "fac701a7fd022ab09ee6202d726ddb97e5494328d31d5e770cab6877b8cb187e",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -8.189229349667915,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 8.189229349676602,
+        "spectral_centroid_hz": 1944.6426561865853,
+        "band_energy_fraction": {
+          "80-250": 0.1757830951109232,
+          "250-1000": 0.23544088202341332,
+          "1000-4000": 0.303618841804604,
+          "4000-8000": 0.09382733336706485,
+          "8000-16000": 0.05715215064009449
+        },
+        "side_mid_db": -4.061417802114798,
+        "stereo_correlation": 0.436228322043807
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -11.693941422292225,
+        "peak_dbfs": 1.0066474267325694,
+        "crest_db": 12.700588849024793,
+        "spectral_centroid_hz": 1780.930577733193,
+        "band_energy_fraction": {
+          "80-250": 0.019409939604858765,
+          "250-1000": 0.4273193255532009,
+          "1000-4000": 0.46593470258493447,
+          "4000-8000": 0.06076167150227723,
+          "8000-16000": 0.025611551863236708
+        },
+        "side_mid_db": -2.390965314422232,
+        "stereo_correlation": 0.26846356713437075
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Tobee",
+    "track_id": 1459618684,
+    "credited_artists": "Tobee",
+    "title": "Saufi saufi",
+    "edition": "Saufi saufi - Single",
+    "catalog_release_date": "2019-04-18T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/saufi-saufi/1459618683?i=1459618684&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/tobee/261297894?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "7ad3814660caebff4bbce7dbc975fb89f8b29b641af393bf93123e56d3c4ff7e",
+    "measurements": {
+      "preview_duration_s": 29.92907029478458,
+      "analysis_window_preview_s": [
+        10.965,
+        18.965
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -8.951472288017575,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 8.951472288026261,
+        "spectral_centroid_hz": 2270.1130528512954,
+        "band_energy_fraction": {
+          "80-250": 0.20430851930715016,
+          "250-1000": 0.36238500119593475,
+          "1000-4000": 0.13416157822077046,
+          "4000-8000": 0.07333201331346818,
+          "8000-16000": 0.12397643485960759
+        },
+        "side_mid_db": -8.129432575777857,
+        "stereo_correlation": 0.7334750989336675
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.192699226034032,
+        "peak_dbfs": 1.343383490156771,
+        "crest_db": 13.536082716190803,
+        "spectral_centroid_hz": 2508.823389056212,
+        "band_energy_fraction": {
+          "80-250": 0.028091241056538915,
+          "250-1000": 0.6201060191991324,
+          "1000-4000": 0.14538702865269254,
+          "4000-8000": 0.06533233311069307,
+          "8000-16000": 0.14027904432541433
+        },
+        "side_mid_db": -8.426225523982113,
+        "stereo_correlation": 0.7487729779960611
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Tobee",
+    "track_id": 1416510472,
+    "credited_artists": "Tobee",
+    "title": "Helikopter 117 (Mach' den Hub Hub Hub) [Après Ski Mix]",
+    "edition": "Helikopter 117 (Mach' den Hub Hub Hub) - Single",
+    "catalog_release_date": "2017-12-08T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/helikopter-117-mach-den-hub-hub-hub-apr%C3%A8s-ski-mix/1416510462?i=1416510472&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/tobee/261297894?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "86895b9b3c2104010186532133c7c290e9995517b7b9ee1938210bb87825fff2",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -6.9137878227921865,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 6.913787822800874,
+        "spectral_centroid_hz": 692.39851522562,
+        "band_energy_fraction": {
+          "80-250": 0.19393130487731733,
+          "250-1000": 0.15865038517501936,
+          "1000-4000": 0.09505546401601216,
+          "4000-8000": 0.016227425453525377,
+          "8000-16000": 0.023699595382430657
+        },
+        "side_mid_db": -13.390545979544072,
+        "stereo_correlation": 0.9124140385722581
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -13.47099515541492,
+        "peak_dbfs": 0.2614306106629236,
+        "crest_db": 13.732425766077842,
+        "spectral_centroid_hz": 1999.479562013779,
+        "band_energy_fraction": {
+          "80-250": 0.03870112150575676,
+          "250-1000": 0.5410633686946746,
+          "1000-4000": 0.3074400841855501,
+          "4000-8000": 0.041084301069675894,
+          "8000-16000": 0.06998132293914568
+        },
+        "side_mid_db": -13.03212870423766,
+        "stereo_correlation": 0.9057476412197722
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Kings of Günter",
+    "track_id": 1890134077,
+    "credited_artists": "Kings of Günter",
+    "title": "Trili Frili Lovesong (Darlin)",
+    "edition": "Trili Frili Lovesong (Darlin) - Single",
+    "catalog_release_date": "2026-04-02T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/trili-frili-lovesong-darlin/1890134076?i=1890134077&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/kings-of-g%C3%BCnter/1489269376?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "152add1fead7b16d94aff0818206052e47988fd86ec9a43629740c4603f35afa",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -6.15911493200624,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 6.159114932014927,
+        "spectral_centroid_hz": 1612.1353668602892,
+        "band_energy_fraction": {
+          "80-250": 0.26090416252882176,
+          "250-1000": 0.20081485866214377,
+          "1000-4000": 0.16966702073819537,
+          "4000-8000": 0.0610972374430691,
+          "8000-16000": 0.06826089525955593
+        },
+        "side_mid_db": -5.695445527333451,
+        "stereo_correlation": 0.5755303074099816
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -11.069216104728369,
+        "peak_dbfs": 2.2236332225819675,
+        "crest_db": 13.292849327310336,
+        "spectral_centroid_hz": 2151.9205093457886,
+        "band_energy_fraction": {
+          "80-250": 0.008224028640638214,
+          "250-1000": 0.4653157796982419,
+          "1000-4000": 0.38776211486753537,
+          "4000-8000": 0.07536469966695696,
+          "8000-16000": 0.061671309385415096
+        },
+        "side_mid_db": -3.7469296790861466,
+        "stereo_correlation": 0.4068016676449069
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Kings of Günter",
+    "track_id": 1743149835,
+    "credited_artists": "Kings of Günter",
+    "title": "Hast Du Saufen mal probiert? (1000 und 1 Nacht)",
+    "edition": "Hast Du Saufen mal probiert? (1000 und 1 Nacht) - Single",
+    "catalog_release_date": "2024-05-08T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/hast-du-saufen-mal-probiert-1000-und-1-nacht/1743149830?i=1743149835&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/kings-of-g%C3%BCnter/1489269376?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "ffbcb9296cab664ec182fd0f1297155a93f55a83641efbf64208d51a08edbba5",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -7.681933815110177,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 7.681933815118863,
+        "spectral_centroid_hz": 1311.0562846103867,
+        "band_energy_fraction": {
+          "80-250": 0.20920139694240164,
+          "250-1000": 0.301683985672679,
+          "1000-4000": 0.1286869460478459,
+          "4000-8000": 0.057780540215477495,
+          "8000-16000": 0.044954530900328776
+        },
+        "side_mid_db": -7.010074193134569,
+        "stereo_correlation": 0.6680364776829276
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -11.643031376215838,
+        "peak_dbfs": 2.3388903265798238,
+        "crest_db": 13.981921702795663,
+        "spectral_centroid_hz": 1586.2364217307027,
+        "band_energy_fraction": {
+          "80-250": 0.055274195565690326,
+          "250-1000": 0.6043624167695184,
+          "1000-4000": 0.22967737875107208,
+          "4000-8000": 0.06749104485255289,
+          "8000-16000": 0.04236534689545011
+        },
+        "side_mid_db": -5.106399991488285,
+        "stereo_correlation": 0.5283848828138888
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Kings of Günter",
+    "track_id": 6784787706,
+    "credited_artists": "Kings of Günter & Nina Reh",
+    "title": "Saufgelage",
+    "edition": "Saufgelage - Single",
+    "catalog_release_date": "2026-07-10T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/saufgelage/6784787703?i=6784787706&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/kings-of-g%C3%BCnter/1489269376?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "ba45ec342402acc951196ae02e2224cd2cf88a42ff20b5dd8afee426c675baf3",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -9.12545467904752,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 9.125454679056206,
+        "spectral_centroid_hz": 1627.5320877718116,
+        "band_energy_fraction": {
+          "80-250": 0.28759946194087604,
+          "250-1000": 0.3861386349064591,
+          "1000-4000": 0.11756449295473308,
+          "4000-8000": 0.05667676429597582,
+          "8000-16000": 0.07253782893440965
+        },
+        "side_mid_db": -5.046550221370875,
+        "stereo_correlation": 0.5236735139922329
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.771868677400768,
+        "peak_dbfs": 0.9268841706845077,
+        "crest_db": 13.698752848085276,
+        "spectral_centroid_hz": 2171.4370301963604,
+        "band_energy_fraction": {
+          "80-250": 0.03353094230440702,
+          "250-1000": 0.6840577751559583,
+          "1000-4000": 0.1069821579342919,
+          "4000-8000": 0.05309572252700356,
+          "8000-16000": 0.11979615172591898
+        },
+        "side_mid_db": -3.5136281808818004,
+        "stereo_correlation": 0.3848461760945318
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Malle Anja",
+    "track_id": 1887328977,
+    "credited_artists": "Malle Anja",
+    "title": "Dieter (Der LKW Song)",
+    "edition": "Dieter (Der LKW Song) - Single",
+    "catalog_release_date": "2026-04-02T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/dieter-der-lkw-song/1887328965?i=1887328977&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/malle-anja/1523812848?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "fbd2bad76cfe8765adf1052f1e540f6129b9909da70e931ebb1103d0a6132fa7",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -9.275361134029863,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 9.275361134038551,
+        "spectral_centroid_hz": 1394.359168589396,
+        "band_energy_fraction": {
+          "80-250": 0.30678711652428736,
+          "250-1000": 0.3488304196344295,
+          "1000-4000": 0.1536751547549812,
+          "4000-8000": 0.07197585485388111,
+          "8000-16000": 0.042085009893464066
+        },
+        "side_mid_db": -7.60277597112903,
+        "stereo_correlation": 0.7040602284931508
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -13.7546053494419,
+        "peak_dbfs": 1.1745594574928042,
+        "crest_db": 14.929164806934702,
+        "spectral_centroid_hz": 1973.6130279968645,
+        "band_energy_fraction": {
+          "80-250": 0.04486234842588849,
+          "250-1000": 0.5500655848702403,
+          "1000-4000": 0.24494236290716995,
+          "4000-8000": 0.09808771502015284,
+          "8000-16000": 0.05958735257278132
+        },
+        "side_mid_db": -15.750808232817795,
+        "stereo_correlation": 0.9481708706020429
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Malle Anja",
+    "track_id": 6790916873,
+    "credited_artists": "Malle Anja",
+    "title": "SO VOLL",
+    "edition": "SO VOLL - Single",
+    "catalog_release_date": "2026-07-24T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/so-voll/6790916572?i=6790916873&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/malle-anja/1523812848?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "a910627a6fee66d51ec7b3a52b9be4222ea12e8793fd6a2c71344293b39fc9cb",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -7.051856310980494,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 7.05185631098918,
+        "spectral_centroid_hz": 630.7476890224879,
+        "band_energy_fraction": {
+          "80-250": 0.30144785395137536,
+          "250-1000": 0.18812581035179457,
+          "1000-4000": 0.08778102146154428,
+          "4000-8000": 0.017949215776604677,
+          "8000-16000": 0.019034552376047332
+        },
+        "side_mid_db": -10.827636018510729,
+        "stereo_correlation": 0.847322100071241
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -13.675474664895763,
+        "peak_dbfs": -0.6490630410661308,
+        "crest_db": 13.026411623829633,
+        "spectral_centroid_hz": 1559.9648980822835,
+        "band_energy_fraction": {
+          "80-250": 0.0612043944853203,
+          "250-1000": 0.5713991731653029,
+          "1000-4000": 0.28276239475034914,
+          "4000-8000": 0.03272941455685553,
+          "8000-16000": 0.050955751393749235
+        },
+        "side_mid_db": -11.843213490337321,
+        "stereo_correlation": 0.8780137092306217
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Malle Anja",
+    "track_id": 1631159596,
+    "credited_artists": "Malle Anja",
+    "title": "Der Zug hat keine Bremse (Radio Edit)",
+    "edition": "Der Zug hat keine Bremse (Radio Edit) - Single",
+    "catalog_release_date": "2020-07-15T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/der-zug-hat-keine-bremse-radio-edit/1631159595?i=1631159596&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/malle-anja/1523812848?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "9d2a71ae684dd084c72866e051f8422d1436a7b6e3289c37b639d11b7c752c79",
+    "measurements": {
+      "preview_duration_s": 29.92907029478458,
+      "analysis_window_preview_s": [
+        10.965,
+        18.965
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -11.763051959402322,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 11.76305195941101,
+        "spectral_centroid_hz": 304.4816868417929,
+        "band_energy_fraction": {
+          "80-250": 0.23325425043893336,
+          "250-1000": 0.11080067362364385,
+          "1000-4000": 0.024150830572302315,
+          "4000-8000": 0.00429153588038174,
+          "8000-16000": 0.010570302430497051
+        },
+        "side_mid_db": -12.721147463758342,
+        "stereo_correlation": 0.8985556420224025
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -20.42515501688934,
+        "peak_dbfs": -2.8518721945931285,
+        "crest_db": 17.573282822296214,
+        "spectral_centroid_hz": 595.6452765525737,
+        "band_energy_fraction": {
+          "80-250": 0.2004538203854733,
+          "250-1000": 0.6528860411755228,
+          "1000-4000": 0.12442231738657755,
+          "4000-8000": 0.0021702008384698835,
+          "8000-16000": 0.001744580674209196
+        },
+        "side_mid_db": -39.12110664663512,
+        "stereo_correlation": 0.9997555683019792
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Lorenz Büffel",
+    "track_id": 1882766670,
+    "credited_artists": "Lorenz Büffel",
+    "title": "Hier kommt der Büffelmann",
+    "edition": "Hier kommt der Büffelmann",
+    "catalog_release_date": "2026-05-22T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/hier-kommt-der-b%C3%BCffelmann/1882766668?i=1882766670&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/lorenz-b%C3%BCffel/308808754?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "92aa71e7391aedbd82cc7460a8b8d70ae7f4e14c9277a912c864f47b015e61d8",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -9.909015400096772,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 9.90901540010546,
+        "spectral_centroid_hz": 1414.9545047465544,
+        "band_energy_fraction": {
+          "80-250": 0.19398944193499015,
+          "250-1000": 0.2779768250801891,
+          "1000-4000": 0.24302071659300536,
+          "4000-8000": 0.05484525648595188,
+          "8000-16000": 0.036917139843222604
+        },
+        "side_mid_db": -4.026632502954306,
+        "stereo_correlation": 0.43305078027741145
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -15.636183586026824,
+        "peak_dbfs": 1.27530664118424,
+        "crest_db": 16.911490227211065,
+        "spectral_centroid_hz": 1014.022086819508,
+        "band_energy_fraction": {
+          "80-250": 0.014805810434747546,
+          "250-1000": 0.5953747925398285,
+          "1000-4000": 0.3876779119229075,
+          "4000-8000": 0.0015928965083729769,
+          "8000-16000": 0.0002012202824908424
+        },
+        "side_mid_db": -3.62904313821646,
+        "stereo_correlation": 0.39508270102074666
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Lorenz Büffel",
+    "track_id": 1129707127,
+    "credited_artists": "Lorenz Büffel",
+    "title": "Johnny Däpp",
+    "edition": "Mallorca Highlights 2016 Powered by Xtreme Sound",
+    "catalog_release_date": "2016-06-10T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/johnny-d%C3%A4pp/1129706660?i=1129707127&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/lorenz-b%C3%BCffel/308808754?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "672b72fc31656326ad042292d2e37c679de57c3d6c60df8ec686373e2e370518",
+    "measurements": {
+      "preview_duration_s": 29.92907029478458,
+      "analysis_window_preview_s": [
+        10.965,
+        18.965
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -11.39433613923633,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 11.394336139245016,
+        "spectral_centroid_hz": 1550.1399121021927,
+        "band_energy_fraction": {
+          "80-250": 0.11671888858617849,
+          "250-1000": 0.44318609026375316,
+          "1000-4000": 0.26290494948805054,
+          "4000-8000": 0.05556507889654957,
+          "8000-16000": 0.0350498850552882
+        },
+        "side_mid_db": -5.053052169195636,
+        "stereo_correlation": 0.5239831009777998
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -14.62038083710719,
+        "peak_dbfs": 1.1047910186852807,
+        "crest_db": 15.725171855792471,
+        "spectral_centroid_hz": 1388.0146307626287,
+        "band_energy_fraction": {
+          "80-250": 0.05279908536227406,
+          "250-1000": 0.5593129550047231,
+          "1000-4000": 0.32555579656414946,
+          "4000-8000": 0.03898912636672039,
+          "8000-16000": 0.022996757425315532
+        },
+        "side_mid_db": -7.390671868446229,
+        "stereo_correlation": 0.6915467840228054
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Lorenz Büffel",
+    "track_id": 1827029538,
+    "credited_artists": "Mickie Krause, Lorenz Büffel, Kings of Günter & Immer Hansi",
+    "title": "Baila Baila",
+    "edition": "Baila Baila - Single",
+    "catalog_release_date": "2025-07-18T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/baila-baila/1827029536?i=1827029538&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/mickie-krause/16339718?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "fd1528582bcbd2cf540d69cd1d58e8603e4147f53bb44d97f1695da86c8f9e29",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -5.795435233478474,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 5.795435233487161,
+        "spectral_centroid_hz": 1274.8263060075067,
+        "band_energy_fraction": {
+          "80-250": 0.3306934934221719,
+          "250-1000": 0.13748078462269084,
+          "1000-4000": 0.16527446383799269,
+          "4000-8000": 0.04658125232249558,
+          "8000-16000": 0.04881358095319522
+        },
+        "side_mid_db": -7.426537350273172,
+        "stereo_correlation": 0.693678966693285
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.085296849464886,
+        "peak_dbfs": 2.1668191334857907,
+        "crest_db": 14.252115982950677,
+        "spectral_centroid_hz": 1897.7120532380256,
+        "band_energy_fraction": {
+          "80-250": 0.006162830896447782,
+          "250-1000": 0.3380287478847874,
+          "1000-4000": 0.5703144573837484,
+          "4000-8000": 0.06432193828126431,
+          "8000-16000": 0.019532829117588704
+        },
+        "side_mid_db": -4.502148431378355,
+        "stereo_correlation": 0.47643885306110273
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Ikke Hüftgold",
+    "track_id": 1889201536,
+    "credited_artists": "Ikke Hüftgold",
+    "title": "NACHTRINKEN",
+    "edition": "NACHTRINKEN - Single",
+    "catalog_release_date": "2026-04-10T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/nachtrinken/1889201532?i=1889201536&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/ikke-h%C3%BCftgold/375734138?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "7b72683707601f9ae6e6dc9d0726913a4f79236fac2868af04775a53ae51060a",
+    "measurements": {
+      "preview_duration_s": 29.952290249433105,
+      "analysis_window_preview_s": [
+        10.976,
+        18.976
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -8.453615264565432,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 8.453615264574118,
+        "spectral_centroid_hz": 1338.6574413331418,
+        "band_energy_fraction": {
+          "80-250": 0.21659325377183558,
+          "250-1000": 0.49314741678557694,
+          "1000-4000": 0.16148729911116147,
+          "4000-8000": 0.04106894190830394,
+          "8000-16000": 0.03858432891846132
+        },
+        "side_mid_db": -4.066057730475831,
+        "stereo_correlation": 0.4366807984713589
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -11.841640132340443,
+        "peak_dbfs": 1.068871561411442,
+        "crest_db": 12.910511693751888,
+        "spectral_centroid_hz": 1643.3238847774705,
+        "band_energy_fraction": {
+          "80-250": 0.03247336827002686,
+          "250-1000": 0.6329449120294443,
+          "1000-4000": 0.23664087919307802,
+          "4000-8000": 0.053233110072029015,
+          "8000-16000": 0.0440488233220676
+        },
+        "side_mid_db": -8.919693782652445,
+        "stereo_correlation": 0.7728122290879321
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Ikke Hüftgold",
+    "track_id": 1712088218,
+    "credited_artists": "Ikke Hüftgold",
+    "title": "Engel",
+    "edition": "Engel - Single",
+    "catalog_release_date": "2023-11-03T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/engel/1712088215?i=1712088218&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/ikke-h%C3%BCftgold/375734138?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "69ef61e77050f5141f95902cf89879a47eddabb5e3e81d1d326c66a51d34347e",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -7.3710322818059835,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 7.37103228181467,
+        "spectral_centroid_hz": 482.71115870348484,
+        "band_energy_fraction": {
+          "80-250": 0.18531085583297266,
+          "250-1000": 0.17447801334963423,
+          "1000-4000": 0.09049436961347454,
+          "4000-8000": 0.011373558336615542,
+          "8000-16000": 0.007995727534765759
+        },
+        "side_mid_db": -14.81470068627685,
+        "stereo_correlation": 0.9361068128250549
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -14.057517275405772,
+        "peak_dbfs": 0.5146979467173054,
+        "crest_db": 14.572215222123077,
+        "spectral_centroid_hz": 1147.5208994720506,
+        "band_energy_fraction": {
+          "80-250": 0.0092587092361965,
+          "250-1000": 0.6388658310536496,
+          "1000-4000": 0.33682415455887876,
+          "4000-8000": 0.013496950410231285,
+          "8000-16000": 0.0013542802451249887
+        },
+        "side_mid_db": -8.879691006132166,
+        "stereo_correlation": 0.7709673418836799
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Ikke Hüftgold",
+    "track_id": 1634783802,
+    "credited_artists": "Die Draufgänger & Ikke Hüftgold",
+    "title": "Rapunzel",
+    "edition": "Rapunzel - Single",
+    "catalog_release_date": "2022-07-29T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/rapunzel/1634783799?i=1634783802&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/die-draufg%C3%A4nger/42280534?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "e4ca0c69853a643cee7f8b0612329b82e1b9d16734014e05282b024c399008b2",
+    "measurements": {
+      "preview_duration_s": 29.92907029478458,
+      "analysis_window_preview_s": [
+        10.965,
+        18.965
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -8.944668213814907,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 8.944668213823594,
+        "spectral_centroid_hz": 989.8078173283222,
+        "band_energy_fraction": {
+          "80-250": 0.22155900629888303,
+          "250-1000": 0.35134372981719886,
+          "1000-4000": 0.21447533643883912,
+          "4000-8000": 0.04381003805566294,
+          "8000-16000": 0.012972904403052096
+        },
+        "side_mid_db": -4.026616625886682,
+        "stereo_correlation": 0.43317918928231874
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -13.555686320875811,
+        "peak_dbfs": 0.3307165759883075,
+        "crest_db": 13.88640289686412,
+        "spectral_centroid_hz": 1137.8286906049561,
+        "band_energy_fraction": {
+          "80-250": 0.07475524182654684,
+          "250-1000": 0.6521295024296729,
+          "1000-4000": 0.2308963317390669,
+          "4000-8000": 0.013963820134048507,
+          "8000-16000": 0.027808181119934012
+        },
+        "side_mid_db": -3.7009786516339487,
+        "stereo_correlation": 0.4020449080226455
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Rumbombe",
+    "track_id": 1882994210,
+    "credited_artists": "Rumbombe & Bozi",
+    "title": "INSELBANDE",
+    "edition": "INSELBANDE - Single",
+    "catalog_release_date": "2026-03-20T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/inselbande/1882994207?i=1882994210&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/rumbombe/1588367849?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "ba447a3944e4f461051498d370504c072fcad8dcdffc99c785e3a021d93955f6",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -6.831904408353289,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 6.831904408361976,
+        "spectral_centroid_hz": 925.0738543842509,
+        "band_energy_fraction": {
+          "80-250": 0.30923448257629027,
+          "250-1000": 0.18424800834299673,
+          "1000-4000": 0.10718241801975276,
+          "4000-8000": 0.045096177521506006,
+          "8000-16000": 0.027052501563469864
+        },
+        "side_mid_db": -6.901558852720699,
+        "stereo_correlation": 0.6610008905425467
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.261539617378418,
+        "peak_dbfs": 1.9194684559459587,
+        "crest_db": 14.18100807332438,
+        "spectral_centroid_hz": 1764.5870200730344,
+        "band_energy_fraction": {
+          "80-250": 0.054117390896241756,
+          "250-1000": 0.507083672155763,
+          "1000-4000": 0.31125413885090736,
+          "4000-8000": 0.09362365003182893,
+          "8000-16000": 0.033254305373221604
+        },
+        "side_mid_db": -2.441387112094646,
+        "stereo_correlation": 0.2739136443785545
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Rumbombe",
+    "track_id": 6789103158,
+    "credited_artists": "Rumbombe, Marc Eggers & Bozi",
+    "title": "ALDI",
+    "edition": "ALDI - Single",
+    "catalog_release_date": "2026-07-17T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/aldi/6789103154?i=6789103158&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/rumbombe/1588367849?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "d22d81044f17f7c5e82715fe9ac72c0b84b7acfc6f94caf70b591a704d051f82",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -9.299935959114134,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 9.29993595912282,
+        "spectral_centroid_hz": 1229.234508995359,
+        "band_energy_fraction": {
+          "80-250": 0.2518731543066532,
+          "250-1000": 0.37615877718565377,
+          "1000-4000": 0.16211718364634964,
+          "4000-8000": 0.07492168962074068,
+          "8000-16000": 0.02486828301292603
+        },
+        "side_mid_db": -8.026097278442855,
+        "stereo_correlation": 0.7279473391430805
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -12.368854738673278,
+        "peak_dbfs": 0.947380509082777,
+        "crest_db": 13.316235247756055,
+        "spectral_centroid_hz": 1888.6779236202403,
+        "band_energy_fraction": {
+          "80-250": 0.11339530022264471,
+          "250-1000": 0.4618505815139354,
+          "1000-4000": 0.25851505359629284,
+          "4000-8000": 0.1258005532986413,
+          "8000-16000": 0.04010057377152167
+        },
+        "side_mid_db": -16.720582196222797,
+        "stereo_correlation": 0.9583987116403304
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Rumbombe",
+    "track_id": 1698724820,
+    "credited_artists": "Rumbombe & Mia Julia",
+    "title": "Mallelelele",
+    "edition": "Mallelelele - Single",
+    "catalog_release_date": "2023-07-28T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/mallelelele/1698724601?i=1698724820&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/rumbombe/1588367849?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "e8a140b4ec678b9ff4673d5f119a07c89f69b683c0de81928716fbf6c167da80",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -8.061469400356023,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 8.06146940036471,
+        "spectral_centroid_hz": 458.5616937890123,
+        "band_energy_fraction": {
+          "80-250": 0.3553280873178844,
+          "250-1000": 0.12485576497637099,
+          "1000-4000": 0.06952370430154474,
+          "4000-8000": 0.014430387174642841,
+          "8000-16000": 0.009270889383320303
+        },
+        "side_mid_db": -10.578564451799279,
+        "stereo_correlation": 0.8393561821963283
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -15.712806036074422,
+        "peak_dbfs": -0.4564200156449514,
+        "crest_db": 15.25638602042947,
+        "spectral_centroid_hz": 1378.8386256512263,
+        "band_energy_fraction": {
+          "80-250": 0.11842878640892977,
+          "250-1000": 0.5304960999149261,
+          "1000-4000": 0.28959965331000714,
+          "4000-8000": 0.0363658367530045,
+          "8000-16000": 0.024402559147703833
+        },
+        "side_mid_db": -14.937828157738213,
+        "stereo_correlation": 0.9378424957364105
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Carolina",
+    "track_id": 1677670955,
+    "credited_artists": "Carolina & Dj Aaron",
+    "title": "Malle Ladies",
+    "edition": "Malle Ladies - Single",
+    "catalog_release_date": "2023-03-31T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/malle-ladies/1677670630?i=1677670955&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/carolina/1458587079?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "7c92632defd762408974360d88fcf33b32901692b89d5d647dd0fb00737b86e2",
+    "measurements": {
+      "preview_duration_s": 29.92907029478458,
+      "analysis_window_preview_s": [
+        10.965,
+        18.965
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -6.405147276261345,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 6.405147276270031,
+        "spectral_centroid_hz": 803.9286538174231,
+        "band_energy_fraction": {
+          "80-250": 0.16276159397231194,
+          "250-1000": 0.15947545401276983,
+          "1000-4000": 0.15084745088067528,
+          "4000-8000": 0.02850226785541847,
+          "8000-16000": 0.019144797558981238
+        },
+        "side_mid_db": -6.553585497409626,
+        "stereo_correlation": 0.6379644848937565
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -11.48418642402952,
+        "peak_dbfs": 2.6362608701428467,
+        "crest_db": 14.120447294172367,
+        "spectral_centroid_hz": 1802.2280668779276,
+        "band_energy_fraction": {
+          "80-250": 0.019219865472144344,
+          "250-1000": 0.4268652297852374,
+          "1000-4000": 0.46172367070887377,
+          "4000-8000": 0.06514279369977541,
+          "8000-16000": 0.02625727459859699
+        },
+        "side_mid_db": -2.6690305423075866,
+        "stereo_correlation": 0.2980346941632576
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Carolina",
+    "track_id": 1880445533,
+    "credited_artists": "Carolina",
+    "title": "Meer Sinn",
+    "edition": "Meer Sinn - Single",
+    "catalog_release_date": "2026-03-06T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/meer-sinn/1880445455?i=1880445533&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/carolina/1458587079?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "ab874cf8d3116a3e966c5e15bb7448d94b28f1c3429cb652371ff0f9700e7a9b",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -8.9321217473553,
+        "peak_dbfs": 8.686661818707667e-12,
+        "crest_db": 8.932121747363986,
+        "spectral_centroid_hz": 1515.9627334627069,
+        "band_energy_fraction": {
+          "80-250": 0.20699130807138394,
+          "250-1000": 0.2244222879941746,
+          "1000-4000": 0.14013679487235203,
+          "4000-8000": 0.07430818033389533,
+          "8000-16000": 0.06016491069277337
+        },
+        "side_mid_db": -8.217442501792348,
+        "stereo_correlation": 0.7379244273221963
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -13.705437959993894,
+        "peak_dbfs": 0.05001033358215658,
+        "crest_db": 13.755448293576048,
+        "spectral_centroid_hz": 2206.2899561161676,
+        "band_energy_fraction": {
+          "80-250": 0.08319589971271243,
+          "250-1000": 0.42353480170777885,
+          "1000-4000": 0.29164789442913364,
+          "4000-8000": 0.13532676528968035,
+          "8000-16000": 0.06192637560382028
+        },
+        "side_mid_db": -8.666223560149401,
+        "stereo_correlation": 0.7603301936049912
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  },
+  {
+    "requested_act": "Carolina",
+    "track_id": 6763563782,
+    "credited_artists": "Carolina",
+    "title": "Meer Sinn",
+    "edition": "Ballermann Hits 2026 (XXL Fan Edition)",
+    "catalog_release_date": "2026-03-06T12:00:00Z",
+    "catalog_url": "https://music.apple.com/de/album/meer-sinn/1895376410?i=6763563782&uo=4",
+    "artist_url": "https://music.apple.com/de/artist/carolina/1458587079?uo=4",
+    "selection": "current catalog edition / streaming or chart signal requires track-specific verification",
+    "analysis_status": "audio_accessible",
+    "audio_sha256": "7c093b1b9d7fd4e56592662b3cb1bb6dcb9354038105ffd712548a58b22393b3",
+    "measurements": {
+      "preview_duration_s": 29.975510204081633,
+      "analysis_window_preview_s": [
+        10.988,
+        18.988
+      ],
+      "absolute_song_offset": "unknown - preview offset not supplied by catalog",
+      "master": {
+        "rms_dbfs": -9.674753808143556,
+        "peak_dbfs": -0.22311633329078506,
+        "crest_db": 9.451637474852772,
+        "spectral_centroid_hz": 1195.8113902348375,
+        "band_energy_fraction": {
+          "80-250": 0.2225602625947667,
+          "250-1000": 0.22968846166859822,
+          "1000-4000": 0.12080280514043276,
+          "4000-8000": 0.05583619567416906,
+          "8000-16000": 0.04423336803579849
+        },
+        "side_mid_db": -8.722147831415207,
+        "stereo_correlation": 0.7632822762232655
+      },
+      "vocal_estimate": {
+        "rms_dbfs": -14.744064844886628,
+        "peak_dbfs": -0.9430625260372825,
+        "crest_db": 13.801002318849347,
+        "spectral_centroid_hz": 1915.9286996569897,
+        "band_energy_fraction": {
+          "80-250": 0.10115766702359322,
+          "250-1000": 0.4635952519009858,
+          "1000-4000": 0.26999294034933996,
+          "4000-8000": 0.11038987338373621,
+          "8000-16000": 0.05030002296764022
+        },
+        "side_mid_db": -8.674567254890412,
+        "stereo_correlation": 0.7607172010255581
+      },
+      "separation": "Demucs 4.0.1 htdemucs 955717e8-8726e21a, CPU, shifts=0",
+      "separation_note": "Estimated combined vocal stem. Main/backing/crowd not separated; artefacts possible."
+    }
+  }
+]

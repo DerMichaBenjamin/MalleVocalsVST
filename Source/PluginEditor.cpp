@@ -1,35 +1,318 @@
 #include "PluginEditor.h"
-MalleEditor::Control::Control(MalleProcessor &p, const malle::Param &d) {
-  label.setText((d.id.find(".amount") != std::string::npos &&
-                         d.section == d.id.substr(0, d.id.find('.'))
-                     ? d.section
-                 : d.name == "Aktiv" ? d.section + " Aktiv"
-                                     : d.name) +
-                    (d.unit.empty() ? "" : " (" + d.unit + ")"),
+namespace {
+const juce::Colour orange(0xffffb53d), teal(0xff4eddd4), ink(0xff101416);
+const std::array<std::string, 6> macroIds{"druck",  "klang", "waerme",
+                                          "breite", "raum",  "bewegung"};
+const std::array<juce::String, 6> macroNames{
+    "DRUCK", "KLANG", "WAERME", "BREITE", "HALL & DELAY", "PUMPEN"};
+const std::array<juce::String, 11> nodeNames{
+    "Input EQ",  "Tune",     "FET", "Leveler",    "De-Esser",       "Klang EQ",
+    "Multiband", "Resonanz", "Air", "Saettigung", "Pitch / Formant"};
+const std::array<std::string, 11> nodeOn{
+    "inputEQ.on", "tune.on", "fet.on", "level.on", "deess.on",   "eq.on",
+    "mb.on",      "res.on",  "air.on", "sat.on",   "creative.on"};
+const std::array<juce::String, 11> nodeSections{
+    "Input EQ",  "Tune",       "FET", "Leveling",   "De-Esser",     "Klang EQ",
+    "Multiband", "Resonanzen", "Air", "Saturation", "Pitch/Formant"};
+const std::array<juce::String, 10> parallelNames{
+    "Parallel-Kompressor", "Doubler / Chor", "Stadium", "Kurzer Raum",
+    "Short Delay",         "Long Delay",     "Hall",    "Throw Delay",
+    "FX-Ducking",          "Pumpen"};
+const std::array<std::string, 10> parallelOn{
+    "parallel.on", "double.on", "stadium.on", "room.on", "short.on",
+    "long.on",     "reverb.on", "throw.on",   "duck.on", "pump.on"};
+const std::array<juce::String, 10> parallelSection{
+    "Parallel", "Doubler", "Stadium", "room",    "short",
+    "long",     "reverb",  "throw",   "Ducking", "Bewegung"};
+} // namespace
+void GraphiteLook::drawRotarySlider(juce::Graphics &g, int x, int y, int w,
+                                    int h, float pos, float start, float end,
+                                    juce::Slider &s) {
+  float radius = std::min(w, h) * .38f, cx = x + w * .5f, cy = y + h * .5f;
+  juce::Rectangle<float> r(cx - radius, cy - radius, radius * 2, radius * 2);
+  auto accent =
+      bool(s.getProperties().getWithDefault("teal", false)) ? teal : orange;
+  g.setColour(juce::Colours::black.withAlpha(.7f));
+  g.fillEllipse(r.expanded(5).translated(2, 5));
+  juce::ColourGradient gradient(juce::Colour(0xff62666a), cx - radius,
+                                cy - radius, juce::Colour(0xff080a0b),
+                                cx + radius, cy + radius, false);
+  g.setGradientFill(gradient);
+  g.fillEllipse(r.expanded(3));
+  g.setColour(juce::Colour(0xff090c0d));
+  g.fillEllipse(r);
+  juce::ColourGradient face(juce::Colour(0xff2a2d2e), cx - radius * .6f,
+                            cy - radius * .7f, juce::Colour(0xff07090a),
+                            cx + radius, cy + radius, false);
+  g.setGradientFill(face);
+  g.fillEllipse(r.reduced(4));
+  g.setColour(juce::Colour(0xff171c1e));
+  juce::Path track;
+  track.addCentredArc(cx, cy, radius + 8, radius + 8, 0, start, end, true);
+  g.strokePath(track, juce::PathStrokeType(5));
+  g.setColour(accent);
+  juce::Path arc;
+  arc.addCentredArc(cx, cy, radius + 8, radius + 8, 0, start,
+                    start + pos * (end - start), true);
+  g.strokePath(arc, juce::PathStrokeType(4));
+  for (int i = 0; i <= 10; ++i) {
+    float a = start + (end - start) * i / 10;
+    g.setColour(juce::Colour(0xffa5a9aa));
+    g.drawLine(
+        cx + std::sin(a) * (radius + 15), cy - std::cos(a) * (radius + 15),
+        cx + std::sin(a) * (radius + 19), cy - std::cos(a) * (radius + 19), 1);
+  }
+  float a = start + pos * (end - start);
+  g.setColour(accent.brighter());
+  g.drawLine(cx + std::sin(a) * radius * .55f, cy - std::cos(a) * radius * .55f,
+             cx + std::sin(a) * (radius - 5), cy - std::cos(a) * (radius - 5),
+             3);
+}
+void GraphiteLook::drawButtonBackground(juce::Graphics &g, juce::Button &b,
+                                        const juce::Colour &, bool over,
+                                        bool down) {
+  auto r = b.getLocalBounds().toFloat().reduced(1);
+  auto c = b.getToggleState() || down
+               ? orange
+               : juce::Colour(over ? 0xff353b3d : 0xff22282a);
+  g.setGradientFill(juce::ColourGradient(c.brighter(.25f), 0, 0, c.darker(.45f),
+                                         0, float(b.getHeight()), false));
+  g.fillRoundedRectangle(r, 4);
+  g.setColour(b.getToggleState() ? orange.brighter()
+                                 : juce::Colour(0xff657073));
+  g.drawRoundedRectangle(r, 4, 1);
+}
+ValueControl::ValueControl(MalleProcessor &p, std::string id,
+                           juce::String title, bool isTeal) {
+  auto &d = malle::parameters()[size_t(malle::index(id))];
+  if (title.isEmpty())
+    title = d.name;
+  label.setText(title + (d.unit.empty() ? "" : " (" + d.unit + ")"),
                 juce::dontSendNotification);
-  label.setFont(juce::FontOptions(16.f));
+  label.setFont(juce::FontOptions(15));
   label.setJustificationType(juce::Justification::centred);
   addAndMakeVisible(label);
   slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
   slider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 100, 24);
   slider.setDoubleClickReturnValue(true, d.def);
-  slider.setTooltip(
-      d.section + ": " + d.name +
-      ". Doppelklick = Reset; Shift = fein; Zahl direkt editieren.");
-  slider.setNumDecimalPlacesToDisplay(malle::discrete(d.id) ? 0
-                                      : d.max <= 1          ? 2
-                                                            : 1);
+  slider.getProperties().set("teal", isTeal);
+  slider.setTooltip(d.section + ": " + d.name +
+                    ". Doppelklick: Reset. Shift: fein. Zahl editierbar.");
   addAndMakeVisible(slider);
-  attachment =
+  attach =
       std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
-          p.state, d.id, slider);
-  slider.onDragStart = [&p] { p.undo.beginNewTransaction("Parameter"); };
-  slider.onDragEnd = [&p] { p.undo.beginNewTransaction(); };
+          p.state, id, slider);
+  slider.onDragStart = [&p] {
+    p.state.copyState();
+    p.undo.beginNewTransaction("Parameter");
+  };
+  slider.onDragEnd = [&p] {
+    p.state.copyState();
+    p.undo.beginNewTransaction();
+  };
 }
-void MalleEditor::Control::resized() {
-  auto b = getLocalBounds();
-  label.setBounds(b.removeFromTop(32));
-  slider.setBounds(b);
+void ValueControl::resized() {
+  auto r = getLocalBounds();
+  label.setBounds(r.removeFromTop(24));
+  slider.setBounds(r);
+}
+ParamChoice::ParamChoice(MalleProcessor &p, std::string id, juce::String title,
+                         juce::StringArray names, std::vector<float> v)
+    : values(std::move(v)) {
+  label.setText(title, juce::dontSendNotification);
+  label.setFont(juce::FontOptions(14));
+  addAndMakeVisible(label);
+  box.addItemList(names, 1);
+  addAndMakeVisible(box);
+  if (values.empty())
+    for (int i = 0; i < names.size(); ++i)
+      values.push_back(float(i));
+  auto *parameter = p.state.getParameter(id);
+  attach = std::make_unique<juce::ParameterAttachment>(
+      *parameter,
+      [this](float value) {
+        int best = -1;
+        for (size_t i = 0; i < values.size(); ++i)
+          if (std::abs(value - values[i]) < .001f)
+            best = int(i);
+        box.setSelectedId(best + 1, juce::dontSendNotification);
+        if (best < 0)
+          box.setText(juce::String(value, 2) + " (Custom)",
+                      juce::dontSendNotification);
+      },
+      &p.undo);
+  box.onChange = [this, &p] {
+    int i = box.getSelectedId() - 1;
+    if (i >= 0) {
+      p.undo.beginNewTransaction("Auswahl");
+      attach->setValueAsCompleteGesture(values[size_t(i)]);
+      p.state.copyState();
+      p.undo.beginNewTransaction();
+    }
+  };
+  attach->sendInitialUpdate();
+}
+void ParamChoice::resized() {
+  auto r = getLocalBounds();
+  label.setBounds(r.removeFromTop(20));
+  box.setBounds(r.reduced(1));
+}
+ParamToggle::ParamToggle(MalleProcessor &p, std::string id, juce::String text)
+    : TextButton(text) {
+  setClickingTogglesState(true);
+  attach =
+      std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
+          p.state, id, *this);
+}
+void Card::paint(juce::Graphics &g) {
+  auto r = getLocalBounds().toFloat().reduced(1);
+  g.setGradientFill(juce::ColourGradient(
+      juce::Colour(0xff303638), 0, 0, juce::Colour(0xff151a1c),
+      float(getWidth()), float(getHeight()), false));
+  g.fillRoundedRectangle(r, 5);
+  g.setColour(juce::Colour(0xff080b0c));
+  g.drawRoundedRectangle(r, 5, 2);
+  g.setColour(juce::Colour(0xff596164));
+  g.drawRoundedRectangle(r.reduced(2), 3, .6f);
+  g.setFont(juce::FontOptions(17, juce::Font::bold));
+  g.setColour(teal ? ::teal : orange);
+  g.drawText(title, 14, 8, getWidth() - 30, 25, juce::Justification::left);
+}
+MacroCard::MacroCard(MalleProcessor &p, int n)
+    : Card(macroNames[n], n == 4), proc(p), slot(n) {
+  auto id = macroIds[n];
+  amount =
+      std::make_unique<ValueControl>(p, id + ".amount", "Intensitaet", n == 4);
+  on = std::make_unique<ParamToggle>(p, id + ".on", "ON");
+  juce::StringArray names;
+  for (auto &v : malle::variants())
+    names.add(v);
+  variant =
+      std::make_unique<ParamChoice>(p, id + ".variant", "Variante", names);
+  for (auto *c : std::initializer_list<juce::Component *>{
+           amount.get(), on.get(), variant.get()})
+    addAndMakeVisible(c);
+  if (n == 1) {
+    res = std::make_unique<ValueControl>(p, "res.amount", "Resonanz");
+    air = std::make_unique<ValueControl>(p, "air.high", "Air");
+    resOn = std::make_unique<ParamToggle>(p, "res.on", "Res ON");
+    airOn = std::make_unique<ParamToggle>(p, "air.on", "Air ON");
+    addAndMakeVisible(*resOn);
+    addAndMakeVisible(*airOn);
+    addAndMakeVisible(*res);
+    addAndMakeVisible(*air);
+  }
+  if (n == 5) {
+    mode = std::make_unique<ParamChoice>(
+        p, "pump.mode", "Steuerung", juce::StringArray{"Tempo", "Extern SC"});
+    rate = std::make_unique<ParamChoice>(
+        p, "pump.beats", "Raster",
+        juce::StringArray{"1/16", "1/8", "1/4", "1/2"},
+        std::vector<float>{.25f, .5f, 1, 2});
+    addAndMakeVisible(*mode);
+    addAndMakeVisible(*rate);
+  }
+}
+void MacroCard::resized() {
+  int w = getWidth(), h = getHeight();
+  on->setBounds(w - 70, 10, 55, 26);
+  variant->setBounds(w - 153, 43, 138, 48);
+  amount->setBounds(12, slot == 1 ? 84 : 83, slot == 1 ? w - 110 : w - 24,
+                    h - 94);
+  if (res) {
+    int y = 92, half = (h - y - 10) / 2;
+    resOn->setBounds(w - 100, y, 86, 23);
+    res->setBounds(w - 107, y + 25, 99, half - 28);
+    airOn->setBounds(w - 100, y + half, 86, 23);
+    air->setBounds(w - 107, y + half + 25, 99, half - 28);
+  }
+  if (mode) {
+    amount->setBounds(10, 90, w - 155, h - 100);
+    mode->setBounds(w - 145, 103, 130, 48);
+    rate->setBounds(w - 145, 165, 130, 48);
+  }
+}
+ThrowPanel::ThrowPanel(MalleProcessor &p) : Card("THROW DELAY", true), proc(p) {
+  type = std::make_unique<ParamChoice>(
+      p, "throw.type", "Typ", juce::StringArray{"Mono", "Stereo", "Ping Pong"});
+  grid = std::make_unique<ParamChoice>(
+      p, "throw.beats", "Raster",
+      juce::StringArray{"1/32", "1/16", "1/8", "3/16", "1/4", "1/2", "1/1"},
+      std::vector<float>{.125f, .25f, .5f, .75f, 1, 2, 4});
+  feel = std::make_unique<ParamChoice>(
+      p, "throw.feel", "Feel",
+      juce::StringArray{"Gerade", "Punktiert", "Triolisch"});
+  verbType =
+      std::make_unique<ParamChoice>(p, "throw.verb.type", "Hall-Typ",
+                                    juce::StringArray{"Room", "Plate", "Hall"});
+  verbOn = std::make_unique<ParamToggle>(p, "throw.verb.on", "Hall ON");
+  on = std::make_unique<ParamToggle>(p, "throw.on", "ON");
+  sync = std::make_unique<ParamToggle>(p, "throw.sync", "Tempo Sync");
+  for (auto *c : std::initializer_list<juce::Component *>{
+           &trigger, &kill, sync.get(), type.get(), grid.get(), feel.get(),
+           verbType.get(), verbOn.get(), on.get()})
+    addAndMakeVisible(c);
+  trigger.onStateChange = [this] {
+    proc.setValue("throw.trigger", trigger.isDown() ? 1 : 0);
+  };
+  kill.onStateChange = [this] {
+    proc.setValue("throw.kill", kill.isDown() ? 1 : 0);
+  };
+  for (auto pair : std::initializer_list<std::pair<std::string, juce::String>>{
+           {"throw.feedback", "Feedback"},
+           {"throw.return", "Throw-Mix"},
+           {"throw.verb.amount", "Hall-Menge"}}) {
+    auto c = std::make_unique<ValueControl>(p, pair.first, pair.second, true);
+    addAndMakeVisible(*c);
+    primary.push_back(std::move(c));
+  }
+  for (auto pair : std::initializer_list<std::pair<std::string, juce::String>>{
+           {"throw.low", "Low Cut"},
+           {"throw.high", "High Cut"},
+           {"throw.width", "Breite"},
+           {"throw.window", "Send-Fenster"},
+           {"throw.offset", "Startversatz"},
+           {"throw.quantize", "Quant. Beats"},
+           {"throw.tail", "Max. Tail"},
+           {"throw.fade", "Fade-out"},
+           {"throw.time", "Freie Zeit"},
+           {"throw.send", "Send-Pegel"}}) {
+    auto c = std::make_unique<ValueControl>(p, pair.first, pair.second, true);
+    addAndMakeVisible(*c);
+    detail.push_back(std::move(c));
+  }
+  trigger.setTooltip("Steigende Flanke oeffnet das Send-Fenster. Loslassen "
+                     "schliesst den Send; Echo und Hall klingen weiter.");
+}
+void ThrowPanel::setAdvanced(bool a) {
+  advanced = a;
+  for (auto &c : detail)
+    c->setVisible(a);
+  kill.setVisible(a);
+  sync->setVisible(true);
+  resized();
+}
+void ThrowPanel::resized() {
+  int w = getWidth();
+  on->setBounds(w - 65, 8, 50, 25);
+  trigger.setBounds(15, 44, 155, 65);
+  int left = 185;
+  int col = (w - 200) / 8;
+  type->setBounds(left, 43, col - 7, 55);
+  grid->setBounds(left + col, 43, col - 7, 55);
+  feel->setBounds(left + 2 * col, 43, col - 7, 55);
+  primary[0]->setBounds(left + 3 * col, 30, col, 100);
+  primary[1]->setBounds(left + 4 * col, 30, col, 100);
+  verbOn->setBounds(left + 5 * col, 62, col - 9, 30);
+  verbType->setBounds(left + 6 * col, 43, col - 7, 55);
+  primary[2]->setBounds(left + 7 * col, 30, col, 100);
+  sync->setBounds(15, 111, 155, 24);
+  if (advanced) {
+    int dw = (w - 155) / 10;
+    for (int i = 0; i < 10; ++i)
+      detail[i]->setBounds(12 + i * dw, 132, dw - 5, 107);
+    kill.setBounds(w - 140, 168, 125, 36);
+  }
 }
 juce::Point<float> EqView::point(int b) const {
   float f = proc.getValue("eq" + std::to_string(b) + ".freq"),
@@ -147,35 +430,247 @@ void EqView::mouseWheelMove(const juce::MouseEvent &,
   auto id = "eq" + std::to_string(selected) + ".q";
   proc.setValue(id, juce::jlimit(.2f, 12.f, proc.getValue(id) + w.deltaY * 3));
 }
+
+void WaveView::paint(juce::Graphics &g) {
+  g.fillAll(juce::Colour(0xff101b26));
+  g.setColour(juce::Colour(0xff6bd3cd));
+  for (int i = 0; i < 512; ++i) {
+    float x = getWidth() * i / 512.f,
+          peak = std::min(1.f, proc.waveform[size_t(i)]);
+    g.drawVerticalLine(int(x), getHeight() * (.5f - peak * .45f),
+                       getHeight() * (.5f + peak * .45f));
+  }
+  g.setFont(juce::FontOptions(14));
+  g.drawText("Crowd-Wellenform / Audiodatei hier ablegen", 10, 2,
+             getWidth() - 20, 20, juce::Justification::left);
+}
+void RoutingView::paint(juce::Graphics &g) {
+  g.fillAll(juce::Colour(0xff111719));
+  auto order = proc.routing();
+  auto base = malle::defaults();
+  for (size_t i = 0; i < base.size(); ++i)
+    base[i] = proc.getValue(malle::parameters()[i].id);
+  auto effective = malle::resolve(base);
+  auto heading = [&](juce::String text, int y) {
+    g.setColour(juce::Colour(0xff283235));
+    g.fillRect(0, y - scroll, getWidth(), 28);
+    g.setColour(juce::Colours::white);
+    g.setFont(juce::FontOptions(14, juce::Font::bold));
+    g.drawText(text, 9, y - scroll, getWidth() - 12, 28,
+               juce::Justification::left);
+  };
+  auto row = [&](juce::String text, std::string id, int y, bool serial) {
+    bool on = effective[size_t(malle::index(id))] > .5f;
+    g.setColour(on ? juce::Colour(0xffe6e9e9) : juce::Colour(0xff727e81));
+    g.setFont(juce::FontOptions(14));
+    g.drawText((serial ? ":: " : "> ") + text, 9, y - scroll, getWidth() - 37,
+               26, juce::Justification::left);
+    g.setColour(on ? (serial ? orange : teal) : juce::Colour(0xff41494b));
+    g.drawEllipse(float(getWidth() - 25), float(y - scroll + 8), 11, 11, 2);
+  };
+  heading("DIREKTKETTE - verschiebbar", 0);
+  for (int i = 0; i < 11; ++i)
+    row(nodeNames[order[i]], nodeOn[order[i]], 28 + i * 26, true);
+  heading("PARALLEL - Abgriff / Return", 314);
+  for (int i = 0; i < 8; ++i)
+    row(parallelNames[i], parallelOn[i], 342 + i * 26, false);
+  heading("STEUERUNG - Quelle / Ziele", 550);
+  for (int i = 8; i < 10; ++i)
+    row(parallelNames[i], parallelOn[i], 578 + (i - 8) * 26, false);
+  heading("OUTPUT - fester Abschluss", 630);
+  if (drop >= 0) {
+    g.setColour(orange);
+    g.fillRect(4, 28 + drop * 26 - scroll, getWidth() - 8, 3);
+  }
+}
+void RoutingView::mouseDown(const juce::MouseEvent &e) {
+  int y = e.y + scroll;
+  from = -1;
+  auto order = proc.routing();
+  if (y >= 28 && y < 314) {
+    int row = (y - 28) / 26;
+    if (e.x > getWidth() - 34) {
+      auto id = nodeOn[order[row]];
+      proc.undo.beginNewTransaction("Modul-Bypass");
+      proc.setValue(id, proc.getValue(id) > .5f ? 0 : 1);
+      proc.state.copyState();
+      proc.undo.beginNewTransaction();
+    } else {
+      from = row;
+      select(nodeSections[order[row]]);
+    }
+  } else {
+    int row = y >= 342 && y < 550   ? (y - 342) / 26
+              : y >= 578 && y < 630 ? 8 + (y - 578) / 26
+                                    : -1;
+    if (row >= 0 && row < 10) {
+      if (e.x > getWidth() - 34) {
+        auto id = parallelOn[row];
+        proc.undo.beginNewTransaction("Weg-Bypass");
+        proc.setValue(id, proc.getValue(id) > .5f ? 0 : 1);
+        proc.state.copyState();
+        proc.undo.beginNewTransaction();
+      } else
+        select(parallelSection[row]);
+    }
+  }
+  repaint();
+}
+void RoutingView::mouseDrag(const juce::MouseEvent &e) {
+  if (from >= 0 && e.getDistanceFromDragStart() > 5)
+    if (auto *d = juce::DragAndDropContainer::findParentDragContainerFor(this))
+      if (!d->isDragAndDropActive())
+        d->startDragging(from, this);
+}
+void RoutingView::mouseWheelMove(const juce::MouseEvent &,
+                                 const juce::MouseWheelDetails &w) {
+  scroll = juce::jlimit(0, std::max(0, 658 - getHeight()),
+                        scroll - int(w.deltaY * 150));
+  repaint();
+}
+bool RoutingView::isInterestedInDragSource(const SourceDetails &s) {
+  return s.sourceComponent.get() == this && int(s.description) >= 0 &&
+         int(s.description) < 11;
+}
+void RoutingView::itemDragMove(const SourceDetails &s) {
+  int y = s.localPosition.y + scroll;
+  drop = y >= 28 && y < 314 ? (y - 28) / 26 : -1;
+  repaint();
+}
+void RoutingView::itemDragExit(const SourceDetails &) {
+  drop = -1;
+  repaint();
+}
+void RoutingView::itemDropped(const SourceDetails &s) {
+  if (drop >= 0)
+    proc.moveModule(int(s.description), drop);
+  drop = -1;
+  from = -1;
+  repaint();
+}
 MalleEditor::MalleEditor(MalleProcessor &p)
-    : AudioProcessorEditor(p), proc(p), eq(p), wave(p) {
-  look.setColour(juce::ResizableWindow::backgroundColourId,
-                 juce::Colour(0xff14202c));
-  look.setColour(juce::Slider::rotarySliderFillColourId,
-                 juce::Colour(0xffe9b65f));
-  look.setColour(juce::Slider::thumbColourId, juce::Colour(0xffffd990));
-  look.setColour(juce::TextButton::buttonColourId, juce::Colour(0xff2c4656));
+    : AudioProcessorEditor(p), proc(p), throws(p), wave(p), eq(p),
+      routing(p, [this](juce::String s) { selectModule(s); }) {
   setLookAndFeel(&look);
+  look.setColour(juce::Label::textColourId, juce::Colour(0xffeef0f0));
+  look.setColour(juce::TextButton::textColourOffId, juce::Colours::white);
+  look.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+  look.setColour(juce::Slider::textBoxBackgroundColourId,
+                 juce::Colour(0xff101719));
+  look.setColour(juce::Slider::textBoxOutlineColourId,
+                 juce::Colour(0xff515c60));
+  look.setColour(juce::ComboBox::backgroundColourId, juce::Colour(0xff111719));
+  look.setColour(juce::ComboBox::outlineColourId, juce::Colour(0xff586063));
+  look.setColour(juce::PopupMenu::backgroundColourId, juce::Colour(0xff172023));
   setResizable(true, true);
-  setResizeLimits(950, 720, 1800, 1300);
+  setResizeLimits(1160, 900, 2000, 1500);
   for (auto *c : std::initializer_list<juce::Component *>{
-           &mode,    &undo,      &redo,        &import,      &save,
-           &load,    &favorite,  &preview,     &throwButton, &wave,
-           &lockKey, &lockInput, &lockRouting, &search,      &preset,
-           &section, &status,    &sample,      &viewport,    &eq})
+           &simple,      &advancedButton, &undo,    &redo,     &save,
+           &load,        &favorite,       &import,  &preview,  &lockKey,
+           &lockInput,   &lockRouting,    &preset,  &section,  &search,
+           &status,      &sourceInfo,     &throws,  &stadium,  &tuning,
+           &io,          &detailCard,     &routing, &viewport, &eq,
+           &deessPresets})
     addAndMakeVisible(c);
+  for (int i = 0; i < 6; ++i) {
+    macros[i] = std::make_unique<MacroCard>(p, i);
+    addAndMakeVisible(*macros[i]);
+  }
+  const juce::StringArray tabNames{"Klang & Dynamik", "Tune & Stimmen",
+                                   "Stadium", "Hall & Delay", "Routing"};
+  for (int i = 0; i < 5; ++i) {
+    tabs[i].setButtonText(tabNames[i]);
+    addAndMakeVisible(tabs[i]);
+    tabs[i].onClick = [this, i] {
+      selectModule(juce::StringArray{"Klang EQ", "Tune", "Stadium", "reverb",
+                                     "Routing"}[i]);
+    };
+  }
+  stadiumOn = std::make_unique<ParamToggle>(p, "stadium.on", "ON");
+  stadiumAmount = std::make_unique<ValueControl>(p, "stadium.mix", "Menge");
+  texture = std::make_unique<ParamChoice>(
+      p, "stadium.texture", "Testtextur",
+      juce::StringArray{"Test 1", "Test 2", "Test 3", "Test 4", "Test 5",
+                        "Test 6", "Test 7"});
+  for (auto *c : std::initializer_list<juce::Component *>{
+           stadiumOn.get(), stadiumAmount.get(), texture.get(), &wave, &import,
+           &preview})
+    stadium.addAndMakeVisible(c);
+  tuneOn = std::make_unique<ParamToggle>(p, "tune.on", "ON");
+  tuneAmount = std::make_unique<ValueControl>(p, "tune.amount", "Korrektur");
+  root = std::make_unique<ParamChoice>(p, "tune.root", "Grundton",
+                                       juce::StringArray{"C", "C#", "D", "D#",
+                                                         "E", "F", "F#", "G",
+                                                         "G#", "A", "A#", "B"});
+  scale = std::make_unique<ParamChoice>(
+      p, "tune.scale", "Skala",
+      juce::StringArray{"Chromatisch", "Dur", "Moll", "Custom"});
+  for (auto *c : std::initializer_list<juce::Component *>{
+           tuneOn.get(), tuneAmount.get(), root.get(), scale.get()})
+    tuning.addAndMakeVisible(c);
+  input = std::make_unique<ValueControl>(p, "input", "Input");
+  output = std::make_unique<ValueControl>(p, "output", "Output");
+  fxMix = std::make_unique<ValueControl>(p, "fx.mix", "Gesamt-FX-Mix", true);
+  for (auto *c : {input.get(), fxMix.get(), output.get()})
+    io.addAndMakeVisible(c);
   viewport.setViewedComponent(&content, false);
-  search.setTextToShowWhenEmpty("Suche (* = Favoriten)", juce::Colours::grey);
-  search.onTextChange = [this] { populatePresets(); };
-  populatePresets();
-  preset.onChange = [this] { proc.applyPreset(preset.getSelectedId() - 1); };
-  mode.onClick = [this] {
-    advanced = !advanced;
-    mode.setButtonText(advanced ? "Simple" : "Advanced");
+  juce::StringArray groups;
+  for (auto &d : malle::parameters())
+    if (!groups.contains(d.section) && juce::String(d.section) != "Global" &&
+        juce::String(d.section) != "throw")
+      groups.add(d.section);
+  section.addItemList(groups, 1);
+  section.setText("Klang EQ", juce::dontSendNotification);
+  section.onChange = [this] { rebuild(); };
+  deessPresets.addItemList({"S-Laute", "SCH/SH-Laute", "Breitband"}, 1);
+  deessPresets.onChange = [this] {
+    proc.deesserPreset(deessPresets.getSelectedId() - 1);
+  };
+  auto changeView = [this](bool a) {
+    advanced = a;
+    simple.setToggleState(!a, juce::dontSendNotification);
+    advancedButton.setToggleState(a, juce::dontSendNotification);
     rebuild();
   };
-  undo.onClick = [this] {proc.state.copyState();proc.undo.undo(); };
-  redo.onClick = [this] {proc.state.copyState();proc.undo.redo(); };
+  simple.onClick = [changeView] { changeView(false); };
+  advancedButton.onClick = [changeView] { changeView(true); };
+  simple.setToggleState(true, juce::dontSendNotification);
+  undo.onClick = [this] {
+    proc.state.copyState();
+    proc.undo.undo();
+  };
+  redo.onClick = [this] {
+    proc.state.copyState();
+    proc.undo.redo();
+  };
+  save.onClick = [this] { choose(true); };
+  load.onClick = [this] { choose(false); };
+  favorite.onClick = [this] {
+    auto key = "fav." + juce::String(preset.getSelectedId());
+    proc.state.state.setProperty(key, !bool(proc.state.state.getProperty(key)),
+                                 &proc.undo);
+    populatePresets();
+  };
+  search.setTextToShowWhenEmpty("Suche (* Favoriten)", juce::Colours::grey);
+  search.onTextChange = [this] { populatePresets(); };
+  populatePresets();
+  preset.onChange = [this] {
+    int i = preset.getSelectedId() - 1;
+    proc.applyPreset(i);
+    if (i >= 0 && i < int(malle::presets().size())) {
+      auto &p = malle::presets()[size_t(i)];
+      preset.setTooltip(p.description + "\n" + p.status + "\n" + p.reference);
+    }
+  };
+  auto bindLock = [this](juce::ToggleButton &b, const char *key) {
+    b.onClick = [this, &b, key] {
+      proc.undo.beginNewTransaction("Lock");
+      proc.state.state.setProperty(key, b.getToggleState(), &proc.undo);
+    };
+  };
+  bindLock(lockKey, "lock.key");
+  bindLock(lockInput, "lock.input");
+  bindLock(lockRouting, "lock.routing");
   import.onClick = [this] {
     chooser = std::make_unique<juce::FileChooser>(
         "Crowd importieren", juce::File{}, "*.wav;*.aif;*.aiff;*.flac");
@@ -188,53 +683,12 @@ MalleEditor::MalleEditor(MalleProcessor &p)
                                  {fc.getResult().getFullPathName()}, 0, 0);
                          });
   };
-  throwButton.onStateChange = [this] {
-    proc.setValue("throw.trigger", throwButton.isDown() ? 1.f : 0.f);
-  };
   preview.setClickingTogglesState(true);
   preview.onClick = [this] {
     proc.engine.audition.store(preview.getToggleState());
   };
-  save.onClick = [this] { choose(true); };
-  load.onClick = [this] { choose(false); };
-  favorite.setClickingTogglesState(true);
-  favorite.onClick = [this] {
-    auto key = "fav." + juce::String(preset.getSelectedId());
-    proc.state.state.setProperty(key, !bool(proc.state.state.getProperty(key)),
-                                 &proc.undo);
-  };
-  auto lock = [this](juce::ToggleButton &b, const char *key) {
-    b.setToggleState(bool(proc.state.state.getProperty(key)),
-                     juce::dontSendNotification);
-    b.onClick = [this, &b, key] {
-      proc.undo.beginNewTransaction("Lock");
-      proc.state.state.setProperty(key, b.getToggleState(), &proc.undo);
-    };
-  };
-  lock(lockKey, "lock.key");
-  lock(lockInput, "lock.input");
-  lock(lockRouting, "lock.routing");
-  juce::StringArray groups;
-  for (auto &d : malle::parameters())
-    if (!groups.contains(d.section))
-      groups.add(d.section);
-  section.addItemList(groups, 1);
-  section.setSelectedId(1);
-  section.onChange = [this] {
-    if (advanced)
-      rebuild();
-  };
-  for (int i = 0; i < 6; ++i) {
-    addAndMakeVisible(variants[i]);
-    for (int j = 0; j < 20; ++j)
-      variants[i].addItem(malle::variants()[j], j + 1);
-    std::string key = std::array<std::string, 6>{
-        "druck", "klang", "waerme", "breite", "raum", "bewegung"}[i];
-    variantAttachments[i] = std::make_unique<
-        juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
-        proc.state, key + ".variant", variants[i]);
-  }
-  setSize(1120, 850);
+  ready = true;
+  setSize(1440, 1080);
   rebuild();
   startTimerHz(20);
   timerCallback();
@@ -247,129 +701,257 @@ MalleEditor::~MalleEditor() {
 void MalleEditor::populatePresets() {
   int selected = preset.getSelectedId();
   preset.clear(juce::dontSendNotification);
-  auto q = search.getText();bool onlyFavorites=q.startsWith("*");if(onlyFavorites)q=q.substring(1).trim();
+  auto q = search.getText();
+  bool favorites = q.startsWith("*");
+  if (favorites)
+    q = q.substring(1).trim();
   int i = 0;
   for (auto &p : malle::presets()) {
     ++i;
-    bool fav=bool(proc.state.state.getProperty("fav."+juce::String(i)));
-    juce::String text = (fav?"* ":"")+p.category + " / " + p.name;
-    if (text.containsIgnoreCase(q)&&(!onlyFavorites||fav))
+    bool fav = bool(proc.state.state.getProperty("fav." + juce::String(i)));
+    juce::String text = (fav ? "* " : "") + p.category + " / " + p.name;
+    if (text.containsIgnoreCase(q) && (!favorites || fav))
       preset.addItem(text, i);
+    if (selected == 0 && juce::String(p.name) == proc.currentPreset)
+      selected = i;
   }
-  if (selected == 0) {
-    int i = 0;
-    for (auto &p : malle::presets()) {
-      ++i;
-      if (juce::String(p.name) == proc.currentPreset) {
-        selected = i;
+  preset.setSelectedId(selected, juce::dontSendNotification);
+}
+void MalleEditor::selectModule(juce::String s) {
+  section.setText(s, juce::dontSendNotification);
+  rebuild();
+}
+void MalleEditor::rebuild() {
+  controls.clear();
+  sectionVariant.reset();
+  juce::String group = section.getText();
+  juce::String macro = group == "FET" || group == "Leveling" ||
+                               group == "Multiband" || group == "Parallel"
+                           ? "druck"
+                       : group == "Klang EQ" || group == "Input EQ" ||
+                               group == "De-Esser" || group == "Resonanzen" ||
+                               group == "Air"
+                           ? "klang"
+                       : group == "Saturation" ? "waerme"
+                       : group == "Doubler"    ? "breite"
+                       : group == "room" || group == "short" ||
+                               group == "long" || group == "reverb"
+                           ? "raum"
+                       : group == "Bewegung" ? "bewegung"
+                                             : "";
+  if (macro.isNotEmpty()) {
+    juce::StringArray names;
+    for (auto &v : malle::variants())
+      names.add(v);
+    sectionVariant =
+        std::make_unique<ParamChoice>(proc, macro.toStdString() + ".variant",
+                                      "Gemeinsame Sektionvariante", names);
+    addAndMakeVisible(*sectionVariant);
+    sectionVariant->setVisible(advanced);
+  }
+  for (auto &d : malle::parameters())
+    if (juce::String(d.section) == group && d.id.rfind("route.", 0) != 0 &&
+        (d.id.size() < 3 || d.id.substr(d.id.size() - 3) != ".on") &&
+        d.id != "deess.preset" && d.id.find(".variant") == std::string::npos) {
+      auto c = std::make_unique<ValueControl>(
+          proc, d.id, juce::String{},
+          group == "room" || group == "short" || group == "long" ||
+              group == "reverb");
+      content.addAndMakeVisible(*c);
+      controls.push_back(std::move(c));
+    }
+  for (auto &c : macros)
+    c->setVisible(!advanced);
+  stadium.setVisible(!advanced);
+  tuning.setVisible(!advanced);
+  for (auto &b : tabs)
+    b.setVisible(advanced);
+  routing.setVisible(advanced);
+  section.setVisible(advanced);
+  detailCard.setVisible(advanced);
+  viewport.setVisible(advanced);
+  eq.setVisible(advanced && group == "Klang EQ");
+  deessPresets.setVisible(advanced && group == "De-Esser");
+  sourceInfo.setVisible(advanced);
+  throws.setAdvanced(advanced);
+  detailCard.title = group == "Routing"
+                         ? "ROUTING - DIREKT / PARALLEL / STEUERUNG"
+                         : group.toUpperCase();
+  resized();
+}
+void MalleEditor::resized() {
+  if (!ready)
+    return;
+  int w = getWidth(), h = getHeight();
+  simple.setBounds(w - 210, 15, 90, 31);
+  advancedButton.setBounds(w - 115, 15, 98, 31);
+  preset.setBounds(20, 57, w - 690, 34);
+  search.setBounds(w - 650, 57, 165, 34);
+  favorite.setBounds(w - 480, 57, 35, 34);
+  undo.setBounds(w - 440, 57, 65, 34);
+  redo.setBounds(w - 370, 57, 65, 34);
+  save.setBounds(w - 300, 57, 90, 34);
+  load.setBounds(w - 205, 57, 80, 34);
+  lockKey.setBounds(20, 96, 95, 25);
+  lockInput.setBounds(115, 96, 85, 25);
+  lockRouting.setBounds(205, 96, 100, 25);
+  int throwH = advanced ? 250 : 144;
+  throws.setBounds(18, h - throwH - 41, w - 36, throwH);
+  status.setBounds(22, h - 37, w - 44, 32);
+  int top = 132, bottom = throws.getY() - 10;
+  if (!advanced) {
+    int rightW = w / 4 - 12, leftW = w - rightW - 48, gap = 9,
+        col = (leftW - 2 * gap) / 3, rowH = (bottom - top - gap) / 2;
+    for (int i = 0; i < 6; ++i)
+      macros[i]->setBounds(18 + (i % 3) * (col + gap),
+                           top + (i / 3) * (rowH + gap), col, rowH);
+    int rx = w - rightW - 18;
+    stadium.setBounds(rx, top, rightW, int((bottom - top) * .42));
+    tuning.setBounds(rx, stadium.getBottom() + 8, rightW,
+                     int((bottom - top) * .27));
+    io.setBounds(rx, tuning.getBottom() + 8, rightW,
+                 bottom - tuning.getBottom() - 8);
+  } else {
+    int rw = 220;
+    for (int i = 0; i < 5; ++i)
+      tabs[i].setBounds(18 + rw + 8 + i * (w - rw - 54) / 5, top,
+                        (w - rw - 54) / 5 - 3, 30);
+    routing.setBounds(18, top, rw, bottom - top);
+    detailCard.setBounds(18 + rw + 8, top + 38, w - rw - 44,
+                         bottom - top - 190);
+    section.setBounds(detailCard.getRight() - 235, detailCard.getY() + 7, 218,
+                      30);
+    int eqH = eq.isVisible() ? 170 : 0;
+    eq.setBounds(detailCard.getX() + 13, detailCard.getY() + 42,
+                 detailCard.getWidth() - 26, eqH);
+    deessPresets.setBounds(detailCard.getX() + 18, detailCard.getY() + 43, 280,
+                           32);
+    int extra = deessPresets.isVisible() ? 65 : sectionVariant ? 60 : 0;
+    if (sectionVariant)
+      sectionVariant->setBounds(detailCard.getRight() - 320,
+                                detailCard.getY() + 43 + eqH, 300, 54);
+    viewport.setBounds(
+        detailCard.getX() + 10, detailCard.getY() + 44 + eqH + extra,
+        detailCard.getWidth() - 20, detailCard.getHeight() - 54 - eqH - extra);
+    io.setBounds(detailCard.getX(), detailCard.getBottom() + 8,
+                 detailCard.getWidth(), 143);
+    sourceInfo.setBounds(detailCard.getX() + 280, io.getY() + 6,
+                         detailCard.getWidth() - 295, 22);
+  }
+  int sw = stadium.getWidth(), sh = stadium.getHeight();
+  stadiumOn->setBounds(sw - 68, 9, 53, 25);
+  stadiumAmount->setBounds(8, 43, sw / 2 - 10, sh - 110);
+  texture->setBounds(sw / 2, 43, sw / 2 - 13, 54);
+  wave.setBounds(sw / 2, 106, sw / 2 - 14, std::max(25, sh - 174));
+  import.setBounds(12, sh - 48, sw / 2 - 17, 32);
+  preview.setBounds(sw / 2 + 2, sh - 48, sw / 2 - 16, 32);
+  tuneOn->setBounds(tuning.getWidth() - 68, 9, 53, 25);
+  root->setBounds(12, 42, tuning.getWidth() / 2 - 20, 53);
+  scale->setBounds(12, 99, tuning.getWidth() / 2 - 20, 53);
+  tuneAmount->setBounds(tuning.getWidth() / 2, 40, tuning.getWidth() / 2 - 10,
+                        tuning.getHeight() - 50);
+  int iw = io.getWidth() / 3;
+  input->setBounds(7, 31, iw - 9, io.getHeight() - 36);
+  fxMix->setBounds(iw + 2, 31, iw - 7, io.getHeight() - 36);
+  output->setBounds(iw * 2, 31, iw - 8, io.getHeight() - 36);
+  int cw = viewport.getWidth() - 20, cols = std::max(3, cw / 170),
+      cell = cw / cols;
+  for (size_t i = 0; i < controls.size(); ++i)
+    controls[i]->setBounds(int(i) % cols * cell, int(i) / cols * 137, cell - 6,
+                           133);
+  content.setSize(cw, int((controls.size() + cols - 1) / cols) * 137);
+}
+void MalleEditor::paint(juce::Graphics &g) {
+  g.setGradientFill(juce::ColourGradient(
+      juce::Colour(0xff303638), 0, 0, juce::Colour(0xff0a0e10),
+      float(getWidth()), float(getHeight()), false));
+  g.fillAll();
+  g.setColour(juce::Colour(0xff737b7e));
+  g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(2), 10, 1);
+  g.setFont(juce::FontOptions(28, juce::Font::bold));
+  g.setColour(juce::Colour(0xffe0e3e4));
+  g.drawText("MALLE VOCALS", getWidth() / 2 - 220, 9, 440, 37,
+             juce::Justification::centred);
+  g.setFont(juce::FontOptions(15));
+  g.drawText("R O H S T O F F   A U D I O", 20, 10, 300, 22,
+             juce::Justification::left);
+  g.setFont(juce::FontOptions(12));
+  g.drawText("by Micha Benjamin / 0.2.0 ALPHA", 20, 32, 300, 19,
+             juce::Justification::left);
+  for (int x : {7, getWidth() - 12})
+    for (int y : {7, getHeight() - 13}) {
+      g.setColour(juce::Colour(0xff071012));
+      g.fillEllipse(float(x), float(y), 6, 6);
+      g.setColour(juce::Colour(0xff7b8386));
+      g.drawLine(float(x + 1), float(y + 4), float(x + 5), float(y + 2), 1);
+    }
+}
+void MalleEditor::timerCallback() {
+  auto &m = proc.engine.meters;
+  bool external =
+      proc.getValue("duck.source") > .5f || proc.getValue("pump.mode") > .5f;
+  juce::String sc =
+      external ? (proc.sidechainEnabled.load()
+                      ? (m.sidechain.load() > 1e-6f ? "SC Signal"
+                                                    : "SC: kein Signal")
+                      : "SC Eingang fehlt")
+               : "Ducking intern";
+  juce::String text =
+      "IN " + juce::String(malle::db(m.input.load()), 1) + " dB | OUT " +
+      juce::String(malle::db(m.output.load()), 1) + " dB | GR FET " +
+      juce::String(m.fet.load(), 1) + " / Level " +
+      juce::String(m.level.load(), 1) + " dB | " + sc + " | " + proc.sampleName;
+  juce::MemoryBlock baseline;
+  auto encoded = proc.state.state.getProperty("preset.baseline").toString();
+  bool modified = false;
+  if (baseline.fromBase64Encoding(encoded) &&
+      baseline.getSize() == malle::parameters().size() * sizeof(float)) {
+    for (size_t i = 0; i < malle::parameters().size(); ++i) {
+      float v;
+      std::memcpy(
+          &v, static_cast<const char *>(baseline.getData()) + i * sizeof(float),
+          sizeof(v));
+      if (std::abs(proc.getValue(malle::parameters()[i].id) - v) >
+          1e-5f * (1 + std::abs(v))) {
+        modified = true;
         break;
       }
     }
   }
-  preset.setSelectedId(selected, juce::dontSendNotification);
-}
-void MalleEditor::rebuild() {
-  controls.clear();
-  auto display = malle::parameters();
-  if (!advanced)
-    std::stable_sort(display.begin(), display.end(), [](auto &a, auto &b) {
-      auto macro = [](auto &d) {
-        return d.id.find(".amount") != std::string::npos &&
-               d.section == d.id.substr(0, d.id.find('.'));
-      };
-      return macro(a) > macro(b);
-    });
-  for (auto &d : display) {
-    bool show = advanced ? juce::String(d.section) == section.getText()
-                         : (d.id == "input" || d.id == "output" ||
-                            d.id == "fx.mix" || d.id == "tune.on" ||
-                            d.id == "tune.root" || d.id == "tune.scale" ||
-                            d.id == "stadium.mix" || d.id == "stadium.on" ||
-                            d.id == "throw.trigger" || d.id == "res.amount" ||
-                            d.id == "res.on" || d.id == "air.high" ||
-                            d.id == "air.presence" || d.id == "air.on" ||
-                            d.id.find(".amount") != std::string::npos &&
-                                d.section == d.id.substr(0, d.id.find('.')));
-    if (show) {
-      auto c = std::make_unique<Control>(proc, d);
-      content.addAndMakeVisible(*c);
-      controls.push_back(std::move(c));
-    }
-  }
-  for (auto &v : variants)
-    v.setVisible(!advanced);
-  section.setVisible(advanced);
-  resized();
-}
-void MalleEditor::resized() {
-  int w = getWidth();
-  mode.setBounds(w - 135, 20, 110, 32);
-  undo.setBounds(w - 340, 20, 90, 32);
-  redo.setBounds(w - 240, 20, 90, 32);
-  preset.setBounds(24, 83, w - 610, 32);
-  search.setBounds(w - 570, 83, 180, 32);
-  save.setBounds(w - 375, 83, 170, 32);
-  load.setBounds(w - 190, 83, 165, 32);
-  lockKey.setBounds(24, 125, 145, 28);
-  lockInput.setBounds(175, 125, 140, 28);
-  lockRouting.setBounds(320, 125, 150, 28);
-  favorite.setBounds(480, 125, 90, 28);
-  section.setBounds(w - 270, 125, 245, 28);
-  eq.setBounds(24, 165, w - 48, 135);
-  import.setBounds(24, 312, 200, 32);
-  sample.setBounds(235, 312, w - 540, 32);
-  preview.setBounds(w - 140, 312, 115, 32);
-  throwButton.setBounds(w - 290, 312, 140, 32);
-  wave.setBounds(24, 355, w - 48, 42);
-  int top = 408;
-  for (int i = 0; i < 6; ++i)
-    variants[i].setBounds(24 + i * (w - 48) / 6, top, (w - 60) / 6, 30);
-  viewport.setBounds(20, advanced ? 408 : 450, w - 40,
-                     getHeight() - (advanced ? 473 : 515));
-  int cw = viewport.getWidth() - 20, columns = advanced ? 4 : 6,
-      width = cw / columns, height = 155;
-  for (size_t i = 0; i < controls.size(); ++i)
-    controls[i]->setBounds(int(i) % columns * width, int(i) / columns * height,
-                           width - 8, height - 4);
-  content.setSize(cw, int((controls.size() + columns - 1) / columns) * height);
-  status.setBounds(24, getHeight() - 52, w - 48, 44);
-}
-void MalleEditor::paint(juce::Graphics &g) {
-  g.fillAll(juce::Colour(0xff14202c));
-  g.setColour(juce::Colours::white);
-  g.setFont(30);
-  g.drawText("MALLE VOCALS", 24, 14, 360, 38, juce::Justification::left);
-  g.setFont(14);
-  g.setColour(juce::Colour(0xffc5d3dd));
-  g.drawText("ROHSTOFF AUDIO / MICHA BENJAMIN   /   0.1.0 ALPHA", 24, 53, 620,
-             22, juce::Justification::left);
-}
-void MalleEditor::timerCallback() {
-  auto &m = proc.engine.meters;
-  juce::String sc =
-      (proc.getValue("duck.source") > .5f || proc.getValue("pump.mode") > .5f)
-          ? (proc.sidechainEnabled.load()
-                 ? (m.sidechain.load() > 1e-6f ? "SC Signal"
-                                               : "SC: kein Signal")
-                 : "SC: Eingang fehlt")
-          : "Ducking intern";
-  status.setText(
-      "IN " + juce::String(malle::db(m.input.load()), 1) + " dB  |  OUT " +
-          juce::String(malle::db(m.output.load()), 1) + " dB  |  GR FET " +
-          juce::String(m.fet.load(), 1) + " / Level " +
-          juce::String(m.level.load(), 1) + " dB  |  MIDI " +
-          juce::String(m.pitch.load(), 1) + "  |  " + sc +
-          "\nInput EQ > Tune* > FET > Level > DeEss > EQ > Multiband > "
-          "Resonanz > Air > Sat > Doubler/Stadium > Raum",
-      juce::dontSendNotification);
-  sample.setText(proc.sampleName +
-                     (proc.sampleMissing.load() ? " - FEHLER" : ""),
-                 juce::dontSendNotification);
-  lockKey.setToggleState(bool(proc.state.state.getProperty("lock.key")),juce::dontSendNotification);lockInput.setToggleState(bool(proc.state.state.getProperty("lock.input")),juce::dontSendNotification);lockRouting.setToggleState(bool(proc.state.state.getProperty("lock.routing")),juce::dontSendNotification);favorite.setToggleState(bool(proc.state.state.getProperty("fav."+juce::String(preset.getSelectedId()))),juce::dontSendNotification);
+  if (modified)
+    text = "CUSTOM / Geaendert | " + text;
+  status.setText(text, juce::dontSendNotification);
+  status.setFont(juce::FontOptions(13));
+  lockKey.setToggleState(bool(proc.state.state.getProperty("lock.key")),
+                         juce::dontSendNotification);
+  lockInput.setToggleState(bool(proc.state.state.getProperty("lock.input")),
+                           juce::dontSendNotification);
+  lockRouting.setToggleState(bool(proc.state.state.getProperty("lock.routing")),
+                             juce::dontSendNotification);
   undo.setEnabled(proc.undo.canUndo());
   redo.setEnabled(proc.undo.canRedo());
   eq.repaint();
   wave.repaint();
+  auto group = section.getText();
+  juce::String context =
+      group == "Parallel"
+          ? (proc.getValue("parallel.tap") < .5f
+                 ? "Abgriff Input (latenzausgerichtet) -> Kompressor -> "
+                   "Vocal-Bus"
+                 : "Abgriff Direktkette -> Kompressor -> Vocal-Bus")
+      : group == "Doubler" || group == "Stadium"
+          ? "Abgriff Direktkette -> eigener Weg -> Vocal-Bus"
+      : group == "Ducking"
+          ? "Quelle: eigene Vocal / externer Lead | Ziele: FX, optional Dry"
+      : group == "Bewegung" ? "Tempo-Shaping ODER externe SC-Kompression | "
+                              "Ziel: Dry / FX / Gesamt"
+      : group == "room" || group == "short" || group == "long" ||
+              group == "reverb" || group == "throw"
+          ? "Vocal-Bus -> eigener 100% Wet-Weg -> FX-Bus -> Gesamt-FX-Mix"
+          : "Direktkette in angezeigter Reihenfolge -> Vocal-Bus -> Output";
+  sourceInfo.setText(context, juce::dontSendNotification);
+  sourceInfo.setFont(juce::FontOptions(12));
+  routing.repaint();
 }
 void MalleEditor::filesDropped(const juce::StringArray &files, int, int) {
   if (files.isEmpty())
@@ -399,18 +981,4 @@ void MalleEditor::choose(bool saving) {
         else
           safe->proc.loadPreset(fc.getResult());
       });
-}
-
-void WaveView::paint(juce::Graphics &g) {
-  g.fillAll(juce::Colour(0xff101b26));
-  g.setColour(juce::Colour(0xff6bd3cd));
-  for (int i = 0; i < 512; ++i) {
-    float x = getWidth() * i / 512.f,
-          peak = std::min(1.f, proc.waveform[size_t(i)]);
-    g.drawVerticalLine(int(x), getHeight() * (.5f - peak * .45f),
-                       getHeight() * (.5f + peak * .45f));
-  }
-  g.setFont(juce::FontOptions(14));
-  g.drawText("Crowd-Wellenform / Audiodatei hier ablegen", 10, 2,
-             getWidth() - 20, 20, juce::Justification::left);
 }

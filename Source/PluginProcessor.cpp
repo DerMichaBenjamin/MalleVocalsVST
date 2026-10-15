@@ -22,6 +22,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout MalleProcessor::layout() {
                                       "Custom"}[juce::jlimit(0, 3, int(v))]);
               if (id.find(".on") != std::string::npos || id == "bypass")
                 return juce::String(v > .5f ? "An" : "Aus");
+              if (id == "druck.amount" || id == "klang.amount" ||
+                  id == "waerme.amount" || id == "breite.amount" ||
+                  id == "raum.amount" || id == "bewegung.amount" ||
+                  id == "fx.mix" || id == "stadium.mix" || id == "throw.return")
+                return juce::String(v * 100, 0) + " %";
               return juce::String(v, malle::discrete(id)            ? 0
                                      : unit == "Hz"                 ? 0
                                      : unit == "dB" || unit == "ms" ? 1
@@ -45,6 +50,11 @@ juce::AudioProcessorValueTreeState::ParameterLayout MalleProcessor::layout() {
                 if (i >= 0)
                   return float(i);
               }
+              if (id == "druck.amount" || id == "klang.amount" ||
+                  id == "waerme.amount" || id == "breite.amount" ||
+                  id == "raum.amount" || id == "bewegung.amount" ||
+                  id == "fx.mix" || id == "stadium.mix" || id == "throw.return")
+                return s.getFloatValue() / 100;
               return s.getFloatValue();
             });
     l.add(std::make_unique<juce::AudioParameterFloat>(
@@ -63,7 +73,7 @@ MalleProcessor::MalleProcessor()
       resolved(base) {
   for (auto &p : malle::parameters())
     raw.push_back(state.getRawParameterValue(p.id));
-  state.state.setProperty("schema", 1, nullptr);
+  state.state.setProperty("schema", 2, nullptr);
   state.state.setProperty("lock.key", true, nullptr);
   state.state.setProperty("lock.input", true, nullptr);
   state.state.setProperty("lock.routing", true, nullptr);
@@ -119,7 +129,7 @@ juce::AudioProcessorEditor *MalleProcessor::createEditor() {
 }
 void MalleProcessor::getStateInformation(juce::MemoryBlock &m) {
   auto tree = state.copyState();
-  tree.setProperty("schema", 1, nullptr);
+  tree.setProperty("schema", 2, nullptr);
   tree.setProperty("preset", currentPreset, nullptr);
   if (auto xml = tree.createXml())
     copyXmlToBinary(*xml, m);
@@ -128,7 +138,26 @@ void MalleProcessor::setStateInformation(const void *d, int n) {
   if (auto xml = getXmlFromBinary(d, n)) {
     auto tree = juce::ValueTree::fromXml(*xml);
     if (tree.hasType("MalleVocals") &&
-        int(tree.getProperty("schema", 1)) <= 1) {
+        int(tree.getProperty("schema", 2)) <= 2) {
+      if (int(tree.getProperty("schema", 1)) < 2) {
+        auto oldTune = tree.getChildWithProperty("id", "tune.on");
+        auto creative = tree.getChildWithProperty("id", "creative.on");
+        if (!creative.isValid()) {
+          juce::ValueTree n("PARAM");
+          n.setProperty("id", "creative.on", nullptr);
+          n.setProperty("value", float(oldTune.getProperty("value", 0)),
+                        nullptr);
+          tree.addChild(n, -1, nullptr);
+        }
+        std::array<int, 11> legacy{0, 1, 10, 2, 3, 4, 5, 6, 7, 8, 9};
+        for (int i = 0; i < 11; ++i) {
+          juce::ValueTree n("PARAM");
+          n.setProperty("id", "route." + juce::String(i), nullptr);
+          n.setProperty("value", legacy[i], nullptr);
+          tree.addChild(n, -1, nullptr);
+        }
+        tree.setProperty("schema", 2, nullptr);
+      }
       state.replaceState(tree);
       currentPreset = tree.getProperty("preset", "User").toString();
       restoreSample();
@@ -160,6 +189,13 @@ void MalleProcessor::applyPreset(int n) {
       continue;
     setValue(id, pr.values[i]);
   }
+  juce::MemoryBlock baseline;
+  for (auto &d : malle::parameters()) {
+    float v = getValue(d.id);
+    baseline.append(&v, sizeof(v));
+  }
+  state.state.setProperty("preset.baseline", baseline.toBase64Encoding(),
+                          &undo);
   currentPreset = pr.name;
   state.state.setProperty("preset", currentPreset, &undo);
   state.copyState();
@@ -268,7 +304,7 @@ void MalleProcessor::restoreSample() {
 void MalleProcessor::timerCallback() { restoreSample(); }
 void MalleProcessor::savePreset(const juce::File &f) {
   auto tree = state.copyState();
-  tree.setProperty("schema", 1, nullptr);
+  tree.setProperty("schema", 2, nullptr);
   if (auto x = tree.createXml())
     x->writeTo(f);
 }
@@ -302,4 +338,54 @@ bool MalleProcessor::loadPreset(const juce::File &f) {
 }
 juce::AudioProcessor *JUCE_CALLTYPE createPluginFilter() {
   return new MalleProcessor();
+}
+
+std::array<int, 11> MalleProcessor::routing() const {
+  std::array<int, 11> r{};
+  std::array<bool, 11> seen{};
+  for (int i = 0; i < 11; ++i) {
+    int v = int(getValue("route." + std::to_string(i)));
+    if (v < 0 || v > 10 || seen[size_t(v)]) {
+      for (int j = 0; j < 11; ++j)
+        r[j] = j;
+      return r;
+    }
+    seen[size_t(v)] = true;
+    r[i] = v;
+  }
+  return r;
+}
+void MalleProcessor::moveModule(int from, int to) {
+  if (from < 0 || from > 10 || to < 0 || to > 10 || from == to)
+    return;
+  state.copyState();
+  undo.beginNewTransaction("Direktmodul verschieben");
+  auto r = routing();
+  int id = r[size_t(from)];
+  if (from < to)
+    for (int i = from; i < to; ++i)
+      r[i] = r[i + 1];
+  else
+    for (int i = from; i > to; --i)
+      r[i] = r[i - 1];
+  r[size_t(to)] = id;
+  for (int i = 0; i < 11; ++i)
+    setValue("route." + std::to_string(i), float(r[i]));
+  state.copyState();
+  undo.beginNewTransaction();
+}
+void MalleProcessor::deesserPreset(int n) {
+  if (n < 0 || n > 2)
+    return;
+  state.copyState();
+  undo.beginNewTransaction("De-Esser Startabstimmung");
+  setValue("deess.preset", float(n));
+  setValue("deess.low", n == 0 ? 5000 : n == 1 ? 2200 : 3000);
+  setValue("deess.high", n == 0 ? 11000 : n == 1 ? 6500 : 14000);
+  setValue("deess.threshold", n == 1 ? -27 : -24);
+  setValue("deess.amount", n == 2 ? .35f : .6f);
+  setValue("deess.mode", n == 2 ? 1 : 0);
+  setValue("deess.on", 1);
+  state.copyState();
+  undo.beginNewTransaction();
 }
