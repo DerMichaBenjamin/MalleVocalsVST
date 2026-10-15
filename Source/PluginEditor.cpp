@@ -3,7 +3,8 @@ MalleEditor::Control::Control(MalleProcessor &p, const malle::Param &d) {
   label.setText((d.id.find(".amount") != std::string::npos &&
                          d.section == d.id.substr(0, d.id.find('.'))
                      ? d.section
-                     : d.name) +
+                 : d.name == "Aktiv" ? d.section + " Aktiv"
+                                     : d.name) +
                     (d.unit.empty() ? "" : " (" + d.unit + ")"),
                 juce::dontSendNotification);
   label.setFont(juce::FontOptions(16.f));
@@ -235,6 +236,7 @@ MalleEditor::MalleEditor(MalleProcessor &p)
   setSize(1120, 850);
   rebuild();
   startTimerHz(20);
+  timerCallback();
 }
 MalleEditor::~MalleEditor() {
   stopTimer();
@@ -251,6 +253,16 @@ void MalleEditor::populatePresets() {
     juce::String text = p.category + " / " + p.name;
     if (text.containsIgnoreCase(q))
       preset.addItem(text, i);
+  }
+  if (selected == 0) {
+    int i = 0;
+    for (auto &p : malle::presets()) {
+      ++i;
+      if (juce::String(p.name) == proc.currentPreset) {
+        selected = i;
+        break;
+      }
+    }
   }
   preset.setSelectedId(selected, juce::dontSendNotification);
 }
@@ -292,10 +304,10 @@ void MalleEditor::resized() {
   mode.setBounds(w - 135, 20, 110, 32);
   undo.setBounds(w - 340, 20, 90, 32);
   redo.setBounds(w - 240, 20, 90, 32);
-  preset.setBounds(24, 83, w / 2 - 35, 32);
-  search.setBounds(w / 2, 83, 180, 32);
-  save.setBounds(w / 2 + 190, 83, 140, 32);
-  load.setBounds(w / 2 + 340, 83, 140, 32);
+  preset.setBounds(24, 83, w - 610, 32);
+  search.setBounds(w - 570, 83, 180, 32);
+  save.setBounds(w - 375, 83, 170, 32);
+  load.setBounds(w - 190, 83, 165, 32);
   lockKey.setBounds(24, 125, 145, 28);
   lockInput.setBounds(175, 125, 140, 28);
   lockRouting.setBounds(320, 125, 150, 28);
@@ -327,7 +339,7 @@ void MalleEditor::paint(juce::Graphics &g) {
   g.drawText("MALLE VOCALS", 24, 14, 360, 38, juce::Justification::left);
   g.setFont(14);
   g.setColour(juce::Colour(0xffc5d3dd));
-  g.drawText("ROHSTOFF AUDIO / MICHA BENJAMIN   ·   0.1.0 ALPHA", 24, 53, 620,
+  g.drawText("ROHSTOFF AUDIO / MICHA BENJAMIN   /   0.1.0 ALPHA", 24, 53, 620,
              22, juce::Justification::left);
 }
 void MalleEditor::timerCallback() {
@@ -349,7 +361,7 @@ void MalleEditor::timerCallback() {
           "Resonanz > Air > Sat > Doubler/Stadium > Raum",
       juce::dontSendNotification);
   sample.setText(proc.sampleName +
-                     (proc.sampleMissing.load() ? " — FEHLER" : ""),
+                     (proc.sampleMissing.load() ? " - FEHLER" : ""),
                  juce::dontSendNotification);
   undo.setEnabled(proc.undo.canUndo());
   redo.setEnabled(proc.undo.canRedo());
@@ -396,6 +408,6 @@ void WaveView::paint(juce::Graphics &g) {
                        getHeight() * (.5f + peak * .45f));
   }
   g.setFont(juce::FontOptions(14));
-  g.drawText("Crowd-Wellenform · Audiodatei hier ablegen", 10, 2,
+  g.drawText("Crowd-Wellenform / Audiodatei hier ablegen", 10, 2,
              getWidth() - 20, 20, juce::Justification::left);
 }

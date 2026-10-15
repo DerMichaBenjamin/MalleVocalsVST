@@ -32,15 +32,14 @@ jobs:
             codesign --force --deep --sign - "$bundle"
             codesign --verify --deep --strict "$bundle"
           done
+      - name: Package bundles and documentation
+        run: python scripts/package.py
       - name: Upload plugin artifacts
         uses: actions/upload-artifact@v4
         with:
           name: MalleVocals-0.1.0-${{ runner.os }}
           path: |
-            build/MalleVocals_artefacts/Release/VST3/
-            build/MalleVocals_artefacts/Release/AU/
-            build/MalleVocals_artefacts/Release/Standalone/
-            README.md
-            docs/
+            packages/*.zip
+            packages/*.sha256
           if-no-files-found: error
           retention-days: 30

@@ -29,30 +29,37 @@ void Engine::prepare(double rate, int block, int channels) {
       x.carrier[b].set(2, f, 2, 0, sr);
     }
   }
-  for (int texture = 0; texture < 7; ++texture) {
-    auto &test = synthetic[texture];
-    test.sampleRate = sr;
-    test.name = "Original synthetic test crowd " + std::to_string(texture + 1);
-    test.left.resize(size_t(sr * 2));
-    test.right.resize(test.left.size());
-    unsigned seed = 76543 + texture;
-    for (size_t i = 0; i < test.left.size(); ++i) {
-      float t = float(i) / sr, l = 0, r = 0;
-      for (int v = 0; v < 5 + texture; ++v) {
-        float f = 110 * std::pow(2.f, (v - 3) * (.006f + texture * .002f));
-        for (int h = 1; h < 12; ++h) {
-          float a = 1.f / std::pow(float(h), .7f + texture * .15f);
-          l += a * std::sin(2 * pi * f * h * t + v);
-          r += a * std::sin(2 * pi * f * h * t + v + .3f + texture * .1f);
+  static const auto testBank = [] {
+    constexpr float sr = 22050;
+    std::array<Sample, 7> bank;
+    for (int texture = 0; texture < 7; ++texture) {
+      auto &test = bank[texture];
+      test.sampleRate = sr;
+      test.name =
+          "Original synthetic test crowd " + std::to_string(texture + 1);
+      test.left.resize(size_t(sr * 2));
+      test.right.resize(test.left.size());
+      unsigned seed = 76543 + texture;
+      for (size_t i = 0; i < test.left.size(); ++i) {
+        float t = float(i) / sr, l = 0, r = 0;
+        for (int v = 0; v < 5 + texture; ++v) {
+          float f = 110 * std::pow(2.f, (v - 3) * (.006f + texture * .002f));
+          for (int h = 1; h < 12; ++h) {
+            float a = 1.f / std::pow(float(h), .7f + texture * .15f);
+            l += a * std::sin(2 * pi * f * h * t + v);
+            r += a * std::sin(2 * pi * f * h * t + v + .3f + texture * .1f);
+          }
         }
+        seed = 1664525 * seed + 1013904223;
+        float noise =
+            (float(seed >> 8) / 8388608.f - 1) * (.01f + texture * .005f);
+        test.left[i] = l * .02f + noise;
+        test.right[i] = r * .02f - noise;
       }
-      seed = 1664525 * seed + 1013904223;
-      float noise =
-          (float(seed >> 8) / 8388608.f - 1) * (.01f + texture * .005f);
-      test.left[i] = l * .02f + noise;
-      test.right[i] = r * .02f - noise;
     }
-  }
+    return bank;
+  }();
+  synthetic = testBank;
   setParameters(p);
   reset();
 }
@@ -220,7 +227,11 @@ void Engine::process(float *const *data, int channels, int count,
     fx[b] = {a(0) > .5f, a(4) > .5f, a(1), a(2),  a(3),
              a(5),       a(6),       a(9), a(10), a(11)};
   }
-  for(int c=0;c<channels;++c){channel[c].reverbs[0].configure(fx[0].width,std::min(1.5f,fx[0].tail),6500,fx[0].fb);channel[c].reverbs[1].configure(fx[3].width,fx[3].tail,6500,fx[3].fb);}
+  for (int c = 0; c < channels; ++c) {
+    channel[c].reverbs[0].configure(fx[0].width, std::min(1.5f, fx[0].tail),
+                                    6500, fx[0].fb);
+    channel[c].reverbs[1].configure(fx[3].width, fx[3].tail, 6500, fx[3].fb);
+  }
   std::array<float, 4> eqDynamic{}, eqThreshold{};
   for (int b = 0; b < 4; ++b) {
     int start = index("eq0.freq") + b * 6;
@@ -569,7 +580,11 @@ void Engine::process(float *const *data, int channels, int count,
             float pan = channels == 1 ? 1.f
                                       : (c == 0 ? 1 - sign * doubleWidth
                                                 : 1 + sign * doubleWidth);
-            float omega=2*pi*(.6f+v*.13f);float modulationMs=(std::pow(2.f,doublePitch/1200)-1)*1000/omega;float centsMod=std::min(doubleTime*.6f,modulationMs)*std::sin(float(phase)*omega);
+            float omega = 2 * pi * (.6f + v * .13f);
+            float modulationMs =
+                (std::pow(2.f, doublePitch / 1200) - 1) * 1000 / omega;
+            float centsMod = std::min(doubleTime * .6f, modulationMs) *
+                             std::sin(float(phase) * omega);
             float delay = (doubleTime + v * 2 + centsMod) * sr * .001f;
             doubled += z.doubler.read(delay) * pan / voices;
           }

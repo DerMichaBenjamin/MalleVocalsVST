@@ -44,3 +44,7 @@ Diese Version ist eine erste native Entwicklungsfassung. Der vollständige Auftr
 `malle_integration`: Tonart-/Input-Locks, Preset Undo/Redo, kompletter Parameter-Recall, identischer State beim Ansichtswechsel, PNG-Screenshots, eingebetteter Sample-Recall nach Löschen der Originaldatei, Offline-Ausgabe nach Recall.
 
 Tests sind keine menschlichen Hörtests und ersetzen keine DAW-/Gatekeeper-Prüfung. Prüfprotokolle und Workflows zeigen, welche Tests tatsächlich bestanden haben.
+
+## Lokal ausgeführte Messungen (15.10.2026)
+
+`malle_analysis` hat Oktav-Pitch-Shift 220→440 Hz, Hard-Tune 224→220 Hz, lokale Resonanzabsenkung, Air-Hochtonanhebung, externe Sidechain-Kompression sowie das latenzausgerichtete Throw-Send-Fenster inklusive weiterlaufender Fahne bestanden. `malle_integration` bestand lokal unter einem virtuellen X-Display. Das bestätigt State-/Audiologik und gerenderte UI; noch keinen Cubase-Test und keinen menschlichen Hörtest.

@@ -7,7 +7,46 @@ juce::AudioProcessorValueTreeState::ParameterLayout MalleProcessor::layout() {
                                      malle::discrete(p.id) ? 1.f : 0.f);
     if (p.logarithmic)
       r.setSkewForCentre(std::sqrt(p.min * p.max));
-    auto attr = juce::AudioParameterFloatAttributes().withLabel(p.unit);
+    auto attr =
+        juce::AudioParameterFloatAttributes()
+            .withLabel(p.unit)
+            .withStringFromValueFunction([id = p.id, unit = p.unit](float v,
+                                                                    int) {
+              if (id == "tune.root" || id == "stadium.root")
+                return juce::String(juce::StringArray{
+                    "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#",
+                    "B"}[juce::jlimit(0, 11, int(v))]);
+              if (id == "tune.scale")
+                return juce::String(
+                    juce::StringArray{"Chromatisch", "Dur", "Moll",
+                                      "Custom"}[juce::jlimit(0, 3, int(v))]);
+              if (id.find(".on") != std::string::npos || id == "bypass")
+                return juce::String(v > .5f ? "An" : "Aus");
+              return juce::String(v, malle::discrete(id)            ? 0
+                                     : unit == "Hz"                 ? 0
+                                     : unit == "dB" || unit == "ms" ? 1
+                                                                    : 2);
+            })
+            .withValueFromStringFunction([id = p.id](const juce::String &s) {
+              if (s.equalsIgnoreCase("An"))
+                return 1.f;
+              if (s.equalsIgnoreCase("Aus"))
+                return 0.f;
+              if (id == "tune.root" || id == "stadium.root") {
+                juce::StringArray names{"C",  "C#", "D",  "D#", "E",  "F",
+                                        "F#", "G",  "G#", "A",  "A#", "B"};
+                int i = names.indexOf(s, true);
+                if (i >= 0)
+                  return float(i);
+              }
+              if (id == "tune.scale") {
+                juce::StringArray names{"Chromatisch", "Dur", "Moll", "Custom"};
+                int i = names.indexOf(s, true);
+                if (i >= 0)
+                  return float(i);
+              }
+              return s.getFloatValue();
+            });
     l.add(std::make_unique<juce::AudioParameterFloat>(
         juce::ParameterID(p.id, 1), p.section + ": " + p.name, r, p.def, attr));
   }
