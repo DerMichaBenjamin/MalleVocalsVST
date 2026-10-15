@@ -1,0 +1,58 @@
+Start testing: Oct 15 04:54 CEST
+----------------------------------------------------------
+1/3 Testing: DSP
+1/3 Test: DSP
+Command: "/workspace/scratch/527cf12be981/MalleVocalsVST/build/malle_tests"
+Directory: /workspace/scratch/527cf12be981/MalleVocalsVST/build
+"DSP" start time: Oct 15 04:54 CEST
+Output:
+----------------------------------------------------------
+PASS: 100 presets, 20 variants, 24 rate/channel/buffer configurations, exact latency/bypass, finite outputs, pitch detection
+<end of output>
+Test time =  10.44 sec
+----------------------------------------------------------
+Test Passed.
+"DSP" end time: Oct 15 04:54 CEST
+"DSP" time elapsed: 00:00:10
+----------------------------------------------------------
+
+2/3 Testing: PluginStateAndUI
+2/3 Test: PluginStateAndUI
+Command: "/workspace/scratch/527cf12be981/MalleVocalsVST/build/malle_integration"
+Directory: /workspace/scratch/527cf12be981/MalleVocalsVST/build
+"PluginStateAndUI" start time: Oct 15 04:54 CEST
+Output:
+----------------------------------------------------------
+PASS: locks, preset Undo/Redo, full recall, view-state identity, embedded sample recall, exact offline output, UI screenshots
+<end of output>
+Test time =   1.05 sec
+----------------------------------------------------------
+Test Passed.
+"PluginStateAndUI" end time: Oct 15 04:54 CEST
+"PluginStateAndUI" time elapsed: 00:00:01
+----------------------------------------------------------
+
+3/3 Testing: MeasuredDSP
+3/3 Test: MeasuredDSP
+Command: "/workspace/scratch/527cf12be981/MalleVocalsVST/build/malle_analysis"
+Directory: /workspace/scratch/527cf12be981/MalleVocalsVST/build
+"MeasuredDSP" start time: Oct 15 04:54 CEST
+Output:
+----------------------------------------------------------
+Ping pong/release/tail kill: PASS
+Tuning 224 Hz -> 221.137 Hz
+Resonance 1355.59 Hz: -2.04332 dB
+Air 10 kHz: +2.88162 dB
+External SC output RMS: 0.0219615
+Routing EQ/FET order difference: 10.5 dB
+Throw delay: correct latency/window, tail energy 0.579829
+PASS: measured DSP behaviour
+<end of output>
+Test time =   2.93 sec
+----------------------------------------------------------
+Test Passed.
+"MeasuredDSP" end time: Oct 15 04:54 CEST
+"MeasuredDSP" time elapsed: 00:00:02
+----------------------------------------------------------
+
+End testing: Oct 15 04:54 CEST

@@ -22,6 +22,8 @@ cmake --build build-core --parallel 3
 ctest --test-dir build-core --output-on-failure
 ```
 
+Aktuelle gebaute Testpakete, Architekturprüfung, Screenshots und genaue Prüfgrenzen: [Validierung 0.2.0](docs/VALIDATION_0.2.0.md).
+
 ## Download / Installation
 
 [GitHub Actions](https://github.com/DerMichaBenjamin/MalleVocalsVST/actions): erfolgreichen Lauf öffnen, unter **Artifacts** das Windows- oder macOS-Paket laden. Windows: den gesamten `Malle Vocals.vst3`-Ordner nach `C:\Program Files\Common Files\VST3` kopieren. Mac: VST3 nach `~/Library/Audio/Plug-Ins/VST3`, AU nach `~/Library/Audio/Plug-Ins/Components`. Host neu scannen.
