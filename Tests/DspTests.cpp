@@ -51,13 +51,13 @@ int main() {
           for (int pos = 0; pos < total; pos += block) {
             for (int c = 0; c < nc; ++c)
               for (int i = 0; i < block; ++i)
-                a[c][i] = .1f * std::sin(2 * pi * 220 * (pos + i) / rate);
+                a[c][i] = .1f * std::sin(2 * malle::pi * 220 * (pos + i) / rate);
             e.process(ptr, nc, block, nullptr, 0, {});
             for (int c = 0; c < nc; ++c)
               for (int i = 0; i < block; ++i) {
                 int t = pos + i - e.latency();
                 float expected =
-                    t < 0 ? 0 : .1f * std::sin(2 * pi * 220 * t / rate);
+                    t < 0 ? 0 : .1f * std::sin(2 * malle::pi * 220 * t / rate);
                 maxError = std::max(maxError, std::abs(a[c][i] - expected));
               }
           }
@@ -74,7 +74,7 @@ int main() {
       for (int n = 0; n < 80; ++n) {
         for (int c = 0; c < 2; ++c)
           for (int i = 0; i < 256; ++i)
-            a[c][i] = .15f * std::sin(2 * pi * 220 * (n * 256 + i) / 48000);
+            a[c][i] = .15f * std::sin(2 * malle::pi * 220 * (n * 256 + i) / 48000);
         e.process(ptr, 2, 256, nullptr, 0,
                   {128, n * 256 * 128. / (48000 * 60), true, true});
         for (auto &v : a)

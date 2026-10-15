@@ -33,7 +33,7 @@ std::vector<float> render(Values p, float hz, int seconds = 3,
     for (int i = 0; i < 256; ++i) {
       int t = pos + i;
       a[i] = impulse >= 0 ? (t == impulse ? .5f : 0)
-                          : .1f * std::sin(2 * pi * hz * t / 48000);
+                          : .1f * std::sin(2 * malle::pi * hz * t / 48000);
       sc[i] = .3f;
     }
     e.process(ptr, 1, 256, side ? sp : nullptr, side ? 1 : 0,

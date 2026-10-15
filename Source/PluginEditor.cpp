@@ -165,7 +165,7 @@ MalleEditor::MalleEditor(MalleProcessor &p)
            &section, &status,    &sample,      &viewport,    &eq})
     addAndMakeVisible(c);
   viewport.setViewedComponent(&content, false);
-  search.setTextToShowWhenEmpty("Preset suchen", juce::Colours::grey);
+  search.setTextToShowWhenEmpty("Suche (* = Favoriten)", juce::Colours::grey);
   search.onTextChange = [this] { populatePresets(); };
   populatePresets();
   preset.onChange = [this] { proc.applyPreset(preset.getSelectedId() - 1); };
@@ -174,8 +174,8 @@ MalleEditor::MalleEditor(MalleProcessor &p)
     mode.setButtonText(advanced ? "Simple" : "Advanced");
     rebuild();
   };
-  undo.onClick = [this] { proc.undo.undo(); };
-  redo.onClick = [this] { proc.undo.redo(); };
+  undo.onClick = [this] {proc.state.copyState();proc.undo.undo(); };
+  redo.onClick = [this] {proc.state.copyState();proc.undo.redo(); };
   import.onClick = [this] {
     chooser = std::make_unique<juce::FileChooser>(
         "Crowd importieren", juce::File{}, "*.wav;*.aif;*.aiff;*.flac");
@@ -197,6 +197,7 @@ MalleEditor::MalleEditor(MalleProcessor &p)
   };
   save.onClick = [this] { choose(true); };
   load.onClick = [this] { choose(false); };
+  favorite.setClickingTogglesState(true);
   favorite.onClick = [this] {
     auto key = "fav." + juce::String(preset.getSelectedId());
     proc.state.state.setProperty(key, !bool(proc.state.state.getProperty(key)),
@@ -246,12 +247,13 @@ MalleEditor::~MalleEditor() {
 void MalleEditor::populatePresets() {
   int selected = preset.getSelectedId();
   preset.clear(juce::dontSendNotification);
-  auto q = search.getText();
+  auto q = search.getText();bool onlyFavorites=q.startsWith("*");if(onlyFavorites)q=q.substring(1).trim();
   int i = 0;
   for (auto &p : malle::presets()) {
     ++i;
-    juce::String text = p.category + " / " + p.name;
-    if (text.containsIgnoreCase(q))
+    bool fav=bool(proc.state.state.getProperty("fav."+juce::String(i)));
+    juce::String text = (fav?"* ":"")+p.category + " / " + p.name;
+    if (text.containsIgnoreCase(q)&&(!onlyFavorites||fav))
       preset.addItem(text, i);
   }
   if (selected == 0) {
@@ -363,6 +365,7 @@ void MalleEditor::timerCallback() {
   sample.setText(proc.sampleName +
                      (proc.sampleMissing.load() ? " - FEHLER" : ""),
                  juce::dontSendNotification);
+  lockKey.setToggleState(bool(proc.state.state.getProperty("lock.key")),juce::dontSendNotification);lockInput.setToggleState(bool(proc.state.state.getProperty("lock.input")),juce::dontSendNotification);lockRouting.setToggleState(bool(proc.state.state.getProperty("lock.routing")),juce::dontSendNotification);favorite.setToggleState(bool(proc.state.state.getProperty("fav."+juce::String(preset.getSelectedId()))),juce::dontSendNotification);
   undo.setEnabled(proc.undo.canUndo());
   redo.setEnabled(proc.undo.canRedo());
   eq.repaint();

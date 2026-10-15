@@ -48,3 +48,5 @@ Tests sind keine menschlichen Hörtests und ersetzen keine DAW-/Gatekeeper-Prüf
 ## Lokal ausgeführte Messungen (15.10.2026)
 
 `malle_analysis` hat Oktav-Pitch-Shift 220→440 Hz, Hard-Tune 224→220 Hz, lokale Resonanzabsenkung, Air-Hochtonanhebung, externe Sidechain-Kompression sowie das latenzausgerichtete Throw-Send-Fenster inklusive weiterlaufender Fahne bestanden. `malle_integration` bestand lokal unter einem virtuellen X-Display. Das bestätigt State-/Audiologik und gerenderte UI; noch keinen Cubase-Test und keinen menschlichen Hörtest.
+
+Gemessene Werte des lokalen Analyselaufs: Hard-Tune 224 Hz → 221,14 Hz (Ziel 220 Hz; Toleranz 2 Hz), Resonanztest 1355,59 Hz → −2,04 dB, Air bei 10 kHz → +2,88 dB. Das sind synthetische Messsignale, keine Aussage über die Wahrnehmungsqualität realer Stimmen.
