@@ -1,0 +1,46 @@
+name: Build and test
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  plugin:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure Windows x64
+        if: runner.os == 'Windows'
+        run: cmake -S . -B build -A x64
+      - name: Configure macOS Universal (Sonoma compatible target)
+        if: runner.os == 'macOS'
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+      - name: Build
+        run: cmake --build build --config Release --parallel 3
+      - name: DSP tests
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Ad-hoc sign Mac test builds
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          find build/MalleVocals_artefacts -type d \( -name '*.vst3' -o -name '*.component' -o -name '*.app' \) -prune -print0 | while IFS= read -r -d '' bundle; do
+            codesign --force --deep --sign - "$bundle"
+            codesign --verify --deep --strict "$bundle"
+          done
+      - name: Upload plugin artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MalleVocals-0.1.0-${{ runner.os }}
+          path: |
+            build/MalleVocals_artefacts/Release/VST3/
+            build/MalleVocals_artefacts/Release/AU/
+            build/MalleVocals_artefacts/Release/Standalone/
+            README.md
+            docs/
+          if-no-files-found: error
+          retention-days: 30
