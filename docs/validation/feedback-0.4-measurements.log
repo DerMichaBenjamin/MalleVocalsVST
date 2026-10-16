@@ -1,0 +1,7 @@
+Matched compressor RMS difference: -0.00257456 dB
+Manual compressor makeup with matching: 5.99881 dB
+Manual saturation output with matching: -5.9951 dB
+Reverb modern=0 decay=1.6 occupied=4329 late energy=3.56148e-12
+Reverb modern=1 decay=1.6 occupied=9409 late energy=1.92562e-09
+Reverb modern=1 decay=3 occupied=9409 late energy=6.4765e-06
+PASS recording rates/buffers/layouts; gain comparison; modern reverb

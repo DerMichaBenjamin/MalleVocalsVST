@@ -1,0 +1,13 @@
+Test project /workspace/scratch/527cf12be981/MalleVocalsVST/build-core
+    Start 1: DSP
+1/4 Test #1: DSP ..............................   Passed   10.80 sec
+    Start 2: MeasuredDSP
+2/4 Test #2: MeasuredDSP ......................   Passed    2.95 sec
+    Start 3: CrowdBankDSP
+3/4 Test #3: CrowdBankDSP .....................   Passed    0.76 sec
+    Start 4: FeedbackRegression
+4/4 Test #4: FeedbackRegression ...............   Passed    1.60 sec
+
+100% tests passed out of 4
+
+Total Test time (real) =  16.12 sec

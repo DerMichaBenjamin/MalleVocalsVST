@@ -1,0 +1,17 @@
+finalMacLog
+2026-10-16T15:28:37.9370300Z 1/5 Test #1: DSP ..............................   Passed   12.25 sec
+2026-10-16T15:28:40.3491640Z 2/5 Test #2: PluginStateAndUI .................   Passed    2.41 sec
+2026-10-16T15:28:43.2231690Z 3/5 Test #3: MeasuredDSP ......................   Passed    2.87 sec
+2026-10-16T15:28:44.2780850Z 4/5 Test #4: CrowdBankDSP .....................   Passed    1.05 sec
+2026-10-16T15:28:46.0652920Z 5/5 Test #5: FeedbackRegression ...............   Passed    1.79 sec
+2026-10-16T15:28:46.0661450Z 100% tests passed out of 5
+2026-10-16T15:28:46.0702470Z Total Test time (real) =  20.38 sec
+2026-10-16T15:28:46.0927990Z [36;1m  codesign --verify --deep --strict "$bundle"[0m
+finalWindowsLog
+2026-10-16T15:28:21.5684123Z 1/5 Test #1: DSP ..............................   Passed    8.78 sec
+2026-10-16T15:28:22.6311147Z 2/5 Test #2: PluginStateAndUI .................   Passed    1.06 sec
+2026-10-16T15:28:24.8961767Z 3/5 Test #3: MeasuredDSP ......................   Passed    2.26 sec
+2026-10-16T15:28:25.4798181Z 4/5 Test #4: CrowdBankDSP .....................   Passed    0.58 sec
+2026-10-16T15:28:26.7355199Z 5/5 Test #5: FeedbackRegression ...............   Passed    1.25 sec
+2026-10-16T15:28:26.7369515Z 100% tests passed out of 5
+2026-10-16T15:28:26.7370706Z Total Test time (real) =  13.98 sec

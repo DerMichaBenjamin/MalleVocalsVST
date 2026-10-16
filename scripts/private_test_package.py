@@ -12,6 +12,7 @@ parser.add_argument('--windows', type=Path, required=True)
 parser.add_argument('--macos', type=Path, required=True)
 parser.add_argument('--bank', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
+parser.add_argument('--report', type=Path)
 args = parser.parse_args()
 for item in (args.windows, args.macos, args.bank):
     if not item.is_file():
@@ -45,6 +46,8 @@ readme = '''Malle Vocals 0.4.0 Alpha / Rohstoff Audio / Micha Benjamin
    Manuelle Compressor-Makeup-/Saturation-Output-Werte bleiben wirksam.
 6. "Hall / Delay einstellen" oeffnet die normalen vier Wege direkt aus Simple.
    "Party-Klang 0.4" aktiviert die neue Abstimmung samt Dauer/Typ bei Legacy.
+   Detailregler sind Basiswerte: die Simple-Intensitaet addiert ihre Makro-
+   Zuordnung dazu. Send 0 im Panel kann daher noch einen Makro-Send haben.
    Throw ist ein eigener Weg; Loslassen schliesst nur den Send, nicht den Tail.
 
 Beide Plattformen sind Entwicklungs-/Testversionen, keine Verkaufsfreigabe.
@@ -78,8 +81,11 @@ fi
 cp "$malle_package_dir/Crowd/Micha.mallecrowd" "$malle_bank_dir/Micha.mallecrowd"
 printf 'Crowd-Bank installiert. Neue Plugin-Instanz oeffnen.\\n'
 '''
-manifest = {str(item.name): hashlib.sha256(item.read_bytes()).hexdigest()
-            for item in (args.windows, args.macos, args.bank)}
+manifest = {
+    'Builds/'+args.windows.name: hashlib.sha256(args.windows.read_bytes()).hexdigest(),
+    'Builds/'+args.macos.name: hashlib.sha256(args.macos.read_bytes()).hexdigest(),
+    'Crowd/Micha.mallecrowd': hashlib.sha256(args.bank.read_bytes()).hexdigest(),
+}
 with zipfile.ZipFile(args.output, 'w', zipfile.ZIP_DEFLATED) as archive:
     for item in (args.windows, args.macos):
         archive.write(item, 'Builds/' + item.name)
@@ -87,6 +93,8 @@ with zipfile.ZipFile(args.output, 'w', zipfile.ZIP_DEFLATED) as archive:
     provenance=args.bank.parent/'CrowdBank_Quellen_und_Messungen.json'
     if provenance.is_file():archive.write(provenance,'Crowd/'+provenance.name)
     archive.writestr('BITTE_ZUERST_LESEN.txt', readme)
+    if args.report is not None:
+        archive.write(args.report,'Pruefbericht_0.4.md')
     archive.writestr('SHA256.json', json.dumps(manifest, indent=2))
     archive.writestr('Install_Crowd_Windows.cmd', windows)
     info = zipfile.ZipInfo('Install_Crowd_macOS.command')

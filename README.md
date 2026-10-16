@@ -52,3 +52,5 @@ Neue Instanzen starten im Aufnahme-Modus mit **0 Samples Plugin-Latenz**. Tune u
 Simple: **Pegelgleich** vergleicht langsam die RMS-Energie bei Druck, Klang, Wärme und Breite. Alle sechs Sektionen besitzen einen eigenen Pegelregler. Hall und Pumpen werden bewusst nicht dynamisch zurückgeregelt. **Hall / Delay einstellen** öffnet die vier normalen Wege mit ihren wichtigsten Parametern. Alte Projekte laden mit Legacy-DSP und bisheriger Latenz.
 
 Details und Prüfgrenzen: [Feedback 0.4](docs/FEEDBACK_0.4.md).
+
+**Geprüfte 0.4-Testpakete:** [VALIDATION_0.4.0.md](docs/VALIDATION_0.4.0.md).

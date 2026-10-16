@@ -1,0 +1,47 @@
+[
+  {
+    "platform": "Windows",
+    "archive": "MalleVocals-0.4.0-Windows.zip",
+    "sha256": "b0ad6142b5701b28b6bfd50230b57f1581f966c07b4aadd0ac0fcb729f83c44e",
+    "bytes": 10686794,
+    "binaries": [
+      {
+        "path": "MalleVocals-0.4.0-Windows/Standalone/Malle Vocals.exe",
+        "PE_machine": "0x8664"
+      },
+      {
+        "path": "MalleVocals-0.4.0-Windows/VST3/Malle Vocals.vst3/Contents/x86_64-win/Malle Vocals.vst3",
+        "PE_machine": "0x8664"
+      }
+    ]
+  },
+  {
+    "platform": "macOS",
+    "archive": "MalleVocals-0.4.0-Darwin.zip",
+    "sha256": "ec18c532fdfbda220cc68b5fea8966b617465f3408b9ab12a9b2f18b78bb8359",
+    "bytes": 28671968,
+    "binaries": [
+      {
+        "path": "MalleVocals-0.4.0-Darwin/VST3/Malle Vocals.vst3/Contents/MacOS/Malle Vocals",
+        "architectures": [
+          "0x1000007",
+          "0x100000c"
+        ]
+      },
+      {
+        "path": "MalleVocals-0.4.0-Darwin/Standalone/Malle Vocals.app/Contents/MacOS/Malle Vocals",
+        "architectures": [
+          "0x1000007",
+          "0x100000c"
+        ]
+      },
+      {
+        "path": "MalleVocals-0.4.0-Darwin/AU/Malle Vocals.component/Contents/MacOS/Malle Vocals",
+        "architectures": [
+          "0x1000007",
+          "0x100000c"
+        ]
+      }
+    ]
+  }
+]

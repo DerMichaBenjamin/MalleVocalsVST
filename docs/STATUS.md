@@ -78,3 +78,7 @@ Sieben echte Crowd-Importslots, eigene Parameter je Platz, atomare audioseitige 
 ## Bestätigte Build-Abnahme 0.3.0
 
 Workflow 38911281676: Windows x64 und Mac Universal erfolgreich; alle vier CTest-Suites bestanden. Mac-CI Sonoma 14.8.9, Codesign nur ad hoc. Nach Download wurden ZIP/SHA256 und PE-/Mach-O-Architekturen geprüft. Neue native Screenshots und genaue Grenzen: [VALIDATION_0.3.0.md](VALIDATION_0.3.0.md).
+
+## Bestätigte Feedback-Iteration 0.4.0
+
+Windows x64 und macOS Universal im Lauf 38923565359 erfolgreich gebaut; alle fünf Suites auf beiden Plattformen bestanden. Mac-Ausführung arm64/Sonoma 14.8.9; Intel-Slices geprüft, nicht ausgeführt. ZIP/Hashes/Architekturen nach Download geprüft. Vier lokale Core-Suites und 45 tatsächliche Crowd-Render bei drei Pegeln bestanden. Aufnahme: 0 Samples zusätzliche Plugin-Latenz, Pitch aus. Siehe [VALIDATION_0.4.0.md](VALIDATION_0.4.0.md) und [FEEDBACK_0.4.md](FEEDBACK_0.4.md). Cubase-, Hardware-Monitoring- und subjektive Klangabnahme weiterhin offen.

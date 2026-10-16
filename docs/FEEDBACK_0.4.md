@@ -34,7 +34,7 @@ Reverse Engineering: verwendet wurden eigener bestehender Quellcode, offizielle 
 
 ## Prüfungen
 
-Die neue FeedbackRegression prüft Aufnahme-Impulse bei 44,1/48/96 kHz, Mono/Stereo und Block 1/64/257/1024, absichtlichen Pitch-Bypass, wiederhergestellte Mix-Latenz, stationären Kompressor-Pegelvergleich und FDN-Dichte/Decay. DSP prüft zusätzlich Allokationen bei Aufnahme/Mix-Umschaltungen. PluginStateAndUI prüft kompakten Start, sichtbaren Simple-Raumzugang, identischen View-State, Legacy-Migration, neue Parameter und Offline-Recall. Ergebnisse und native Builds werden nach dem tatsächlichen Lauf ergänzt.
+Die neue FeedbackRegression prüft Aufnahme-Impulse bei 44,1/48/96 kHz, Mono/Stereo und Block 1/64/257/1024, absichtlichen Pitch-Bypass, wiederhergestellte Mix-Latenz, stationären Kompressor-Pegelvergleich und FDN-Dichte/Decay. DSP prüft zusätzlich Allokationen bei Aufnahme/Mix-Umschaltungen. PluginStateAndUI prüft kompakten Start, sichtbaren Simple-Raumzugang, identischen View-State, Legacy-Migration, neue Parameter und Offline-Recall. Finaler Lauf 38923565359: alle fünf Suites auf Windows und Mac bestanden, native Pakete geprüft. Ergebnisse und konkrete Grenzen: [VALIDATION_0.4.0.md](VALIDATION_0.4.0.md).
 
 Keine Cubase-/Hardware-Monitoring-/DAW-Hostprüfung und keine subjektive Klangabnahme in dieser Umgebung. Echtes niedrig latentes Tuning, pro Doublerstimme unabhängige Formanten, umfassende Detail-Automationsglättung, Aliasing-/Stereolink-Verbesserungen und die musikalische Abnahme bleiben offen.
 
