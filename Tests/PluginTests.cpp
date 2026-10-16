@@ -93,6 +93,12 @@ int main() {
     require(before.isEquivalentTo(p.state.copyState()),
             "view switch preserves all state");
     saveImage("advanced.png");
+    auto* stadiumTab=button(*editor,"Stadium");require(stadiumTab!=nullptr,"stadium navigation");
+    stadiumTab->onClick();
+    auto* bankSaveButton=button(*editor,"Bank speichern");
+    require(bankSaveButton && bankSaveButton->getParentComponent()->isVisible(),"crowd bank actions visible in advanced");
+    saveImage("stadium.png");
+    button(*editor,"Klang & Dynamik")->onClick();
     auto file = juce::File::getSpecialLocation(juce::File::tempDirectory)
                     .getNonexistentChildFile("malle-fixture", ".wav");
     juce::WavAudioFormat fmt;

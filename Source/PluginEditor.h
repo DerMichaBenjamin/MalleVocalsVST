@@ -23,7 +23,7 @@ public:
   ParamChoice(MalleProcessor &, std::string, juce::String, juce::StringArray,
               std::vector<float> values = {});
   void resized() override;
-  void setChoiceName(int index, const juce::String& name) { box.changeItemText(index+1,name); }
+  void setChoiceName(int index, const juce::String& name) { box.changeItemText(index+1,name); if(box.getSelectedId()==index+1)box.setTooltip(name); }
 
 private:
   juce::Label label;

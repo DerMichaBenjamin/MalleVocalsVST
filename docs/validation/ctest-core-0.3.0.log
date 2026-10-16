@@ -1,0 +1,58 @@
+Start testing: Oct 16 18:47 PKT
+----------------------------------------------------------
+1/3 Testing: DSP
+1/3 Test: DSP
+Command: "/workspace/scratch/527cf12be981/MalleVocalsVST/build-core/malle_tests"
+Directory: /workspace/scratch/527cf12be981/MalleVocalsVST/build-core
+"DSP" start time: Oct 16 18:47 PKT
+Output:
+----------------------------------------------------------
+PASS: 100 presets, 20 variants, 24 rate/channel/buffer configurations, exact latency/bypass, finite outputs, pitch detection
+<end of output>
+Test time =  10.18 sec
+----------------------------------------------------------
+Test Passed.
+"DSP" end time: Oct 16 18:47 PKT
+"DSP" time elapsed: 00:00:10
+----------------------------------------------------------
+
+2/3 Testing: MeasuredDSP
+2/3 Test: MeasuredDSP
+Command: "/workspace/scratch/527cf12be981/MalleVocalsVST/build-core/malle_analysis"
+Directory: /workspace/scratch/527cf12be981/MalleVocalsVST/build-core
+"MeasuredDSP" start time: Oct 16 18:47 PKT
+Output:
+----------------------------------------------------------
+Ping pong/release/tail kill: PASS
+Tuning 224 Hz -> 221.137 Hz
+Resonance 1355.59 Hz: -2.04332 dB
+Air 10 kHz: +2.88162 dB
+External SC output RMS: 0.0219615
+Routing EQ/FET order difference: 10.5 dB
+Throw delay: correct latency/window, tail energy 0.579829
+PASS: measured DSP behaviour
+<end of output>
+Test time =   3.01 sec
+----------------------------------------------------------
+Test Passed.
+"MeasuredDSP" end time: Oct 16 18:47 PKT
+"MeasuredDSP" time elapsed: 00:00:03
+----------------------------------------------------------
+
+3/3 Testing: CrowdBankDSP
+3/3 Test: CrowdBankDSP
+Command: "/workspace/scratch/527cf12be981/MalleVocalsVST/build-core/malle_crowd_tests"
+Directory: /workspace/scratch/527cf12be981/MalleVocalsVST/build-core
+"CrowdBankDSP" start time: Oct 16 18:47 PKT
+Output:
+----------------------------------------------------------
+PASS: slot crossfade max jump 0.00415805, loop seam 0.00125042
+<end of output>
+Test time =   0.75 sec
+----------------------------------------------------------
+Test Passed.
+"CrowdBankDSP" end time: Oct 16 18:47 PKT
+"CrowdBankDSP" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 16 18:47 PKT

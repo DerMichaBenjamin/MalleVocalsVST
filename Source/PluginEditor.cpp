@@ -860,6 +860,7 @@ void MalleEditor::resized() {
       int bankWidth=std::min(350,detailCard.getWidth()/3);
       stadium.setBounds(detailCard.getRight()-bankWidth-10,detailCard.getY()+46,
                         bankWidth,detailCard.getHeight()-56);
+      stadium.toFront(false);
       viewport.setSize(detailCard.getWidth()-bankWidth-35,viewport.getHeight());
     }
     sourceInfo.setBounds(detailCard.getX() + 280, io.getY() + 6,
