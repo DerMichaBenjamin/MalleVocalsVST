@@ -3,6 +3,15 @@
 #include <cstring>
 #include <iostream>
 #include <cstdint>
+#include <new>
+#include <cstdlib>
+static bool tracing=false;static size_t allocations=0;
+void* operator new(std::size_t n){if(tracing)++allocations;if(auto* p=std::malloc(n?n:1))return p;throw std::bad_alloc();}
+void* operator new[](std::size_t n){return ::operator new(n);}
+void operator delete(void*p)noexcept{std::free(p);}
+void operator delete[](void*p)noexcept{std::free(p);}
+void operator delete(void*p,std::size_t)noexcept{std::free(p);}
+void operator delete[](void*p,std::size_t)noexcept{std::free(p);}
 using namespace malle;
 uint32_t u32(std::ifstream& f){uint32_t v=0;f.read((char*)&v,4);return v;}
 Sample load(const char* path){
@@ -20,8 +29,10 @@ int main(int argc,char**argv){try{
  p[index("stadium.on")]=1;p[index("stadium.mix")]=.6;p[index("stadium.loopSmooth")]=1;p[index("stadium.vocoder")]=float(mode);p[index("output")]=-6;
  double energy=0;for(float x:bank[0].left)energy+=x*x;float cal=.0630957f/std::sqrt(energy/bank[0].left.size());
  std::array<float,256> l{},r{};float* out[]{l.data(),r.data()};double sum=0,mono=0;float peak=0;int count=0;
+ e.setParameters(p);allocations=0;tracing=true;
  for(int t=0;t<48000*25;t+=256){p[index("stadium.slot")]=float(std::min(4,t/(48000*5)));e.setParameters(p);for(int j=0;j<256;++j){size_t at=size_t(t+j)%bank[0].left.size();l[j]=bank[0].left[at]*cal;r[j]=bank[0].right[at]*cal;}e.process(out,2,256,nullptr,0,{});for(int j=0;j<256;++j){if(!std::isfinite(l[j])||!std::isfinite(r[j]))throw std::runtime_error("nonfinite");peak=std::max(peak,std::max(std::abs(l[j]),std::abs(r[j])));sum+=(l[j]*l[j]+r[j]*r[j])*.5;mono+=std::pow((l[j]+r[j])*.5,2);++count;}}
+ tracing=false;if(allocations)throw std::runtime_error("allocation during processing");
  if(peak>=1)throw std::runtime_error("peak exceeds unity");
- std::cout<<"mode="<<mode<<" frames="<<count<<" peak_dbfs="<<db(peak)<<" rms_dbfs="<<db(float(std::sqrt(sum/count)))<<" mono_fold_db="<<10*std::log10(mono/sum)<<" finite=true\n";
+ std::cout<<"mode="<<mode<<" frames="<<count<<" peak_dbfs="<<db(peak)<<" rms_dbfs="<<db(float(std::sqrt(sum/count)))<<" mono_fold_db="<<10*std::log10(mono/sum)<<" finite=true allocations="<<allocations<<"\n";
  }
 }catch(const std::exception&e){std::cerr<<e.what()<<'\n';return 1;}return 0;}

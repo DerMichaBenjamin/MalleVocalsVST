@@ -33,7 +33,7 @@ Diese Version ist eine erste native Entwicklungsfassung. Der vollständige Auftr
 
 | Umgebung | Stand |
 |---|---|
-| Linux x86_64 / GCC 13 | Native DSP, VST3 und Standalone lokal gebaut; zusätzliche automatisierte Prüfungen im Tests-Verzeichnis |
+| Linux x86_64 / GCC 13 | 0.3-Core lokal gebaut/geprüft; native VST3-/Standalone-/pluginval-Prüfung zuletzt für 0.2.0 |
 | Windows x64 | GitHub-CI eingerichtet; aktuelles Ergebnis siehe erfolgreichen Workflow-Lauf |
 | macOS arm64 + x86_64 | Universal-CI eingerichtet; aktuelles Ergebnis siehe Workflow-Lauf |
 | Sonoma 14.5 | Als Ziel berücksichtigt, aber nicht auf dieser exakten Betriebssystemversion getestet |
@@ -72,3 +72,7 @@ Windows x64 und macOS Universal sind im Workflow 38673300202 erfolgreich gebaut 
 ## Ergänzung 0.3.0
 
 Sieben echte Crowd-Importslots, eigene Parameter je Platz, atomare audioseitige Slotwahl, Bank-Import/-Export, Clear/Undo und Schema-3-Recall. Details, Altprojektverhalten und Sampleherkunft: [CROWD_BANK.md](CROWD_BANK.md). Neue Build-/Testresultate werden separat ausgewiesen; die älteren Prüfprotokolle gelten für 0.2.0.
+
+## Bestätigte Build-Abnahme 0.3.0
+
+Workflow 38911281676: Windows x64 und Mac Universal erfolgreich; alle vier CTest-Suites bestanden. Mac-CI Sonoma 14.8.9, Codesign nur ad hoc. Nach Download wurden ZIP/SHA256 und PE-/Mach-O-Architekturen geprüft. Neue native Screenshots und genaue Grenzen: [VALIDATION_0.3.0.md](VALIDATION_0.3.0.md).

@@ -22,7 +22,7 @@ cmake --build build-core --parallel 3
 ctest --test-dir build-core --output-on-failure
 ```
 
-Aktuelle gebaute Testpakete, Architekturprüfung, Screenshots und genaue Prüfgrenzen: [Validierung 0.2.0](docs/VALIDATION_0.2.0.md).
+Aktuelle gebaute Testpakete, Architekturprüfung, Screenshots und genaue Prüfgrenzen: [Validierung 0.3.0](docs/VALIDATION_0.3.0.md).
 
 ## Download / Installation
 
