@@ -23,6 +23,7 @@ public:
   ParamChoice(MalleProcessor &, std::string, juce::String, juce::StringArray,
               std::vector<float> values = {});
   void resized() override;
+  void setChoiceName(int index, const juce::String& name) { box.changeItemText(index+1,name); }
 
 private:
   juce::Label label;
@@ -134,9 +135,10 @@ private:
   juce::TooltipWindow tips{this, 700};
   bool advanced = false;
   bool ready = false;
+  int displayedCrowdSlot = -1;
   juce::TextButton simple{"Simple"}, advancedButton{"Advanced"}, undo{"Undo"},
       redo{"Redo"}, save{"Speichern"}, load{"Laden"}, favorite{"*"},
-      import{"Sample laden"}, preview{"Vorhoeren"};
+      import{"Sample laden"}, preview{"Vorhoeren"}, bankSave{"Bank speichern"}, clearSample{"Platz leeren"};
   juce::ToggleButton lockKey{"Tonart"}, lockInput{"Input"},
       lockRouting{"Routing"};
   juce::ComboBox preset, section, deessPresets;

@@ -172,4 +172,54 @@ struct Sample {
   double sampleRate = 48000;
   std::string name = "Synthetic test crowd (original)";
 };
+// Immutable sample readers; no ownership changes or allocation on the audio thread.
+struct CrowdPlayer {
+  const Sample *active = nullptr, *previous = nullptr;
+  double pos = 0, previousPos = 0;
+  float blend = 1;
+  void reset() { active=previous=nullptr; pos=previousPos=0; blend=1; }
+  static std::array<float,2> read(const Sample* s, double& at, bool loop,
+                                 float fadeMs, bool smooth, double step) {
+    if (!s || s->left.empty()) return {};
+    const double len=double(s->left.size());
+    const double fade=smooth ? std::clamp(double(fadeMs)*.001*s->sampleRate,1.,std::max(1.,len*.25)) : std::max(1.,double(fadeMs)*.001*s->sampleRate);
+    if(loop && at>=len) at=smooth ? fade+std::fmod(at-len,len-fade) : std::fmod(at,len);
+    if(at>=len) return {};
+    auto sampleAt=[&](const std::vector<float>& v,double t) {
+      if(v.empty()) return 0.f;
+      size_t a=std::min(size_t(t),v.size()-1),b=std::min(a+1,v.size()-1);
+      float f=float(t-double(a));return v[a]+(v[b]-v[a])*f;
+    };
+    std::array<float,2> y{};
+    for(int c=0;c<2;++c) {
+      const auto& v=(c==0 || s->right.empty()) ? s->left : s->right;
+      float x=sampleAt(v,at);
+      if(loop && smooth && at>=len-fade) {
+        const float t=float((at-(len-fade))/fade);
+        x=x*(1-t)+sampleAt(v,at-(len-fade))*t;
+      } else {
+        const double edge=(loop && smooth) ? at : std::min(at,len-1-at);
+        x*=float(std::clamp(edge/fade,0.,1.));
+      }
+      y[size_t(c)]=x;
+    }
+    at+=step;return y;
+  }
+  std::array<float,2> next(const Sample* s, float sr, float speed, bool loop,
+                          float fadeMs, bool smooth, bool restart) {
+    if(active!=s) {
+      previous=active; previousPos=pos; active=s; pos=0;
+      blend=previous ? 0.f : 1.f;
+    }
+    if(restart)pos=0;
+    auto y=read(active,pos,loop,fadeMs,smooth,s ? s->sampleRate/sr*speed : 0);
+    if(blend<1) {
+      auto old=read(previous,previousPos,loop,fadeMs,smooth,
+                    previous ? previous->sampleRate/sr*speed : 0);
+      blend=std::min(1.f,blend+1.f/(sr*.01f));
+      for(int c=0;c<2;++c)y[size_t(c)]=old[size_t(c)]*(1-blend)+y[size_t(c)]*blend;
+    }
+    return y;
+  }
+};
 } // namespace malle

@@ -589,12 +589,11 @@ MalleEditor::MalleEditor(MalleProcessor &p)
   stadiumOn = std::make_unique<ParamToggle>(p, "stadium.on", "ON");
   stadiumAmount = std::make_unique<ValueControl>(p, "stadium.mix", "Menge");
   texture = std::make_unique<ParamChoice>(
-      p, "stadium.texture", "Testtextur",
-      juce::StringArray{"Test 1", "Test 2", "Test 3", "Test 4", "Test 5",
-                        "Test 6", "Test 7"});
+      p, "stadium.slot", "Crowd-Platz",
+      juce::StringArray{"1 - Leer", "2 - Leer", "3 - Leer", "4 - Leer", "5 - Leer", "6 - Leer", "7 - Leer"});
   for (auto *c : std::initializer_list<juce::Component *>{
            stadiumOn.get(), stadiumAmount.get(), texture.get(), &wave, &import,
-           &preview})
+           &preview, &bankSave, &clearSample})
     stadium.addAndMakeVisible(c);
   tuneOn = std::make_unique<ParamToggle>(p, "tune.on", "ON");
   tuneAmount = std::make_unique<ValueControl>(p, "tune.amount", "Korrektur");
@@ -673,7 +672,7 @@ MalleEditor::MalleEditor(MalleProcessor &p)
   bindLock(lockRouting, "lock.routing");
   import.onClick = [this] {
     chooser = std::make_unique<juce::FileChooser>(
-        "Crowd importieren", juce::File{}, "*.wav;*.aif;*.aiff;*.flac");
+        "Sample oder Crowd-Bank laden", juce::File{}, "*.wav;*.aif;*.aiff;*.flac;*.mallecrowd");
     auto safe = juce::Component::SafePointer<MalleEditor>(this);
     chooser->launchAsync(juce::FileBrowserComponent::openMode |
                              juce::FileBrowserComponent::canSelectFiles,
@@ -682,6 +681,20 @@ MalleEditor::MalleEditor(MalleProcessor &p)
                              safe->filesDropped(
                                  {fc.getResult().getFullPathName()}, 0, 0);
                          });
+  };
+  import.setButtonText("Sample / Bank laden");
+  clearSample.onClick=[this] { proc.clearCrowdSlot(); };
+  bankSave.onClick=[this] {
+    chooser=std::make_unique<juce::FileChooser>("Crowd-Bank speichern",juce::File{},"*.mallecrowd");
+    auto safe=juce::Component::SafePointer<MalleEditor>(this);
+    chooser->launchAsync(juce::FileBrowserComponent::saveMode | juce::FileBrowserComponent::canSelectFiles | juce::FileBrowserComponent::warnAboutOverwriting,
+      [safe](const juce::FileChooser& fc) {
+        if(safe && fc.getResult()!=juce::File{}) {
+          juce::String error;
+          if(!safe->proc.saveCrowdBank(fc.getResult().withFileExtension("mallecrowd"),error))
+            juce::AlertWindow::showMessageBoxAsync(juce::MessageBoxIconType::WarningIcon,"Crowd-Bank",error);
+        }
+      });
   };
   preview.setClickingTogglesState(true);
   preview.onClick = [this] {
@@ -749,8 +762,16 @@ void MalleEditor::rebuild() {
     addAndMakeVisible(*sectionVariant);
     sectionVariant->setVisible(advanced);
   }
+  int selectedSlot=std::clamp(int(proc.getValue("stadium.slot")),0,malle::crowdSlots-1);
+  auto visibleSlotParameter=[&](const std::string& id) {
+    for(int slot=0;slot<malle::crowdSlots;++slot)
+      for(auto field:{"root","loop","fade","level"})
+        if(id==malle::crowdParameter(slot,field))return slot==selectedSlot;
+    return true;
+  };
   for (auto &d : malle::parameters())
-    if (juce::String(d.section) == group && d.id.rfind("route.", 0) != 0 &&
+    if (visibleSlotParameter(d.id) && d.id!="stadium.slot" && d.id!="stadium.mix" &&
+        (d.id!="stadium.texture" || proc.crowdSlotName(selectedSlot)=="Leer / Testtextur") && juce::String(d.section) == group && d.id.rfind("route.", 0) != 0 &&
         (d.id.size() < 3 || d.id.substr(d.id.size() - 3) != ".on") &&
         d.id != "deess.preset" && d.id.find(".variant") == std::string::npos) {
       auto c = std::make_unique<ValueControl>(
@@ -762,7 +783,7 @@ void MalleEditor::rebuild() {
     }
   for (auto &c : macros)
     c->setVisible(!advanced);
-  stadium.setVisible(!advanced);
+  stadium.setVisible(!advanced || group=="Stadium");
   tuning.setVisible(!advanced);
   for (auto &b : tabs)
     b.setVisible(advanced);
@@ -835,16 +856,24 @@ void MalleEditor::resized() {
         detailCard.getWidth() - 20, detailCard.getHeight() - 54 - eqH - extra);
     io.setBounds(detailCard.getX(), detailCard.getBottom() + 8,
                  detailCard.getWidth(), 143);
+    if(section.getText()=="Stadium") {
+      int bankWidth=std::min(350,detailCard.getWidth()/3);
+      stadium.setBounds(detailCard.getRight()-bankWidth-10,detailCard.getY()+46,
+                        bankWidth,detailCard.getHeight()-56);
+      viewport.setSize(detailCard.getWidth()-bankWidth-35,viewport.getHeight());
+    }
     sourceInfo.setBounds(detailCard.getX() + 280, io.getY() + 6,
                          detailCard.getWidth() - 295, 22);
   }
   int sw = stadium.getWidth(), sh = stadium.getHeight();
   stadiumOn->setBounds(sw - 68, 9, 53, 25);
-  stadiumAmount->setBounds(8, 43, sw / 2 - 10, sh - 110);
+  stadiumAmount->setBounds(8, 43, sw / 2 - 10, sh - 140);
   texture->setBounds(sw / 2, 43, sw / 2 - 13, 54);
-  wave.setBounds(sw / 2, 106, sw / 2 - 14, std::max(25, sh - 174));
-  import.setBounds(12, sh - 48, sw / 2 - 17, 32);
-  preview.setBounds(sw / 2 + 2, sh - 48, sw / 2 - 16, 32);
+  wave.setBounds(sw / 2, 106, sw / 2 - 14, std::max(25, sh - 210));
+  import.setBounds(12, sh - 78, sw / 2 - 17, 28);
+  preview.setBounds(sw / 2 + 2, sh - 78, sw / 2 - 16, 28);
+  bankSave.setBounds(12,sh-43,sw/2-17,28);
+  clearSample.setBounds(sw/2+2,sh-43,sw/2-16,28);
   tuneOn->setBounds(tuning.getWidth() - 68, 9, 53, 25);
   root->setBounds(12, 42, tuning.getWidth() / 2 - 20, 53);
   scale->setBounds(12, 99, tuning.getWidth() / 2 - 20, 53);
@@ -876,7 +905,7 @@ void MalleEditor::paint(juce::Graphics &g) {
   g.drawText("R O H S T O F F   A U D I O", 20, 10, 300, 22,
              juce::Justification::left);
   g.setFont(juce::FontOptions(12));
-  g.drawText("by Micha Benjamin / 0.2.0 ALPHA", 20, 32, 300, 19,
+  g.drawText("by Micha Benjamin / 0.3.0 ALPHA", 20, 32, 300, 19,
              juce::Justification::left);
   for (int x : {7, getWidth() - 12})
     for (int y : {7, getHeight() - 13}) {
@@ -887,6 +916,13 @@ void MalleEditor::paint(juce::Graphics &g) {
     }
 }
 void MalleEditor::timerCallback() {
+  int slot=std::clamp(int(proc.getValue("stadium.slot")),0,malle::crowdSlots-1);
+  for(int i=0;i<malle::crowdSlots;++i)
+    texture->setChoiceName(i,juce::String(i+1)+" - "+proc.crowdSlotName(i));
+  if(displayedCrowdSlot!=slot) {
+    displayedCrowdSlot=slot;
+    if(advanced && section.getText()=="Stadium")rebuild();
+  }
   auto &m = proc.engine.meters;
   bool external =
       proc.getValue("duck.source") > .5f || proc.getValue("pump.mode") > .5f;
@@ -957,7 +993,9 @@ void MalleEditor::filesDropped(const juce::StringArray &files, int, int) {
   if (files.isEmpty())
     return;
   juce::String error;
-  if (!proc.importSample(juce::File(files[0]), error))
+  auto file=juce::File(files[0]);
+  bool ok=file.hasFileExtension("mallecrowd") ? proc.loadCrowdBank(file,error) : proc.importSample(file,error);
+  if (!ok)
     juce::AlertWindow::showMessageBoxAsync(
         juce::MessageBoxIconType::WarningIcon, "Sample Import", error);
 }

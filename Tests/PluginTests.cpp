@@ -105,6 +105,49 @@ int main() {
     w.reset();
     juce::String error;
     require(p.importSample(file, error), "sample import");
+    p.setValue("stadium.slot",1);
+    p.setValue("stadium.1.root",5);
+    p.setValue("stadium.1.level",-9);
+    require(p.importSample(file,error),"second crowd slot import");
+    auto bankFile=file.withFileExtension("mallecrowd");
+    require(p.saveCrowdBank(bankFile,error),"crowd bank export");
+    auto bankXml=juce::XmlDocument::parse(bankFile);
+    auto bankTree=juce::ValueTree::fromXml(*bankXml);
+    for(auto child:bankTree) {
+      auto text=child.getProperty("data").toString();
+      if(text.isEmpty())continue;
+      juce::MemoryBlock bytes;require(bytes.fromBase64Encoding(text),"native bank encoding");
+      child.setProperty("data",juce::Base64::toBase64(bytes.getData(),bytes.getSize()),nullptr);
+      child.setProperty("encoding","base64",nullptr);
+    }
+    bankTree.createXml()->writeTo(bankFile);
+    MalleProcessor bankLoaded;
+    require(bankLoaded.loadCrowdBank(bankFile,error),"crowd bank import");
+    require(bankLoaded.getValue("stadium.1.root")==5 && bankLoaded.getValue("stadium.1.level")==-9,"per slot settings survive bank export");
+    require(bankLoaded.crowdSlotName(0).contains("malle-fixture") && bankLoaded.crowdSlotName(1).contains("malle-fixture"),"bank contains two slots");
+    bankLoaded.undo.undo();
+    require(bankLoaded.crowdSlotName(1)=="Leer / Testtextur","bank undo restores empty bank");
+    bankLoaded.undo.redo();
+    require(bankLoaded.crowdSlotName(1).contains("malle-fixture"),"bank redo restores samples");
+    p.clearCrowdSlot();
+    require(p.crowdSlotName(1)=="Leer / Testtextur","clear slot");
+    p.undo.undo();
+    require(p.crowdSlotName(1).contains("malle-fixture"),"clear slot undo");
+    p.setValue("stadium.slot",0);
+    bankFile.deleteFile();
+    // Legacy 0.2 XML sample properties still restore into slot 1.
+    auto old=p.state.copyState().createCopy();
+    old.setProperty("schema",2,nullptr);
+    old.setProperty("sample.data",old.getProperty("crowd.0.data"),nullptr);
+    old.setProperty("sample.name",old.getProperty("crowd.0.name"),nullptr);
+    for(int i=0;i<malle::crowdSlots;++i)for(auto field:{"data","name"})
+      old.removeProperty(juce::Identifier(juce::String(malle::crowdProperty(i,field))),nullptr);
+    auto oldFile=file.withFileExtension("mallevocals");
+    old.createXml()->writeTo(oldFile);
+    MalleProcessor legacy;
+    require(legacy.loadPreset(oldFile),"legacy preset loads");
+    require(legacy.crowdSlotName(0).contains("malle-fixture"),"legacy sample migrates");
+    oldFile.deleteFile();
     p.getStateInformation(saved);
     file.deleteFile();
     MalleProcessor recalled;

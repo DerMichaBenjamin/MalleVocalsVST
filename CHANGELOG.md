@@ -1,3 +1,12 @@
+# 0.3.0 Alpha — 16.10.2026
+
+- Sieben echte importierbare Crowd-Speicherplätze mit unabhängigen Samplepegeln, Grundtönen, Loops und Fades. Slot 1 behält bisherige Parameter-IDs.
+- Audioseitige Platzwahl über DAW-Automation ohne Dateizugriff oder Decodieren im Prozesspfad.
+- Crowd-Bank laden/speichern und Drag-and-drop, Platz leeren, Bank-/Sample-Undo/Redo und eingebetteter vollständiger Projekt-/Preset-Recall (Schema 3).
+- Optionale überlappende Loop-Crossfades; 10-ms-Überblendung beim Wechsel verschiedener Carrier.
+- Crowd-Upload wiedergefunden und fünf Originaldateien geprüft; separat ladbare Benutzerbank aus dokumentierten Ausschnitten. Weitergaberechte nicht im Archiv belegt, daher keine Audioverteilung im öffentlichen Quellcode/CI.
+- Neue DSP-Tests für Loopgrenzen, Platzwechsel und tatsächlich wirksame Carrier-Automation; Integrationstests für Bank-Recall, Undo/Redo und alte Sample-Presets.
+
 # 0.2.0 Alpha — 15.10.2026
 
 - Native Modular-Graphite-Oberfläche mit sechs Simple-Sektionen, gemeinsamem Advanced-Zustand und durchgehendem Throw-Bereich.

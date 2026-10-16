@@ -1,4 +1,5 @@
 #include "Parameters.h"
+#include "CrowdSlots.h"
 #include <algorithm>
 #include <cmath>
 #include <stdexcept>
@@ -191,6 +192,14 @@ const std::vector<Param> &parameters() {
     add("throw.verb.amount", "Throw Hall Menge", "throw", 0, 1, .2);
     add("throw.kill", "Tail Kill", "throw", 0, 1, 0);
     add("duck.on", "FX Ducking aktiv", "Ducking", 0, 1, 1);
+    add("stadium.slot", "Crowd-Platz 1–7", "Stadium", 0, 6, 0);
+    add("stadium.loopSmooth", "Loop Crossfade", "Stadium", 0, 1, 0);
+    for (int slot = 1; slot < crowdSlots; ++slot) {
+      add(crowdParameter(slot,"root"), "Sample Grundton", "Stadium", 0,11,0);
+      add(crowdParameter(slot,"loop"), "Loop", "Stadium", 0,1,1);
+      add(crowdParameter(slot,"fade"), "Sample Fade", "Stadium", 1,500,30,"ms");
+      add(crowdParameter(slot,"level"), "Sample Pegel", "Stadium", -24,12,0,"dB");
+    }
     return v;
   }();
   return p;
@@ -206,7 +215,8 @@ bool discrete(std::string_view id) {
   return id == "bypass" || id == "tune.root" || id == "tune.scale" ||
          id == "formant.preserve" || id == "double.voices" ||
          id == "stadium.root" || id == "stadium.loop" ||
-         id == "stadium.texture" || id == "duck.source" || id == "pump.mode" ||
+         id == "stadium.texture" || id == "stadium.slot" || id == "stadium.loopSmooth" ||
+         (id.substr(0,8) == "stadium." && (id.find(".root") != std::string_view::npos || id.find(".loop") != std::string_view::npos)) || id == "duck.source" || id == "pump.mode" ||
          id == "pump.target" || id == "throw.type" || id == "throw.feel" ||
          id == "throw.kill" || id == "throw.verb.type" || id == "deess.mode" ||
          id == "deess.preset" || id == "parallel.tap" ||

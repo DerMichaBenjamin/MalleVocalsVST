@@ -1,5 +1,6 @@
 #pragma once
 #include "Parameters.h"
+#include "CrowdSlots.h"
 #include "Primitives.h"
 #include "signalsmith-stretch.h"
 #include <atomic>
@@ -24,7 +25,10 @@ public:
                const float *const *sidechain, int scChannels,
                Transport transport, bool bypass = false);
   void setSample(const Sample *s) {
-    sample.store(s, std::memory_order_release);
+    setSample(0,s);
+  }
+  void setSample(int slot, const Sample* s) {
+    if(slot>=0 && slot<crowdSlots) samples[size_t(slot)].store(s,std::memory_order_release);
   }
   int latency() const { return latencySamples; }
   Meters meters;
@@ -62,7 +66,9 @@ private:
   std::array<float, 1024> pitchHistory{};
   int pitchPos = 0, pitchHop = 0, downCounter = 0;
   float pitchLow = 0, pitchMidi = 0, pitchConfidence = 0, correction = 0;
-  std::atomic<const Sample *> sample{nullptr};
+  std::array<std::atomic<const Sample *>, crowdSlots> samples{};
+  CrowdPlayer crowdPlayer;
+  std::array<std::array<int,4>,crowdSlots> crowdIndices{};
   std::array<Sample, 7> synthetic;
   double samplePos = 0, phase = 0, freePpq = 0;
   bool lastThrow = false;

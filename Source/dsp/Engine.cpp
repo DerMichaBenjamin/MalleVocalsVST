@@ -7,6 +7,10 @@ void Engine::prepare(double rate, int block, int channels) {
   sr = float(rate);
   chs = channels;
   p = defaults();
+  for(int slot=0;slot<crowdSlots;++slot) {
+    int j=0;for(auto field : {"root","loop","fade","level"})
+      crowdIndices[size_t(slot)][size_t(j++)]=index(crowdParameter(slot,field));
+  }
   pitchEngine.presetDefault(chs, sr);
   creativeEngine.presetDefault(chs, sr);
   latencySamples =
@@ -126,6 +130,7 @@ void Engine::reset() {
   pitchPos = pitchHop = downCounter = 0;
   pitchLow = pitchMidi = pitchConfidence = correction = 0;
   samplePos = phase = freePpq = 0;
+  crowdPlayer.reset();
   clock = 0;
   throwStart = throwEnd = -1;
   throwLag = throwRemaining = 0;
@@ -293,10 +298,10 @@ void Engine::process(float *const *data, int channels, int count,
               stadiumWidth = value("stadium.width"),
               stadiumRough = value("stadium.rough"),
               stadiumSize = value("stadium.size"),
-              sampleRoot = value("stadium.root"),
-              sampleLoop = value("stadium.loop"),
-              sampleFade = value("stadium.fade") * .001f,
-              sampleGain = gain(value("stadium.level"));
+              sampleRoot = p[size_t(crowdIndices[size_t(std::clamp(int(value("stadium.slot")),0,6))][0])],
+              sampleLoop = p[size_t(crowdIndices[size_t(std::clamp(int(value("stadium.slot")),0,6))][1])],
+              sampleFade = p[size_t(crowdIndices[size_t(std::clamp(int(value("stadium.slot")),0,6))][2])],
+              sampleGain = gain(p[size_t(crowdIndices[size_t(std::clamp(int(value("stadium.slot")),0,6))][3])]);
   const int voices = int(value("double.voices")),
             root = int(value("tune.root")), scale = int(value("tune.scale"));
   std::array<bool, 12> allowed{};
@@ -320,6 +325,7 @@ void Engine::process(float *const *data, int channels, int count,
               pumpRatio = value("pump.ratio"),
               pumpAttack = value("pump.attack"),
               pumpRelease = value("pump.release");
+  const bool smoothCrowdLoop=value("stadium.loopSmooth")>.5f;
   bool trigger = value("throw.trigger") > .5f;
   double bpm = std::clamp(tr.bpm, 20., 400.), beatsPerSample = bpm / (60 * sr);
   if (trigger && !lastThrow) {
@@ -337,7 +343,7 @@ void Engine::process(float *const *data, int channels, int count,
   if (!trigger && lastThrow)
     throwEnd = clock + throwLag; // close aligned send only; never clear the tail
   lastThrow = trigger;
-  const Sample *samp = sample.load(std::memory_order_acquire);
+  const Sample *samp = samples[size_t(std::clamp(int(value("stadium.slot")),0,6))].load(std::memory_order_acquire);
   if (!samp || samp->left.empty())
     samp = &synthetic[size_t(std::clamp(int(value("stadium.texture")), 0, 6))];
 
@@ -693,29 +699,10 @@ void Engine::process(float *const *data, int channels, int count,
         totalInactive += 1 / sr;
       float globalGate =
           std::clamp((globalTail - totalInactive) / globalFade, 0.f, 1.f);
-      float carrierL = 0, carrierR = 0;
-      if (sampleLoop < .5f && env < 1e-5f)
-        samplePos = 0;
-      if (!samp->left.empty()) {
-        size_t len = samp->left.size();
-        if (samplePos >= len && sampleLoop > .5f)
-          samplePos = std::fmod(samplePos, double(len));
-        if (samplePos < len) {
-          size_t a = size_t(samplePos), b = std::min(a + 1, len - 1);
-          float f = float(samplePos - a),
-                edge = std::min(float(samplePos), float(len - 1 - samplePos)) /
-                       std::max(1.f, sampleFade * float(samp->sampleRate));
-          float fade = std::clamp(edge, 0.f, 1.f);
-          carrierL =
-              (samp->left[a] * (1 - f) + samp->left[b] * f) * fade * sampleGain;
-          carrierR = samp->right.empty()
-                         ? carrierL
-                         : (samp->right[a] * (1 - f) + samp->right[b] * f) *
-                               fade * sampleGain;
-        }
-        samplePos += samp->sampleRate / sr * std::pow(2., -sampleRoot / 12.) *
-                     (1 + .04 * stadiumSize);
-      }
+      auto carrier = crowdPlayer.next(samp,sr,
+          std::pow(2.f,-sampleRoot/12.f)*(1+.04f*stadiumSize),sampleLoop>.5f,
+          sampleFade,smoothCrowdLoop,sampleLoop<.5f && env<1e-5f);
+      float carrierL=carrier[0]*sampleGain,carrierR=carrier[1]*sampleGain;
       phase += 1 / sr;
       bool sendThrow =
           throwStart >= 0 && clock >= throwStart && throwRemaining > 0 &&

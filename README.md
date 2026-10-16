@@ -1,4 +1,4 @@
-# Malle Vocals — 0.2.0 Alpha
+# Malle Vocals — 0.3.0 Alpha
 
 **Rohstoff Audio / Micha Benjamin.** Ein tatsächlich implementiertes C++/JUCE-Audioeffektplugin in Entwicklung. Noch keine verkaufsfertige Vollversion und keine bestätigte Klanggleichheit mit kommerziellen Referenzen.
 
@@ -35,7 +35,7 @@ Mac-Testbuilds sind nur ad hoc signiert, nicht mit Developer ID notarisiert. Das
 1. Simple startet automatisch. Sechs Makros plus gemeinsame Varianten geben die grobe Richtung vor; Advanced zeigt den ausgewählten Modulbereich.
 2. Input/Output und FX Mix sind getrennt. Für Main zuerst wenig Breite/Raum; für Chor Tuning ausgeschaltet lassen.
 3. EQ-Punkte ziehen: Frequenz/Gain, Mausrad: Q. Alle Detailwerte im Bereich „Klang EQ“. Zahlen lassen sich direkt editieren; Doppelklick setzt den Regler zurück.
-4. Crowd über „Crowd laden“ oder Drag-and-drop auf Sample/Wellenform laden; vorhören. Bis eigene Samples vorliegen, erklingen ausdrücklich synthetische Testtexturen. Stadium selbst aktivieren und Menge dosieren.
+4. Crowd-Platz 1–7 auswählen und über „Sample / Bank laden“ oder Drag-and-drop auf Sample/Wellenform laden; vorhören. Eine `.mallecrowd`-Datei lädt eine vollständige Bank. „Bank speichern“ exportiert die eingebetteten Samples und die Einstellungen pro Platz; „Platz leeren“ ist rückgängig machbar. Bis eigene Samples vorliegen, erklingen ausdrücklich synthetische Testtexturen. Stadium selbst aktivieren und Menge dosieren.
 5. Für externe Lead-Steuerung im Host Sidechain anlegen und Ducking auf Extern stellen. Die Statuszeile meldet fehlendes Signal.
 6. Throw halten oder `throw.trigger` automatisieren. Loslassen schließt den latenzausgerichteten Send, spätestens endet er am Send-Fenster. Die Fahne läuft weiter. Throw-Mix ist der eigene Return; Gesamt-FX-Mix skaliert zusätzlich alle parallelen Effektreturns. Optionaler Throw-Hall folgt ausschließlich dem Throw-Delay.
 7. Eigene Presets speichern/laden; Tonart, Input und Routing werden standardmäßig geschützt. Undo/Redo, Presetsuche und Favoriten sind vorhanden.

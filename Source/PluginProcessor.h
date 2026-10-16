@@ -29,6 +29,10 @@ public:
   void moveModule(int from, int to);
   void deesserPreset(int n);
   bool importSample(const juce::File &, juce::String &error);
+  bool loadCrowdBank(const juce::File&, juce::String& error);
+  bool saveCrowdBank(const juce::File&, juce::String& error);
+  void clearCrowdSlot();
+  juce::String crowdSlotName(int slot) const;
   void setValue(const std::string &, float);
   float getValue(const std::string &) const;
   void savePreset(const juce::File &);
@@ -49,6 +53,6 @@ private:
   std::vector<std::atomic<float> *> raw;
   malle::Values base, resolved;
   std::vector<std::unique_ptr<malle::Sample>> retainedSamples;
-  juce::String loadedSample;
+  std::array<juce::String,malle::crowdSlots> loadedSamples;
   std::vector<juce::String> sampleKeys;
 };

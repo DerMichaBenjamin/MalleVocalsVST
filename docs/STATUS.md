@@ -1,4 +1,4 @@
-# Ehrlicher Funktionsstand — 0.2.0 Alpha
+# Ehrlicher Funktionsstand — 0.3.0 Alpha
 
 Diese Version ist eine erste native Entwicklungsfassung. Der vollständige Auftrag ist noch nicht abgeschlossen.
 
@@ -18,12 +18,12 @@ Diese Version ist eine erste native Entwicklungsfassung. Der vollständige Auftr
 
 ## Noch nicht als fertig freigegeben
 
-- Modular-Graphite-Designrichtung ist in der nativen Oberfläche umgesetzt; finales visuelles Feintuning bleibt offen. Die Crowd-ZIP war nicht zugänglich; bisher ausschließlich klar bezeichnete synthetische Testtexturen.
+- Modular-Graphite-Designrichtung ist in der nativen Oberfläche umgesetzt; finales visuelles Feintuning bleibt offen. Die Crowd-ZIP wurde am 16.10. wiedergefunden. Fünf WAVs sind technisch geprüft und als separate Benutzerbank vorbereitet; öffentliche Factory-Audioverteilung erfordert noch dokumentierte Weitergaberechte.
 - Presets sind technische Startpunkte. Keine 55 professionell gehörten/abgenommenen Klangabstimmungen.
 - Tuning-Qualität an realem Sprech-/Gesangsmaterial, Stimmwechseln, tiefen Stimmen, Vibrato und Atemgeräuschen benötigt Hörtests. Spektrale Formantkompensation ist keine perfekte monophone Formantrekonstruktion.
 - Der Doubler besitzt noch keine echte individuelle Formantverschiebung pro Stimme. Der gemeinsame Pitch/Formant-Prozessor ist getrennt davon vorhanden. Dafür wurde kein Dummy-Regler eingebaut.
 - Resonanzbank und Air sind eigene erste Algorithmen; nicht gleichwertig zu soothe/Fresh Air nachgewiesen. Noch kein vollständiges Aliasing-/Rausch-/Phasen-Messprogramm, kein Stereo-Link für die Resonanzbank.
-- Stadium übernimmt grobe Artikulation. Natürliche Wörter/Melodie eines Stadionchors sind nicht nachgewiesen. Sample-Loop-Crossfade und feinere Carrier-Pitchführung fehlen noch.
+- Stadium übernimmt grobe Artikulation. Natürliche Wörter/Melodie eines Stadionchors sind nicht nachgewiesen. Loop-Crossfade und überblendete Samplewechsel sind jetzt implementiert; feinere Carrier-Pitchführung bleibt offen.
 - Detailparameter/Filterwechsel sind noch nicht umfassend gegen schnelle Automation geglättet. Throw-Automation ist blockgenau, nicht unabhängig von der Host-Puffergröße samplegenau.
 - Graphite-GUI mit plastischen Reglern ist eine Entwicklungsfassung; kein auditierter vollständiger Tastatur-/Screenreader-Workflow.
 - Undo/Redo über JUCE-State ist implementiert; Routing bezieht sich auf Pluginparameter. Host-eigene Bus-/Spurzuordnungen kann ein Plugin nicht im eigenen Undo-Verlauf zurücknehmen.
@@ -68,3 +68,7 @@ Die Vergleichsspektren sind auf RMS angeglichen; dies ist keine gehörte oder wa
 ## Bestätigte Build-Abnahme 0.2.0
 
 Windows x64 und macOS Universal sind im Workflow 38673300202 erfolgreich gebaut und haben alle drei CTest-Suites bestanden. Mac-CI: Sonoma 14.8.9, ad-hoc Codesign geprüft. Lokal bestand zusätzlich pluginval 1.0.4 Strictness 5 einschließlich GUI. Details, echte Screenshots und direkte Paketlinks in VALIDATION_0.2.0.md. Keine hier erfolgten DAW- oder menschlichen Hörtests. Die zwei ständig latenzstabil laufenden Pitch-Stufen verursachen im gemessenen 44,1-kHz-Render 10.584 Samples (240 ms) Latenz; primär Mixing, kein als verzögerungsarm abgenommenes Live-Monitoring.
+
+## Ergänzung 0.3.0
+
+Sieben echte Crowd-Importslots, eigene Parameter je Platz, atomare audioseitige Slotwahl, Bank-Import/-Export, Clear/Undo und Schema-3-Recall. Details, Altprojektverhalten und Sampleherkunft: [CROWD_BANK.md](CROWD_BANK.md). Neue Build-/Testresultate werden separat ausgewiesen; die älteren Prüfprotokolle gelten für 0.2.0.

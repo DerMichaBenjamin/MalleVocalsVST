@@ -62,6 +62,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout MalleProcessor::layout() {
   }
   return l;
 }
+namespace {
+bool decodeCrowdData(const juce::String& encoded,juce::MemoryBlock& data) {
+  auto bytes=encoded.upToFirstOccurrenceOf(".",false,false).getLargeIntValue();
+  if(bytes<44 || bytes>48*1024*1024 || encoded.length()>68*1024*1024)return false;
+  return data.fromBase64Encoding(encoded);
+}
+juce::Identifier crowdProp(int slot,const char* field) {
+  return juce::Identifier(juce::String(malle::crowdProperty(slot,field)));
+}
+}
 MalleProcessor::MalleProcessor()
     : AudioProcessor(
           BusesProperties()
@@ -73,7 +83,7 @@ MalleProcessor::MalleProcessor()
       resolved(base) {
   for (auto &p : malle::parameters())
     raw.push_back(state.getRawParameterValue(p.id));
-  state.state.setProperty("schema", 2, nullptr);
+  state.state.setProperty("schema", 3, nullptr);
   state.state.setProperty("lock.key", true, nullptr);
   state.state.setProperty("lock.input", true, nullptr);
   state.state.setProperty("lock.routing", true, nullptr);
@@ -129,7 +139,7 @@ juce::AudioProcessorEditor *MalleProcessor::createEditor() {
 }
 void MalleProcessor::getStateInformation(juce::MemoryBlock &m) {
   auto tree = state.copyState();
-  tree.setProperty("schema", 2, nullptr);
+  tree.setProperty("schema", 3, nullptr);
   tree.setProperty("preset", currentPreset, nullptr);
   if (auto xml = tree.createXml())
     copyXmlToBinary(*xml, m);
@@ -138,7 +148,7 @@ void MalleProcessor::setStateInformation(const void *d, int n) {
   if (auto xml = getXmlFromBinary(d, n)) {
     auto tree = juce::ValueTree::fromXml(*xml);
     if (tree.hasType("MalleVocals") &&
-        int(tree.getProperty("schema", 2)) <= 2) {
+        int(tree.getProperty("schema", 2)) <= 3) {
       if (int(tree.getProperty("schema", 1)) < 2) {
         auto oldTune = tree.getChildWithProperty("id", "tune.on");
         auto creative = tree.getChildWithProperty("id", "creative.on");
@@ -156,7 +166,7 @@ void MalleProcessor::setStateInformation(const void *d, int n) {
           n.setProperty("value", legacy[i], nullptr);
           tree.addChild(n, -1, nullptr);
         }
-        tree.setProperty("schema", 2, nullptr);
+        tree.setProperty("schema", 3, nullptr);
       }
       state.replaceState(tree);
       currentPreset = tree.getProperty("preset", "User").toString();
@@ -237,74 +247,133 @@ bool MalleProcessor::importSample(const juce::File &f, juce::String &error) {
   w->writeFromAudioSampleBuffer(b, 0, b.getNumSamples());
   w.reset();
   undo.beginNewTransaction("Sample importieren");
-  state.state.setProperty("sample.data", encoded.toBase64Encoding(), &undo);
-  state.state.setProperty("sample.name", f.getFileName(), &undo);
+  int slot=int(getValue("stadium.slot"));
+  state.state.setProperty(crowdProp(slot,"data"), encoded.toBase64Encoding(), &undo);
+  state.state.setProperty(crowdProp(slot,"name"), f.getFileName(), &undo);
   undo.beginNewTransaction();
   restoreSample();
   return true;
 }
+juce::String MalleProcessor::crowdSlotName(int slot) const {
+  auto key=crowdProp(slot,"name");
+  auto name=state.state.getProperty(key).toString();
+  if(slot==0 && !state.state.hasProperty(crowdProp(slot,"data")))
+    name=state.state.getProperty("sample.name").toString();
+  return name.isEmpty() ? "Leer / Testtextur" : name;
+}
 void MalleProcessor::restoreSample() {
-  auto encoded = state.state.getProperty("sample.data").toString();
-  if (encoded == loadedSample)
-    return;
-  loadedSample = encoded;
-  if (encoded.isEmpty()) {
-    engine.setSample(nullptr);
-    sampleName = "Synthetic test crowd (original)";
-    return;
-  }
-  juce::MemoryBlock data;
-  if (!data.fromBase64Encoding(encoded)) {
-    sampleMissing = true;
-    return;
-  }
-  juce::AudioFormatManager formats;
-  formats.registerBasicFormats();
-  std::unique_ptr<juce::AudioFormatReader> r(formats.createReaderFor(
-      std::make_unique<juce::MemoryInputStream>(data, true)));
-  if (!r) {
-    sampleMissing = true;
-    return;
-  }
-  if (r->sampleRate > 192000 || r->lengthInSamples < 64 ||
-      r->lengthInSamples > r->sampleRate * 30) {
-    sampleMissing = true;
-    return;
-  }
-  auto key = encoded;
-  for (size_t i = 0; i < sampleKeys.size(); ++i)
-    if (sampleKeys[i] == key) {
-      engine.setSample(retainedSamples[i].get());
-      sampleName = retainedSamples[i]->name;
-      sampleMissing = false;
-      return;
+  for(int slot=0;slot<malle::crowdSlots;++slot) {
+    auto key=crowdProp(slot,"data");
+    auto encoded=state.state.getProperty(key).toString();
+    if(slot==0 && !state.state.hasProperty(key))
+      encoded=state.state.getProperty("sample.data").toString();
+    if(encoded==loadedSamples[size_t(slot)])continue;
+    if(encoded.isEmpty()) {
+      engine.setSample(slot,nullptr); loadedSamples[size_t(slot)]=encoded;continue;
     }
-  auto s = std::make_unique<malle::Sample>();
-  s->sampleRate = r->sampleRate;
-  s->name = state.state.getProperty("sample.name").toString().toStdString();
-  juce::AudioBuffer<float> b(2, int(r->lengthInSamples));
-  r->read(&b, 0, b.getNumSamples(), 0, true, true);
-  s->left.assign(b.getReadPointer(0), b.getReadPointer(0) + b.getNumSamples());
-  s->right.assign(b.getReadPointer(1), b.getReadPointer(1) + b.getNumSamples());
-  sampleName = s->name;
-  auto *ptr = s.get();
-  for (size_t i = 0; i < waveform.size(); ++i) {
-    size_t a = i * s->left.size() / waveform.size(),
-           b = (i + 1) * s->left.size() / waveform.size();
-    float peak = 0;
-    for (size_t j = a; j < b; ++j)
-      peak = std::max(peak, std::abs(s->left[j]));
-    waveform[i] = peak;
+    bool found=false;
+    for(size_t i=0;i<sampleKeys.size();++i)if(sampleKeys[i]==encoded) {
+      engine.setSample(slot,retainedSamples[i].get());found=true;break;
+    }
+    if(!found) {
+      juce::MemoryBlock data;
+      if(!decodeCrowdData(encoded,data)){sampleMissing=true;continue;}
+      juce::AudioFormatManager formats;formats.registerBasicFormats();
+      std::unique_ptr<juce::AudioFormatReader> reader(formats.createReaderFor(
+          std::make_unique<juce::MemoryInputStream>(data,true)));
+      if(!reader || reader->sampleRate>192000 || reader->lengthInSamples<64 ||
+         reader->lengthInSamples>reader->sampleRate*30){sampleMissing=true;continue;}
+      size_t bytes=0;for(auto& s:retainedSamples)bytes+=(s->left.size()+s->right.size())*sizeof(float);
+      if(bytes+size_t(reader->lengthInSamples)*8>128*1024*1024){sampleMissing=true;continue;}
+      auto s=std::make_unique<malle::Sample>();s->sampleRate=reader->sampleRate;
+      s->name=crowdSlotName(slot).toStdString();
+      juce::AudioBuffer<float> audio(2,int(reader->lengthInSamples));
+      if(!reader->read(&audio,0,audio.getNumSamples(),0,true,true)){sampleMissing=true;continue;}
+      s->left.assign(audio.getReadPointer(0),audio.getReadPointer(0)+audio.getNumSamples());
+      s->right.assign(audio.getReadPointer(1),audio.getReadPointer(1)+audio.getNumSamples());
+      engine.setSample(slot,s.get());retainedSamples.push_back(std::move(s));sampleKeys.push_back(encoded);
+    }
+    loadedSamples[size_t(slot)]=encoded;
   }
-  retainedSamples.push_back(std::move(s));
-  sampleKeys.push_back(key);
-  engine.setSample(ptr);
-  sampleMissing = false;
+  int slot=std::clamp(int(getValue("stadium.slot")),0,malle::crowdSlots-1);
+  auto encoded=state.state.getProperty(crowdProp(slot,"data")).toString();
+  if(slot==0 && !state.state.hasProperty(crowdProp(slot,"data")))
+    encoded=state.state.getProperty("sample.data").toString();
+  waveform.fill(0);sampleName=encoded.isEmpty()?"Synthetic test crowd (original)":crowdSlotName(slot);
+  sampleMissing=encoded!=loadedSamples[size_t(slot)];
+  if(!encoded.isEmpty())for(size_t k=0;k<sampleKeys.size();++k)if(sampleKeys[k]==encoded) {
+    auto& s=*retainedSamples[k];
+    for(size_t i=0;i<waveform.size();++i) {
+      size_t a=i*s.left.size()/waveform.size(),b=(i+1)*s.left.size()/waveform.size();
+      for(size_t j=a;j<b;++j)waveform[i]=std::max(waveform[i],std::abs(s.left[j]));
+    }
+    break;
+  }
+}
+void MalleProcessor::clearCrowdSlot() {
+  int slot=int(getValue("stadium.slot"));state.copyState();
+  undo.beginNewTransaction("Crowd-Platz leeren");
+  state.state.setProperty(crowdProp(slot,"data"),juce::String{},&undo);
+  state.state.setProperty(crowdProp(slot,"name"),juce::String{},&undo);
+  undo.beginNewTransaction();restoreSample();
+}
+bool MalleProcessor::saveCrowdBank(const juce::File& file,juce::String& error) {
+  auto full=state.copyState();juce::ValueTree bank("MalleCrowdBank");
+  bank.setProperty("schema",1,nullptr);
+  for(int slot=0;slot<malle::crowdSlots;++slot) {
+    juce::ValueTree child("SAMPLE");child.setProperty("slot",slot,nullptr);
+    auto encoded=full.getProperty(crowdProp(slot,"data")).toString();
+    if(slot==0 && !full.hasProperty(crowdProp(slot,"data")))encoded=full.getProperty("sample.data").toString();
+    child.setProperty("data",encoded,nullptr);child.setProperty("name",crowdSlotName(slot),nullptr);
+    for(auto field:{"root","loop","fade","level"})child.setProperty(field,getValue(malle::crowdParameter(slot,field)),nullptr);
+    bank.addChild(child,-1,nullptr);
+  }
+  bank.setProperty("loopCrossfade",getValue("stadium.loopSmooth"),nullptr);
+  auto xml=bank.createXml();if(!xml || !xml->writeTo(file)){error="Crowd-Bank konnte nicht gespeichert werden.";return false;}return true;
+}
+bool MalleProcessor::loadCrowdBank(const juce::File& file,juce::String& error) {
+  if(file.getSize()>160*1024*1024){error="Crowd-Bank ist zu gross.";return false;}
+  auto xml=juce::XmlDocument::parse(file);if(!xml){error="Crowd-Bank ist nicht lesbar.";return false;}
+  auto bank=juce::ValueTree::fromXml(*xml);
+  if(!bank.hasType("MalleCrowdBank") || int(bank.getProperty("schema",0))!=1 || bank.getNumChildren()>malle::crowdSlots){error="Unbekanntes Crowd-Bankformat.";return false;}
+  std::array<bool,malle::crowdSlots> seen{};size_t required=0;
+  for(auto child:bank) {
+    int slot=int(child.getProperty("slot",-1));
+    if(slot<0 || slot>=malle::crowdSlots || seen[size_t(slot)]){error="Ungueltige Crowd-Plaetze.";return false;}seen[size_t(slot)]=true;
+    auto encoded=child.getProperty("data").toString();if(encoded.isEmpty())continue;
+    if(child.getProperty("encoding").toString()=="base64") {
+      if(encoded.length()>68*1024*1024){error="Audiodaten sind zu gross.";return false;}
+      juce::MemoryBlock decoded;
+      juce::MemoryOutputStream stream(decoded,false);
+      if(!juce::Base64::convertFromBase64(stream,encoded)){error="Ungueltiges Base64.";return false;}
+      stream.flush();encoded=decoded.toBase64Encoding();child.setProperty("data",encoded,nullptr);
+    }
+    juce::MemoryBlock data; if(!decodeCrowdData(encoded,data)){error="Ungueltige Audiodaten.";return false;}
+    juce::AudioFormatManager formats;formats.registerBasicFormats();
+    std::unique_ptr<juce::AudioFormatReader> r(formats.createReaderFor(std::make_unique<juce::MemoryInputStream>(data,true)));
+    if(!r || r->sampleRate>192000 || r->lengthInSamples<64 || r->lengthInSamples>r->sampleRate*30){error="Sample muss 64 Frames bis 30 Sekunden / maximal 192 kHz enthalten.";return false;}
+    bool cached=std::find(sampleKeys.begin(),sampleKeys.end(),encoded)!=sampleKeys.end();
+    if(!cached)required+=size_t(r->lengthInSamples)*8;
+  }
+  size_t held=0;for(auto& s:retainedSamples)held+=(s->left.size()+s->right.size())*sizeof(float);
+  if(held+required>128*1024*1024){error="Sample-Speichergrenze 128 MB. Projekt speichern und Instanz neu laden.";return false;}
+  state.copyState();undo.beginNewTransaction("Crowd-Bank laden");
+  for(int slot=0;slot<malle::crowdSlots;++slot) {
+    auto child=bank.getChildWithProperty("slot",slot);
+    state.state.setProperty(crowdProp(slot,"data"),child.getProperty("data"),&undo);
+    state.state.setProperty(crowdProp(slot,"name"),child.getProperty("name"),&undo);
+    for(auto field:{"root","loop","fade","level"}) {
+      auto id=malle::crowdParameter(slot,field);auto& d=malle::parameters()[size_t(malle::index(id))];
+      float v=float(child.getProperty(field,d.def));setValue(id,std::isfinite(v)?std::clamp(v,d.min,d.max):d.def);
+    }
+  }
+  setValue("stadium.loopSmooth",float(bank.getProperty("loopCrossfade",1))>.5f?1.f:0.f);
+  setValue("stadium.slot",0);state.copyState();undo.beginNewTransaction();restoreSample();return true;
 }
 void MalleProcessor::timerCallback() { restoreSample(); }
 void MalleProcessor::savePreset(const juce::File &f) {
   auto tree = state.copyState();
-  tree.setProperty("schema", 2, nullptr);
+  tree.setProperty("schema", 3, nullptr);
   if (auto x = tree.createXml())
     x->writeTo(f);
 }
@@ -331,9 +400,15 @@ bool MalleProcessor::loadPreset(const juce::File &f) {
   }
   state.state.setProperty("sample.data", t.getProperty("sample.data"), &undo);
   state.state.setProperty("sample.name", t.getProperty("sample.name"), &undo);
+  for(int slot=0;slot<malle::crowdSlots;++slot)for(auto field:{"data","name"}) {
+    auto key=crowdProp(slot,field);
+    if(t.hasProperty(key))state.state.setProperty(key,t.getProperty(key),&undo);
+    else state.state.removeProperty(key,&undo);
+  }
   currentPreset = f.getFileNameWithoutExtension();
   state.copyState();
   undo.beginNewTransaction();
+  restoreSample();
   return true;
 }
 juce::AudioProcessor *JUCE_CALLTYPE createPluginFilter() {
