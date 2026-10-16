@@ -178,8 +178,13 @@ int main() {
     old.createXml()->writeTo(oldFile);
     MalleProcessor legacy;
     require(legacy.loadPreset(oldFile),"legacy preset loads");
-    require(legacy.getValue("monitor.on")==0 && legacy.getValue("quality.on")==0 && legacy.getValue("druck.match.on")==0,"legacy DSP and latency defaults preserved");
+    require(legacy.getValue("monitor.on")==1 && legacy.getValue("quality.on")==0 && legacy.getValue("druck.match.on")==0,"legacy user preset DSP defaults; explicit recording mode preserved");
     require(legacy.crowdSlotName(0).contains("malle-fixture"),"legacy sample migrates");
+    juce::MemoryBlock legacyProject;
+    juce::AudioProcessor::copyXmlToBinary(*old.createXml(),legacyProject);
+    MalleProcessor legacyDaw;
+    legacyDaw.setStateInformation(legacyProject.getData(),int(legacyProject.getSize()));
+    require(legacyDaw.getValue("monitor.on")==0 && legacyDaw.getValue("quality.on")==0 && legacyDaw.getValue("druck.match.on")==0,"old DAW projects retain legacy DSP and mix latency");
     oldFile.deleteFile();
     p.getStateInformation(saved);
     file.deleteFile();

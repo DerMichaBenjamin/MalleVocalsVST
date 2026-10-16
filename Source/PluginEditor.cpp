@@ -1002,6 +1002,9 @@ void MalleEditor::timerCallback() {
     displayedCrowdSlot=slot;
     if(advanced && section.getText()=="Stadium")rebuild();
   }
+  bool recording=proc.getValue("monitor.on")>.5f;
+  tuneOn->setEnabled(!recording);tuneAmount->setEnabled(!recording);
+  tuning.title=recording?"TUNING: NUR IM MIX":"TUNING & TONART";tuning.repaint();
   auto &m = proc.engine.meters;
   bool external =
       proc.getValue("duck.source") > .5f || proc.getValue("pump.mode") > .5f;
@@ -1064,6 +1067,7 @@ void MalleEditor::timerCallback() {
               group == "reverb" || group == "throw"
           ? "Vocal-Bus -> eigener 100% Wet-Weg -> FX-Bus -> Gesamt-FX-Mix"
           : "Direktkette in angezeigter Reihenfolge -> Vocal-Bus -> Output";
+  if(recording && (group=="Tune" || group=="Pitch/Formant"))context="AUFNAHME: Dieser Pitch-Prozessor ist umgangen. Fuer Bearbeitung oben Mix waehlen.";
   sourceInfo.setText(context, juce::dontSendNotification);
   sourceInfo.setFont(juce::FontOptions(12));
   routing.repaint();
