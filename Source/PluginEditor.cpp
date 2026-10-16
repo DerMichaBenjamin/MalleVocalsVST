@@ -234,11 +234,14 @@ MacroCard::MacroCard(MalleProcessor &p, int n)
       if(closePopup)closePopup();
       auto controls=std::make_unique<SpaceControls>(proc);
       juce::Component::SafePointer<SpaceControls> panel(controls.get());
-      auto& callout=juce::CallOutBox::launchAsynchronously(std::move(controls),spaceDetails.getScreenBounds(),nullptr);
+      auto* parent=getTopLevelComponent();
+      auto target=parent->getLocalArea(&spaceDetails,spaceDetails.getLocalBounds());
+      // Embed in the plugin window: no separate desktop/display is required.
+      auto& callout=juce::CallOutBox::launchAsynchronously(std::move(controls),target,parent);
       juce::Component::SafePointer<juce::CallOutBox> popup(&callout);
       // The modal callback can outlive its editor. Detach all parameter
       // references synchronously before the processor may be destroyed.
-      closePopup=[panel,popup]{if(panel)panel->detachParameters();if(popup)popup->dismiss();};
+      closePopup=[panel,popup]{if(panel)panel->detachParameters();if(popup){popup->setVisible(false);popup->dismiss();}};
     };
   }
   amount =

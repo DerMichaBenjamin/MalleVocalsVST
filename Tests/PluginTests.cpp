@@ -15,6 +15,13 @@ juce::TextButton *button(juce::Component &root, const juce::String &text) {
   }
   return nullptr;
 }
+juce::CallOutBox* findCallout(juce::Component& root) {
+  for(auto* c:root.getChildren()){
+    if(auto* popup=dynamic_cast<juce::CallOutBox*>(c))return popup;
+    if(auto* popup=findCallout(*c))return popup;
+  }
+  return nullptr;
+}
 int main() {
   juce::ScopedJuceInitialiser_GUI gui;
   try {
@@ -102,12 +109,9 @@ int main() {
     auto spaceBefore=p.state.copyState().createCopy();
     button(*editor,"Hall / Delay einstellen")->onClick();
     require(spaceBefore.isEquivalentTo(p.state.copyState()),"opening Simple room panel is audio/state neutral");
-    bool panelFound=false;
-    auto& desktop=juce::Desktop::getInstance();
-    for(int i=0;i<desktop.getNumComponents();++i)if(auto* panel=dynamic_cast<juce::CallOutBox*>(desktop.getComponent(i))){
-      saveImage("hall-delay.png",panel);panelFound=true;panel->dismiss();break;
-    }
-    require(panelFound,"native Simple room panel opens");
+    auto* panel=findCallout(*editor);
+    require(panel!=nullptr,"native Simple room panel opens inside plugin");
+    saveImage("hall-delay.png",panel);panel->setVisible(false);panel->dismiss();
     p.setValue("quality.on",1);
     b->onClick();
     require(before.isEquivalentTo(p.state.copyState()),
@@ -123,8 +127,7 @@ int main() {
       auto temporary=std::make_unique<MalleProcessor>();
       auto temporaryEditor=std::unique_ptr<juce::AudioProcessorEditor>(temporary->createEditor());
       button(*temporaryEditor,"Hall / Delay einstellen")->onClick();
-      juce::Component::SafePointer<juce::CallOutBox> popup;
-      for(int i=desktop.getNumComponents()-1;i>=0;--i)if(auto* c=dynamic_cast<juce::CallOutBox*>(desktop.getComponent(i))){popup=c;break;}
+      juce::Component::SafePointer<juce::CallOutBox> popup(findCallout(*temporaryEditor));
       require(popup!=nullptr,"lifetime fixture opens actual popup");
       temporaryEditor.reset();
       require(popup==nullptr || popup->getChildComponent(0)->getNumChildComponents()==0,"closing editor detaches popup parameters before processor destruction");
