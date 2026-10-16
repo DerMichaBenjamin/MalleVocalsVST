@@ -180,10 +180,23 @@ void Card::paint(juce::Graphics &g) {
 }
 namespace {
 class SpaceControls final : public Card {
+  GraphiteLook look;
   std::vector<std::unique_ptr<juce::Component>> controls;
 public:
   explicit SpaceControls(MalleProcessor& p):Card("HALL & DELAY / 100% WET RETURNS",true) {
+    setLookAndFeel(&look);
+    look.setColour(juce::Label::textColourId,juce::Colour(0xffeef0f0));
+    look.setColour(juce::TextButton::textColourOffId,juce::Colours::white);
+    look.setColour(juce::TextButton::textColourOnId,juce::Colours::black);
+    look.setColour(juce::Slider::textBoxBackgroundColourId,juce::Colour(0xff101719));
+    look.setColour(juce::Slider::textBoxOutlineColourId,juce::Colour(0xff515c60));
+    look.setColour(juce::ComboBox::backgroundColourId,juce::Colour(0xff111719));
+    look.setColour(juce::ComboBox::outlineColourId,juce::Colour(0xff586063));
+    look.setColour(juce::PopupMenu::backgroundColourId,juce::Colour(0xff172023));
     setSize(800,535);
+    auto revision=std::make_unique<ParamToggle>(p,"quality.on","Neue Hall-Engine");
+    revision->setTooltip("Neue Dauer-/Typ-Parameter gelten fuer die neue Engine. Legacy behaelt den bisherigen Klang.");
+    addAndMakeVisible(*revision);revision->setBounds(592,7,194,27);controls.push_back(std::move(revision));
     for(int col=0;col<4;++col){
       std::string id=std::array<std::string,4>{"room","reverb","short","long"}[col];
       auto put=[&](std::unique_ptr<juce::Component> c,int y,int h){
@@ -203,6 +216,7 @@ public:
       }
     }
   }
+  ~SpaceControls() override {setLookAndFeel(nullptr);}
 };
 }
 MacroCard::MacroCard(MalleProcessor &p, int n)
@@ -214,8 +228,7 @@ MacroCard::MacroCard(MalleProcessor &p, int n)
   if(n==4){
     addAndMakeVisible(spaceDetails);
     spaceDetails.onClick=[this]{
-      proc.undo.beginNewTransaction("Hall / Delay");
-      proc.setValue("quality.on",1);
+
       juce::CallOutBox::launchAsynchronously(std::make_unique<SpaceControls>(proc),spaceDetails.getScreenBounds(),nullptr);
     };
   }
@@ -861,8 +874,8 @@ void MalleEditor::rebuild() {
 void MalleEditor::resized() {
   if (!ready)
     return;
-  float scale=std::min(getWidth()/1280.f,getHeight()/1000.f);
-  canvas.setBounds(0,0,1280,1000);canvas.setTransform(juce::AffineTransform::scale(scale));
+  float uiScale=std::min(getWidth()/1280.f,getHeight()/1000.f);
+  canvas.setBounds(0,0,1280,1000);canvas.setTransform(juce::AffineTransform::scale(uiScale));
   int w = 1280, h = 1000;
   proc.state.state.setProperty("ui.width",getWidth(),nullptr);
   proc.state.state.setProperty("ui.height",getHeight(),nullptr);

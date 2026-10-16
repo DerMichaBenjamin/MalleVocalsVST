@@ -19,7 +19,7 @@ int main(){try{
   p[index("fet.threshold")]=-30;p[index("fet.ratio")]=8;p[index("druck.match.on")]=1;e.setParameters(p);
   std::array<float,256>a{};float* ptr[]={a.data()};double in=0,out=0;
   for(int pos=0;pos<48000*5;pos+=256){
-    for(int i=0;i<256;++i){a[i]=.2f*std::sin(2*pi*220*(pos+i)/48000.f);if(pos>48000*3)in+=a[i]*a[i];}
+    for(int i=0;i<256;++i){a[i]=.2f*std::sin(2*malle::pi*220*(pos+i)/48000.f);if(pos>48000*3)in+=a[i]*a[i];}
     e.process(ptr,1,256,nullptr,0,{});if(pos>48000*3)for(float x:a)out+=x*x;
   }
   float delta=10*std::log10(out/in);std::cout<<"Matched compressor RMS difference: "<<delta<<" dB\n";check(std::abs(delta)<1,"gain comparison within 1 dB");

@@ -87,8 +87,9 @@ int main() {
     auto screenshots =
         juce::File::getCurrentWorkingDirectory().getChildFile("screenshots");
     screenshots.createDirectory();
-    auto saveImage = [&](juce::String name) {
-      auto image = editor->createComponentSnapshot(editor->getLocalBounds());
+    auto saveImage = [&](juce::String name,juce::Component* view=nullptr) {
+      auto* target=view?view:editor.get();
+      auto image = target->createComponentSnapshot(target->getLocalBounds());
       auto destination = screenshots.getChildFile(name);
       destination.deleteFile();
       juce::FileOutputStream stream(destination);
@@ -96,6 +97,15 @@ int main() {
       require(png.writeImageToStream(image, stream), "PNG snapshot");
     };
     saveImage("simple.png");
+    auto spaceBefore=p.state.copyState().createCopy();
+    button(*editor,"Hall / Delay einstellen")->onClick();
+    require(spaceBefore.isEquivalentTo(p.state.copyState()),"opening Simple room panel is audio/state neutral");
+    bool panelFound=false;
+    auto& desktop=juce::Desktop::getInstance();
+    for(int i=0;i<desktop.getNumComponents();++i)if(auto* panel=dynamic_cast<juce::CallOutBox*>(desktop.getComponent(i))){
+      saveImage("hall-delay.png",panel);panelFound=true;panel->dismiss();break;
+    }
+    require(panelFound,"native Simple room panel opens");
     b->onClick();
     require(before.isEquivalentTo(p.state.copyState()),
             "view switch preserves all state");
