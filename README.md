@@ -1,4 +1,4 @@
-# Malle Vocals — 0.3.0 Alpha
+# Malle Vocals — 0.4.0 Alpha
 
 **Rohstoff Audio / Micha Benjamin.** Ein tatsächlich implementiertes C++/JUCE-Audioeffektplugin in Entwicklung. Noch keine verkaufsfertige Vollversion und keine bestätigte Klanggleichheit mit kommerziellen Referenzen.
 
@@ -44,3 +44,11 @@ Mac-Testbuilds sind nur ad hoc signiert, nicht mit Developer ID notarisiert. Das
 9. Die Bank umfasst 55 technische Ausgangspresets und 45 klar als Studien markierte Referenzansätze. Letztere beruhen auf echten Preview-/Vocal-Schätzmessungen; eine getrennte Rollen-Hörabnahme ist noch offen. [Song-Zuordnung und Methode](docs/SONG_REFERENCE_ANALYSIS.md).
 
 Siehe [Funktions- und Teststand](docs/STATUS.md), [Architektur und Automationsvertrag](docs/ARCHITECTURE.md), [Referenzprüfung](docs/REFERENCE_RESEARCH.md) und [Changelog](CHANGELOG.md).
+
+## Aufnahme und Pegelvergleich (0.4)
+
+Neue Instanzen starten im Aufnahme-Modus mit **0 Samples Plugin-Latenz**. Tune und kreative Pitch/Formant-Verarbeitung werden dabei ausdrücklich umgangen; ihr Zustand bleibt erhalten. Mix-Modus aktiviert wieder die bisherige Pitch-Engine mit etwa 240 ms. Modus möglichst bei gestopptem Transport wechseln; der Host muss seine Latenzkompensation neu berechnen. Audiointerface und DAW-Puffer bleiben zusätzliche Latenzquellen.
+
+Simple: **Pegelgleich** vergleicht langsam die RMS-Energie bei Druck, Klang, Wärme und Breite. Alle sechs Sektionen besitzen einen eigenen Pegelregler. Hall und Pumpen werden bewusst nicht dynamisch zurückgeregelt. **Hall / Delay einstellen** öffnet die vier normalen Wege mit ihren wichtigsten Parametern. Alte Projekte laden mit Legacy-DSP und bisheriger Latenz.
+
+Details und Prüfgrenzen: [Feedback 0.4](docs/FEEDBACK_0.4.md).

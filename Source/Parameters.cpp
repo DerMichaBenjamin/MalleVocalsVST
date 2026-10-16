@@ -200,6 +200,18 @@ const std::vector<Param> &parameters() {
       add(crowdParameter(slot,"fade"), "Sample Fade", "Stadium", 1,500,30,"ms");
       add(crowdParameter(slot,"level"), "Sample Pegel", "Stadium", -24,12,0,"dB");
     }
+    // Append-only IDs: old projects retain the original engine and latency.
+    add("monitor.on", "Aufnahme: 0 Samples / Pitch aus", "Global", 0,1,0);
+    add("quality.on", "Neue Raum-Engine", "Global", 0,1,0);
+    for(auto section : {"druck","klang","waerme","breite","raum","bewegung"}) {
+      add(std::string(section)+".trim", "Sektion Pegel", section,-12,12,0,"dB");
+      if(std::string(section)!="raum" && std::string(section)!="bewegung")
+        add(std::string(section)+".match.on", "Pegelvergleich", section,0,1,0);
+    }
+    add("reverb.type", "Room / Plate / Hall", "reverb",0,2,1);
+    add("reverb.decay", "Hall Dauer (RT60 Ziel)", "reverb",.2,8,1.6,"s");
+    add("room.decay", "Raum Dauer (RT60 Ziel)", "room",.1,2,.45,"s");
+    add("throw.verb.decay", "Throw Hall Dauer", "throw",.2,8,1.8,"s");
     return v;
   }();
   return p;
@@ -688,10 +700,11 @@ void resolveInto(const Values &b, Values &v) {
   auto profile = [&](std::string_view id) -> const VariantProfile & {
     return profiles()[size_t(std::clamp(int(get(id)), 0, 19))];
   };
+  const bool modern=enabled("quality.on");
   auto &d = profile("druck.variant");
   float a = get("druck.amount");
-  add("fet.threshold", -d.compression * a);
-  add("level.threshold", -d.compression * .55f * a);
+  add("fet.threshold", -d.compression * a * (modern?1.3f:1.f));
+  add("level.threshold", -d.compression * .55f * a * (modern?1.2f:1.f));
   add("fet.makeup", d.compression * .25f * a);
   add("level.makeup", d.compression * .15f * a);
   add("fet.ratio", (d.ratio - 4) * a);
@@ -701,22 +714,22 @@ void resolveInto(const Values &b, Values &v) {
   a = get("klang.amount");
   add("eq0.gain", k.body * a);
   add("eq1.gain", -.5f * k.presence * a);
-  add("eq2.gain", k.presence * a);
+  add("eq2.gain", k.presence * a * (modern?1.35f:1.f));
   add("eq3.gain", k.air * a);
   add("air.high", std::max(0.f, k.air) * .06f * a);
   add("deess.threshold", -std::max(0.f, k.air) * a);
   auto &w = profile("waerme.variant");
   a = get("waerme.amount");
-  add("sat.mix", w.warmth * a);
-  add("sat.drive", w.drive * a);
+  add("sat.mix", w.warmth * a * (modern?2.f:1.f));
+  add("sat.drive", w.drive * a * (modern?1.5f:1.f));
   auto &bwidth = profile("breite.variant");
   a = get("breite.amount");
-  add("double.mix", bwidth.width * a);
+  add("double.mix", bwidth.width * a * (modern?1.5f:1.f));
   add("double.time", (bwidth.time - 18) * a);
   add("double.voices", (bwidth.voices - 4) * a);
   add("double.width", (bwidth.stereo - 1) * a);
   auto &r = profile("raum.variant");
-  a = get("raum.amount");
+  a = get("raum.amount") * (modern?2.5f:1.f);
   add("room.send", r.space * .12f * a);
   add("short.send", r.space * .10f * a);
   add("reverb.send", r.space * .38f * a);
@@ -782,6 +795,22 @@ const std::vector<Preset> &presets() {
       }
     }
 #include "ReferencePresets.inc"
+    for(auto& preset : p) {
+      auto& v=preset.values;
+      v[index("quality.on")]=1;
+      if(preset.category.find("Studie/")!=0){v[index("druck.amount")]=std::max(.4f,v[index("druck.amount")]);v[index("klang.amount")]=std::max(.45f,v[index("klang.amount")]);}
+      for(auto section : {"druck","klang","waerme","breite"})
+        v[index(std::string(section)+".match.on")]=1;
+      // More explicit front/back separation; dry centre, filtered rhythmic returns.
+      v[index("reverb.time")]=45;
+      v[index("reverb.decay")]=preset.category=="Chor" ? 2.2f : 1.5f;
+      v[index("reverb.tail")]=8;
+      v[index("throw.type")]=2;
+      v[index("throw.beats")]=.5f;
+      v[index("throw.high")]=5000;
+      v[index("throw.low")]=250;
+      v[index("throw.feedback")]=.38f;
+    }
     return p;
   }();
   return ps;

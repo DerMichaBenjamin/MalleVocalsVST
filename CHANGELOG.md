@@ -1,3 +1,14 @@
+# 0.4.0 Alpha — 16.10.2026
+
+- Expliziter Aufnahme-Modus ohne Pitch-Prozessoren oder zusätzliche Plugin-Latenz; Mix-Modus und Legacy-Recall behalten die Pitch-Verarbeitung.
+- Kleineres, bildschirmabhängiges Startfenster mit skalierter Oberfläche und gespeicherten Maßen.
+- Zuschaltbarer, begrenzter RMS-Pegelvergleich für Druck/Klang/Wärme/Breite; sechs unabhängige Sektionpegel.
+- Simple-Raum-Panel: vier getrennte Wege, Send, Hall-Typ/Dauer/Pre-Delay, Delay-Zeit/Sync/Rhythmus/Feedback.
+- Neue opt-in Raum-Engine mit Allpass-Diffusion und bereinigter Decay-Berechnung; Throw mit weicher Send-Hüllkurve und engerem Stereo-Timing.
+- Deutlichere technische Ausgangspresets; neue Instanzen mit hörbar dosierter Startkette. Keine subjektive Klangabnahme behauptet.
+- State-Schema 4, append-only IDs, Legacy-DSP bei fehlenden neuen Parametern, Undo/Redo und Moduserhalt bei Factory-Presetwechseln.
+- Private Crowd-Bank optional lokal installierbar; neue Instanzen laden sie automatisch, DAW-Recall bleibt eingebettet. Keine privaten Samples im öffentlichen Repository.
+
 # 0.3.0 Alpha — 16.10.2026
 
 - Sieben echte importierbare Crowd-Speicherplätze mit unabhängigen Samplepegeln, Grundtönen, Loops und Fades. Slot 1 behält bisherige Parameter-IDs.

@@ -23,6 +23,7 @@ public:
   ParamChoice(MalleProcessor &, std::string, juce::String, juce::StringArray,
               std::vector<float> values = {});
   void resized() override;
+  void setTooltip(const juce::String& text) { box.setTooltip(text); }
   void setChoiceName(int index, const juce::String& name) { box.changeItemText(index+1,name); if(box.getSelectedId()==index+1)box.setTooltip(name); }
 
 private:
@@ -77,7 +78,9 @@ public:
 private:
   MalleProcessor &proc;
   int slot;
-  std::unique_ptr<ValueControl> amount;
+  std::unique_ptr<ValueControl> amount, trim;
+  std::unique_ptr<ParamToggle> match;
+  juce::TextButton spaceDetails{"Hall / Delay einstellen"};
   std::unique_ptr<ParamToggle> on, resOn, airOn;
   std::unique_ptr<ParamChoice> variant, mode, rate;
   std::unique_ptr<ValueControl> res, air;
@@ -135,6 +138,8 @@ private:
   juce::TooltipWindow tips{this, 700};
   bool advanced = false;
   bool ready = false;
+  juce::Component canvas;
+  std::unique_ptr<ParamChoice> monitor;
   int displayedCrowdSlot = -1;
   juce::TextButton simple{"Simple"}, advancedButton{"Advanced"}, undo{"Undo"},
       redo{"Redo"}, save{"Speichern"}, load{"Laden"}, favorite{"*"},

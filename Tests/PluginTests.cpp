@@ -25,7 +25,7 @@ int main() {
       for (int i=0;i<int(malle::presets().size());++i) {
         catalog.applyPreset(i);
         for (size_t j=0;j<malle::parameters().size();++j) {
-          float expected=malle::presets()[size_t(i)].values[j];
+          float expected=malle::parameters()[j].id=="monitor.on"?1.f:malle::presets()[size_t(i)].values[j];
           require(std::abs(catalog.getValue(malle::parameters()[j].id)-expected)
                       < 1e-4f*(1+std::abs(expected)), "all global presets load actual values");
         }
@@ -34,17 +34,22 @@ int main() {
     }
     MalleProcessor p;
     p.prepareToPlay(48000, 256);
+    require(p.getLatencySamples()==0,"fresh instance recording latency zero");
+    p.setValue("monitor.on",0);p.prepareToPlay(48000,256);
+    require(p.getLatencySamples()>0,"mix mode reports pitch latency");
+    p.setValue("monitor.on",1);p.prepareToPlay(48000,256);
     p.setValue("tune.root", 7);
     p.setValue("input", -3);
     p.state.copyState();
     p.undo.clearUndoHistory();
+    auto initialPressure=p.getValue("druck.amount");
     p.applyPreset(14);
     require(p.getValue("tune.root") == 7, "key lock");
     require(p.getValue("input") == -3, "input lock");
     float pressure = p.getValue("druck.amount");
     require(pressure > 0, "preset applies");
     require(p.undo.undo(), "preset undo exists");
-    require(p.getValue("druck.amount") == 0, "preset undo restores macro");
+    require(std::abs(p.getValue("druck.amount")-initialPressure)<1e-5f, "preset undo restores macro");
     require(p.undo.redo(), "preset redo");
     require(p.getValue("druck.amount") == pressure,
             "preset redo restores macro");
@@ -74,6 +79,8 @@ int main() {
                   1e-5f * (1 + std::abs(p.getValue(d.id))),
               "parameter recall");
     auto editor = std::unique_ptr<juce::AudioProcessorEditor>(p.createEditor());
+    require(editor->getWidth()<=1040 && editor->getHeight()<=813,"compact default editor");
+    require(button(*editor,"Hall / Delay einstellen")!=nullptr,"Simple space controls available");
     auto before = p.state.copyState().createCopy();
     auto *b = button(*editor, "Advanced");
     require(b != nullptr, "simple is default");
@@ -149,6 +156,8 @@ int main() {
     // Legacy 0.2 XML sample properties still restore into slot 1.
     auto old=p.state.copyState().createCopy();
     old.setProperty("schema",2,nullptr);
+    for(auto id:{"quality.on","monitor.on","druck.match.on","klang.match.on","waerme.match.on","breite.match.on"})
+      old.removeChild(old.getChildWithProperty("id",id),nullptr);
     old.setProperty("sample.data",old.getProperty("crowd.0.data"),nullptr);
     old.setProperty("sample.name",old.getProperty("crowd.0.name"),nullptr);
     for(int i=0;i<malle::crowdSlots;++i)for(auto field:{"data","name"})
@@ -157,6 +166,7 @@ int main() {
     old.createXml()->writeTo(oldFile);
     MalleProcessor legacy;
     require(legacy.loadPreset(oldFile),"legacy preset loads");
+    require(legacy.getValue("monitor.on")==0 && legacy.getValue("quality.on")==0 && legacy.getValue("druck.match.on")==0,"legacy DSP and latency defaults preserved");
     require(legacy.crowdSlotName(0).contains("malle-fixture"),"legacy sample migrates");
     oldFile.deleteFile();
     p.getStateInformation(saved);

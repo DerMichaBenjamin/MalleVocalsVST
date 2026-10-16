@@ -97,6 +97,11 @@ int main() {
     e.process(ptr, 2, 256, nullptr, 0, {});
     countAllocations = false;
     check(allocationCount == 0, "audio callback must not allocate");
+    countAllocations=true;
+    resolved[index("monitor.on")]=1;e.setParameters(resolved);e.process(ptr,2,256,nullptr,0,{});
+    resolved[index("monitor.on")]=0;e.setParameters(resolved);e.process(ptr,2,256,nullptr,0,{});
+    countAllocations=false;
+    check(allocationCount==0,"recording mode transitions must not allocate");
     // All module switches remain authoritative even when macros are active.
     base[index("waerme.amount")] = 1;
     base[index("sat.on")] = 0;

@@ -93,6 +93,21 @@ struct Compressor {
     return gain(-red);
   }
 };
+// Slow, bounded RMS comparison. Silence freezes the estimate; no look-ahead,
+// allocations or attempts to cancel deliberate rhythmic attenuation.
+struct LevelMatch {
+  float input=0,output=0,correction=1;
+  float tick(float in,float out,float sr,bool enabled) {
+    if(!enabled)return 1;
+    float a=coef(350,sr);
+    input=a*input+(1-a)*in; output=a*output+(1-a)*out;
+    if(input>1e-6f && output>1e-9f) {
+      float target=std::clamp(std::sqrt(input/output),.2511886f,7.943282f);
+      float b=coef(200,sr);correction=b*correction+(1-b)*target;
+    }
+    return correction;
+  }
+};
 struct Delay {
   std::vector<float> data;
   int pos = 0;
@@ -119,12 +134,15 @@ struct Delay {
 // keeps feedback energy bounded independently of room size and sample rate.
 struct Reverb {
   std::array<Delay, 8> line;
+  std::array<Delay,4> diffuser;
+  bool diffuse=false;
   std::array<float, 8> damping{}, tap{}, feedback{};
   float sr = 48000, alpha = .5f;
   void prepare(float rate) {
     sr = rate;
     for (auto &d : line)
       d.prepare(int(sr * .25f));
+    for(auto& d:diffuser)d.prepare(int(sr*.04f)+8);
     damping.fill(0);
     configure(.5f, 2, 6500, .7f);
   }
@@ -133,9 +151,11 @@ struct Reverb {
       std::fill(d.data.begin(), d.data.end(), 0);
       d.pos = 0;
     }
+    for(auto& d:diffuser){std::fill(d.data.begin(),d.data.end(),0);d.pos=0;}
     damping.fill(0);
   }
-  void configure(float size, float decay, float high, float character) {
+  void configure(float size, float decay, float high, float character, bool dense=false) {
+    diffuse=dense;
     constexpr std::array<float, 8> times{.0297f, .0371f, .0411f, .0437f,
                                          .0531f, .0617f, .0713f, .0799f};
     float scale = .45f + size * 1.5f;
@@ -143,10 +163,18 @@ struct Reverb {
     for (int j = 0; j < 8; ++j) {
       tap[j] = times[j] * sr * scale;
       feedback[j] = std::pow(.001f, times[j] * scale / std::max(.1f, decay)) *
-                    (.75f + .24f * character);
+                    (dense ? 1.f : (.75f + .24f * character));
     }
   }
   float tick(float input) {
+    if(diffuse) {
+      constexpr std::array<float,4> seconds{.0047f,.0083f,.0127f,.0193f};
+      for(size_t i=0;i<diffuser.size();++i){
+        float delayed=diffuser[i].read(seconds[i]*sr);
+        float y=delayed-.65f*input;
+        diffuser[i].push(input+.65f*y); input=y;
+      }
+    }
     std::array<float, 8> v{};
     for (int j = 0; j < 8; ++j) {
       float x = line[j].read(tap[j]);
@@ -164,7 +192,7 @@ struct Reverb {
     for (int j = 0; j < 8; ++j)
       line[j].push(input * (j % 2 ? .3f : -.3f) +
                    v[j] * .35355339f * feedback[j]);
-    return out;
+    return out*(diffuse?2.5f:1.f);
   }
 };
 struct Sample {

@@ -92,15 +92,29 @@ MalleProcessor::MalleProcessor()
       resolved(base) {
   for (auto &p : malle::parameters())
     raw.push_back(state.getRawParameterValue(p.id));
-  state.state.setProperty("schema", 3, nullptr);
+  state.state.setProperty("schema", 4, nullptr);
   state.state.setProperty("lock.key", true, nullptr);
   state.state.setProperty("lock.input", true, nullptr);
   state.state.setProperty("lock.routing", true, nullptr);
+  setValue("quality.on",1);
+  setValue("monitor.on",1);
+  for(auto section : {"druck","klang","waerme","breite"})setValue(std::string(section)+".match.on",1);
+  setValue("druck.amount",.45f);setValue("klang.amount",.55f);setValue("waerme.amount",.3f);setValue("raum.amount",.35f);
+  // Optional private bank installed by the user; never embedded in public builds.
+  auto bankRoot=juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory);
+ #if JUCE_MAC
+  bankRoot=bankRoot.getChildFile("Application Support");
+ #endif
+  auto bank=bankRoot.getChildFile("Rohstoff Audio/Malle Vocals/Micha.mallecrowd");
+  if(bank.existsAsFile()){juce::String error;loadCrowdBank(bank,error);}
+  undo.clearUndoHistory();
   startTimerHz(10);
 }
 MalleProcessor::~MalleProcessor() { stopTimer(); }
 void MalleProcessor::prepareToPlay(double sr, int block) {
   engine.prepare(sr, block, getMainBusNumOutputChannels());
+  for(size_t i=0;i<base.size();++i)base[i]=raw[i]->load();
+  malle::resolveInto(base,resolved);engine.setParameters(resolved);
   setLatencySamples(engine.latency());
 }
 bool MalleProcessor::isBusesLayoutSupported(const BusesLayout &l) const {
@@ -126,6 +140,7 @@ void MalleProcessor::process(juce::AudioBuffer<float> &b, bool bypass) {
     base[i] = raw[i]->load();
   malle::resolveInto(base, resolved);
   engine.setParameters(resolved);
+  if(getLatencySamples()!=engine.latency())setLatencySamples(engine.latency());
   malle::Transport tr;
   if (auto *ph = getPlayHead())
     if (auto pos = ph->getPosition()) {
@@ -148,7 +163,7 @@ juce::AudioProcessorEditor *MalleProcessor::createEditor() {
 }
 void MalleProcessor::getStateInformation(juce::MemoryBlock &m) {
   auto tree = state.copyState();
-  tree.setProperty("schema", 3, nullptr);
+  tree.setProperty("schema", 4, nullptr);
   tree.setProperty("preset", currentPreset, nullptr);
   if (auto xml = tree.createXml())
     copyXmlToBinary(*xml, m);
@@ -157,7 +172,7 @@ void MalleProcessor::setStateInformation(const void *d, int n) {
   if (auto xml = getXmlFromBinary(d, n)) {
     auto tree = juce::ValueTree::fromXml(*xml);
     if (tree.hasType("MalleVocals") &&
-        int(tree.getProperty("schema", 2)) <= 3) {
+        int(tree.getProperty("schema", 2)) <= 4) {
       if (int(tree.getProperty("schema", 1)) < 2) {
         auto oldTune = tree.getChildWithProperty("id", "tune.on");
         auto creative = tree.getChildWithProperty("id", "creative.on");
@@ -175,7 +190,13 @@ void MalleProcessor::setStateInformation(const void *d, int n) {
           n.setProperty("value", legacy[i], nullptr);
           tree.addChild(n, -1, nullptr);
         }
-        tree.setProperty("schema", 3, nullptr);
+        tree.setProperty("schema", 4, nullptr);
+      }
+      // Missing appended parameters in schema <=3 must load legacy DSP, never
+      // inherit new-instance recording or gain-match defaults.
+      for(auto& d : malle::parameters())if(!tree.getChildWithProperty("id",juce::String(d.id)).isValid()) {
+        juce::ValueTree param("PARAM");param.setProperty("id",juce::String(d.id),nullptr);
+        param.setProperty("value",d.def,nullptr);tree.addChild(param,-1,nullptr);
       }
       state.replaceState(tree);
       currentPreset = tree.getProperty("preset", "User").toString();
@@ -202,7 +223,7 @@ void MalleProcessor::applyPreset(int n) {
                id.rfind("tune.scale", 0) == 0 || id.rfind("note.", 0) == 0;
     bool input = id == "input";
     bool routing = isRoutingParameter(id);
-    if(isCrowdAssetParameter(id))continue;
+    if(isCrowdAssetParameter(id) || id=="monitor.on")continue;
     if ((key && bool(state.state.getProperty("lock.key"))) ||
         (input && bool(state.state.getProperty("lock.input"))) ||
         (routing && bool(state.state.getProperty("lock.routing"))))
@@ -383,7 +404,7 @@ bool MalleProcessor::loadCrowdBank(const juce::File& file,juce::String& error) {
 void MalleProcessor::timerCallback() { restoreSample(); }
 void MalleProcessor::savePreset(const juce::File &f) {
   auto tree = state.copyState();
-  tree.setProperty("schema", 3, nullptr);
+  tree.setProperty("schema", 4, nullptr);
   if (auto x = tree.createXml())
     x->writeTo(f);
 }
@@ -397,6 +418,8 @@ bool MalleProcessor::loadPreset(const juce::File &f) {
   undo.beginNewTransaction("User Preset");
   for (auto &pd : malle::parameters()) {
     auto child = t.getChildWithProperty("id", juce::String(pd.id));
+    if(pd.id=="monitor.on")continue;
+    if(!child.isValid() && int(t.getProperty("schema",1))<4){setValue(pd.id,pd.def);continue;}
     if (child.isValid()) {
       bool key = pd.id == "tune.root" || pd.id == "tune.scale" ||
                  pd.id.rfind("note.", 0) == 0;

@@ -178,9 +178,47 @@ void Card::paint(juce::Graphics &g) {
   g.setColour(teal ? ::teal : orange);
   g.drawText(title, 14, 8, getWidth() - 30, 25, juce::Justification::left);
 }
+namespace {
+class SpaceControls final : public Card {
+  std::vector<std::unique_ptr<juce::Component>> controls;
+public:
+  explicit SpaceControls(MalleProcessor& p):Card("HALL & DELAY / 100% WET RETURNS",true) {
+    setSize(800,535);
+    for(int col=0;col<4;++col){
+      std::string id=std::array<std::string,4>{"room","reverb","short","long"}[col];
+      auto put=[&](std::unique_ptr<juce::Component> c,int y,int h){
+        addAndMakeVisible(*c);c->setBounds(14+col*196,y,184,h);controls.push_back(std::move(c));
+      };
+      put(std::make_unique<ParamToggle>(p,id+".on",std::array<juce::String,4>{"Kurzer Raum","Hall","Short Delay","Long Delay"}[col]),43,29);
+      put(std::make_unique<ValueControl>(p,id+".send","Send",true),80,112);
+      if(col<2){
+        put(std::make_unique<ValueControl>(p,id+".decay","Dauer",true),200,112);
+        put(std::make_unique<ValueControl>(p,id+".time","Pre-Delay",true),320,112);
+        if(col==1)put(std::make_unique<ParamChoice>(p,"reverb.type","Hall-Typ",juce::StringArray{"Room","Plate","Hall"}),446,56);
+      }else{
+        put(std::make_unique<ValueControl>(p,id+".feedback","Feedback",true),200,112);
+        put(std::make_unique<ValueControl>(p,id+".time","Zeit (Sync aus)",true),320,112);
+        put(std::make_unique<ParamToggle>(p,id+".sync","Tempo Sync"),439,26);
+        put(std::make_unique<ParamChoice>(p,id+".beats","Rhythmus",juce::StringArray{"1/16","1/8","1/8 punktiert","1/4","1/4 triolisch","1/2"},std::vector<float>{.25f,.5f,.75f,1.f,2.f/3.f,2.f}),470,52);
+      }
+    }
+  }
+};
+}
 MacroCard::MacroCard(MalleProcessor &p, int n)
     : Card(macroNames[n], n == 4), proc(p), slot(n) {
   auto id = macroIds[n];
+  trim=std::make_unique<ValueControl>(p,id+".trim","Pegel",n==4);
+  addAndMakeVisible(*trim);
+  if(n<4){match=std::make_unique<ParamToggle>(p,id+".match.on","Pegelgleich");addAndMakeVisible(*match);}
+  if(n==4){
+    addAndMakeVisible(spaceDetails);
+    spaceDetails.onClick=[this]{
+      proc.undo.beginNewTransaction("Hall / Delay");
+      proc.setValue("quality.on",1);
+      juce::CallOutBox::launchAsynchronously(std::make_unique<SpaceControls>(proc),spaceDetails.getScreenBounds(),nullptr);
+    };
+  }
   amount =
       std::make_unique<ValueControl>(p, id + ".amount", "Intensitaet", n == 4);
   on = std::make_unique<ParamToggle>(p, id + ".on", "ON");
@@ -231,6 +269,10 @@ void MacroCard::resized() {
     mode->setBounds(w - 145, 103, 130, 48);
     rate->setBounds(w - 145, 165, 130, 48);
   }
+  if(match)match->setBounds(12,48,103,27);
+  trim->setBounds(12,h-81,94,76);
+  auto a=amount->getBounds();a.setBottom(h-86);amount->setBounds(a);
+  if(slot==4)spaceDetails.setBounds(112,h-51,w-126,34);
 }
 ThrowPanel::ThrowPanel(MalleProcessor &p) : Card("THROW DELAY", true), proc(p) {
   type = std::make_unique<ParamChoice>(
@@ -276,7 +318,8 @@ ThrowPanel::ThrowPanel(MalleProcessor &p) : Card("THROW DELAY", true), proc(p) {
            {"throw.tail", "Max. Tail"},
            {"throw.fade", "Fade-out"},
            {"throw.time", "Freie Zeit"},
-           {"throw.send", "Send-Pegel"}}) {
+           {"throw.send", "Send-Pegel"},
+           {"throw.verb.decay", "Hall-Dauer"}}) {
     auto c = std::make_unique<ValueControl>(p, pair.first, pair.second, true);
     addAndMakeVisible(*c);
     detail.push_back(std::move(c));
@@ -308,8 +351,8 @@ void ThrowPanel::resized() {
   primary[2]->setBounds(left + 7 * col, 30, col, 100);
   sync->setBounds(15, 111, 155, 24);
   if (advanced) {
-    int dw = (w - 155) / 10;
-    for (int i = 0; i < 10; ++i)
+    int dw = (w - 155) / int(detail.size());
+    for (int i = 0; i < int(detail.size()); ++i)
       detail[i]->setBounds(12 + i * dw, 132, dw - 5, 107);
     kill.setBounds(w - 140, 168, 125, 36);
   }
@@ -563,7 +606,7 @@ MalleEditor::MalleEditor(MalleProcessor &p)
   look.setColour(juce::ComboBox::outlineColourId, juce::Colour(0xff586063));
   look.setColour(juce::PopupMenu::backgroundColourId, juce::Colour(0xff172023));
   setResizable(true, true);
-  setResizeLimits(1160, 900, 2000, 1500);
+  setResizeLimits(800, 625, 1792, 1400);
   for (auto *c : std::initializer_list<juce::Component *>{
            &simple,      &advancedButton, &undo,    &redo,     &save,
            &load,        &favorite,       &import,  &preview,  &lockKey,
@@ -700,8 +743,23 @@ MalleEditor::MalleEditor(MalleProcessor &p)
   preview.onClick = [this] {
     proc.engine.audition.store(preview.getToggleState());
   };
+  monitor=std::make_unique<ParamChoice>(p,"monitor.on","Betrieb",juce::StringArray{"Mix / mit Pitch-Latenz","Aufnahme / 0 Samples"});
+  // Param values are 1 for recording, 0 for mixing.
+  addAndMakeVisible(*monitor);
+  monitor->setTooltip("Aufnahme: Tune und kreative Pitch/Formant-Prozessoren werden umgangen. Interface- und DAW-Puffer bleiben. Modus bevorzugt bei gestopptem Transport wechseln.");
+  std::vector<juce::Component*> children;
+  for(auto* c:getChildren())if(dynamic_cast<juce::ResizableCornerComponent*>(c)==nullptr && dynamic_cast<juce::ResizableBorderComponent*>(c)==nullptr)children.push_back(c);
+  addAndMakeVisible(canvas);
+  for(auto* c:children)canvas.addAndMakeVisible(c);
   ready = true;
-  setSize(1440, 1080);
+  auto* display=juce::Desktop::getInstance().getDisplays().getPrimaryDisplay();
+  auto area=display?display->userArea:juce::Rectangle<int>(0,0,1440,1000);
+  int width=std::min(1040,int(area.getWidth()*.88f));
+  width=std::min(width,int((area.getHeight()-90)*1.28f));
+  width=std::clamp(int(proc.state.state.getProperty("ui.width",width)),800,1792);
+  int height=std::clamp(int(proc.state.state.getProperty("ui.height",width/1.28f)),625,1400);
+  width=std::min(width,std::max(800,area.getWidth()-80));height=std::min(height,std::max(625,area.getHeight()-90));
+  setSize(width,height);
   rebuild();
   startTimerHz(20);
   timerCallback();
@@ -759,7 +817,7 @@ void MalleEditor::rebuild() {
     sectionVariant =
         std::make_unique<ParamChoice>(proc, macro.toStdString() + ".variant",
                                       "Gemeinsame Sektionvariante", names);
-    addAndMakeVisible(*sectionVariant);
+    canvas.addAndMakeVisible(*sectionVariant);
     sectionVariant->setVisible(advanced);
   }
   int selectedSlot=std::clamp(int(proc.getValue("stadium.slot")),0,malle::crowdSlots-1);
@@ -803,7 +861,12 @@ void MalleEditor::rebuild() {
 void MalleEditor::resized() {
   if (!ready)
     return;
-  int w = getWidth(), h = getHeight();
+  float scale=std::min(getWidth()/1280.f,getHeight()/1000.f);
+  canvas.setBounds(0,0,1280,1000);canvas.setTransform(juce::AffineTransform::scale(scale));
+  int w = 1280, h = 1000;
+  proc.state.state.setProperty("ui.width",getWidth(),nullptr);
+  proc.state.state.setProperty("ui.height",getHeight(),nullptr);
+  monitor->setBounds(320,87,305,42);
   simple.setBounds(w - 210, 15, 90, 31);
   advancedButton.setBounds(w - 115, 15, 98, 31);
   preset.setBounds(20, 57, w - 690, 34);
@@ -898,16 +961,18 @@ void MalleEditor::paint(juce::Graphics &g) {
   g.fillAll();
   g.setColour(juce::Colour(0xff737b7e));
   g.drawRoundedRectangle(getLocalBounds().toFloat().reduced(2), 10, 1);
+  g.saveState();g.addTransform(juce::AffineTransform::scale(std::min(getWidth()/1280.f,getHeight()/1000.f)));
   g.setFont(juce::FontOptions(28, juce::Font::bold));
   g.setColour(juce::Colour(0xffe0e3e4));
-  g.drawText("MALLE VOCALS", getWidth() / 2 - 220, 9, 440, 37,
+  g.drawText("MALLE VOCALS", 1280 / 2 - 220, 9, 440, 37,
              juce::Justification::centred);
   g.setFont(juce::FontOptions(15));
   g.drawText("R O H S T O F F   A U D I O", 20, 10, 300, 22,
              juce::Justification::left);
   g.setFont(juce::FontOptions(12));
-  g.drawText("by Micha Benjamin / 0.3.0 ALPHA", 20, 32, 300, 19,
+  g.drawText("by Micha Benjamin / 0.4.0 ALPHA", 20, 32, 300, 19,
              juce::Justification::left);
+  g.restoreState();
   for (int x : {7, getWidth() - 12})
     for (int y : {7, getHeight() - 13}) {
       g.setColour(juce::Colour(0xff071012));
@@ -937,7 +1002,7 @@ void MalleEditor::timerCallback() {
       "IN " + juce::String(malle::db(m.input.load()), 1) + " dB | OUT " +
       juce::String(malle::db(m.output.load()), 1) + " dB | GR FET " +
       juce::String(m.fet.load(), 1) + " / Level " +
-      juce::String(m.level.load(), 1) + " dB | " + sc + " | " + proc.sampleName;
+      juce::String(m.level.load(), 1) + " dB | " + sc + " | " + (proc.getValue("monitor.on")>.5f ? "AUFNAHME: Pitch aus / 0 Samples" : "MIX: "+juce::String(proc.getLatencySamples())+" Samples") + " | " + proc.sampleName;
   juce::MemoryBlock baseline;
   auto encoded = proc.state.state.getProperty("preset.baseline").toString();
   bool modified = false;

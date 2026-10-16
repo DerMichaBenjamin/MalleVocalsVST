@@ -30,7 +30,7 @@ public:
   void setSample(int slot, const Sample* s) {
     if(slot>=0 && slot<crowdSlots) samples[size_t(slot)].store(s,std::memory_order_release);
   }
-  int latency() const { return latencySamples; }
+  int latency() const { return monitoring ? 0 : latencySamples; }
   Meters meters;
   std::atomic<bool> audition{false};
 
@@ -40,6 +40,9 @@ private:
   float sr = 48000;
   int chs = 2, latencySamples = 0;
   Values p;
+  bool monitoring = false;
+  std::array<LevelMatch,12> levelMatch;
+  float throwSendGain = 0;
   struct Channel {
     Biquad hp, lp, correct, dsLow, dsHigh, airLow, airHigh, satTone;
     std::array<Biquad, 4> eq, eqDetect;

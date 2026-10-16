@@ -1,6 +1,8 @@
-# Ehrlicher Funktionsstand — 0.3.0 Alpha
+# Ehrlicher Funktionsstand — 0.4.0 Alpha
 
 Diese Version ist eine erste native Entwicklungsfassung. Der vollständige Auftrag ist noch nicht abgeschlossen.
+
+0.4 ergänzt einen Aufnahme-Modus mit 0 Samples Plugin-Latenz (Pitch/Tuning aus), Pegelvergleich und Sektionpegel, ein kompakteres skalierbares Fenster sowie Simple-Hall-/Delay-Details. Neue Raum-Engine und Presetabstimmungen sind technisch überprüfbare Änderungen, keine professionelle Hörabnahme. [Umsetzung und Grenzen](FEEDBACK_0.4.md).
 
 ## Implementiert
 

@@ -3,7 +3,7 @@ from pathlib import Path
 import hashlib, platform, shutil, subprocess, zipfile
 root=Path(__file__).resolve().parent.parent
 system=platform.system()
-name=f'MalleVocals-0.3.0-{system}'
+name=f'MalleVocals-0.4.0-{system}'
 stage=root/'packages'/name
 if stage.exists():shutil.rmtree(stage)
 stage.mkdir(parents=True)

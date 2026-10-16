@@ -76,6 +76,8 @@ void Engine::prepare(double rate, int block, int channels) {
   reset();
 }
 void Engine::reset() {
+  for(auto& m : levelMatch) m = {};
+  throwSendGain = 0;
   pitchEngine.reset();
   creativeEngine.reset();
   for (auto &x : channel) {
@@ -153,6 +155,17 @@ void Engine::reset() {
 }
 void Engine::setParameters(const Values &values) {
   p = values;
+  bool nextMonitoring=value("monitor.on")>.5f;
+  if(nextMonitoring!=monitoring) {
+    // Reset only preallocated pitch/alignment history, retaining FX tails.
+    pitchEngine.reset();creativeEngine.reset();tuneMix=creativeMix=0;
+    pitchHistory.fill(0);pitchConfidence=correction=0;
+    for(auto& x:channel)for(auto* d:{&x.dry,&x.filteredDry,&x.creativeDry,&x.inputTap,&x.side}) {
+      std::fill(d->data.begin(),d->data.end(),0);d->pos=0;
+    }
+    throwStart=-1;throwRemaining=0;lastThrow=false;
+  }
+  monitoring=nextMonitoring;
   for (auto &x : channel) {
     x.hp.set(1, value("hp"), .707f, 0, sr);
     x.lp.set(0, value("lp"), .707f, 0, sr);
@@ -224,6 +237,16 @@ void Engine::process(float *const *data, int channels, int count,
                      bool hostBypass) {
   if (count <= 0)
     return;
+  const int latencySamples = latency();
+  const bool modern = value("quality.on") > .5f;
+  std::array<bool,4> matching{};
+  std::array<float,6> trims{};
+  int si=0;
+  for(auto section : {"druck","klang","waerme","breite","raum","bewegung"}) {
+    trims[si]=p[size_t(index(std::string(section)+".on"))]>.5f ? gain(p[size_t(index(std::string(section)+".trim"))]) : 1.f;
+    if(si<4)matching[si]=p[size_t(index(std::string(section)+".match.on"))]>.5f;
+    ++si;
+  }
   const auto at = [&](std::string_view id) {
     return p[size_t(index(id))];
   }; // block-only lookups
@@ -257,7 +280,9 @@ void Engine::process(float *const *data, int channels, int count,
   for (int c = 0; c < channels; ++c) {
     channel[c].reverbs[0].configure(fx[0].width, std::min(1.5f, fx[0].tail),
                                     6500, fx[0].fb);
-    channel[c].reverbs[1].configure(fx[3].width, fx[3].tail, 6500, fx[3].fb);
+    channel[c].reverbs[1].configure(modern ? std::array<float,3>{.18f,.48f,.90f}[size_t(std::clamp(int(value("reverb.type")),0,2))] : fx[3].width,
+      modern ? value("reverb.decay") : fx[3].tail, 6500, fx[3].fb,modern);
+    if(modern)channel[c].reverbs[0].configure(.18f,value("room.decay"),6500,fx[0].fb,true);
   }
   std::array<float, 4> eqDynamic{}, eqThreshold{};
   for (int b = 0; b < 4; ++b) {
@@ -381,7 +406,8 @@ void Engine::process(float *const *data, int channels, int count,
                                      verbType == 0   ? 1.f
                                      : verbType == 1 ? 2.5f
                                                      : 5.f,
-                                     verbType == 1 ? 9000 : 5500, .8f);
+                                     verbType == 1 ? 9000 : 5500, .8f, modern);
+  if(modern)for(int c=0;c<channels;++c)channel[c].throwReverb.configure(verbType==0?.18f:verbType==1?.48f:.9f,value("throw.verb.decay"),5500,.8f,true);
   std::array<int, 11> requested{};
   std::array<bool, 11> seen{};
   bool valid = true;
@@ -564,7 +590,16 @@ void Engine::process(float *const *data, int channels, int count,
       }
     }
     for (int module : order) {
+      int sectionId=module==2||module==3||module==6?0:module==9?2:1;
+      bool last=true,found=false;
+      for(int node:order){
+        if(node==module){found=true;continue;}
+        if(!found||node==1||node==10||node==4)continue;
+        int group=node==2||node==3||node==6?0:node==9?2:1;
+        if(group==sectionId)last=false;
+      }
       if (module == 1 || module == 10) {
+        if(monitoring) continue; // Explicit recording mode: no pitch processing or alignment delays.
         bool tuningNode = module == 1, enabled = tuningNode ? tune : creative;
         auto &pitch = tuningNode ? pitchEngine : creativeEngine;
         for (int i = 0; i < n; ++i) {
@@ -643,7 +678,16 @@ void Engine::process(float *const *data, int channels, int count,
           std::array<float, 2> x{};
           for (int c = 0; c < channels; ++c)
             x[c] = work[c][i];
+          float before=0, after=0;
+          for(int c=0;c<channels;++c)before+=x[c]*x[c];
           direct(module, x);
+          for(int c=0;c<channels;++c)after+=x[c]*x[c];
+          bool listen=(module==4 && dsListen>.5f)||(module==7 && resDelta>.5f);
+          bool nodeActive=module==0?inputOn:module==2?cp[0].on:module==3?cp[1].on:module==5?eqOn:module==6?cp[3].on:module==7?resOn:module==8?airOn:module==9?satOn:false;
+          float compensation=levelMatch[size_t(module)].tick(before/channels,after/channels,sr,matching[size_t(sectionId)] && nodeActive && !listen);
+          // One trim per section, after its final node in the actual reordered chain.
+          if(last && module!=4)compensation*=trims[size_t(sectionId)];
+          for(int c=0;c<channels;++c)x[c]*=compensation;
           for (int c = 0; c < channels; ++c)
             work[c][i] = x[c];
         }
@@ -656,15 +700,15 @@ void Engine::process(float *const *data, int channels, int count,
       float detector = 0, scDet = 0;
       for (int c = 0; c < channels; ++c) {
         auto &z = channel[c];
-        dry[c] = z.dry.read(float(latencySamples));
+        dry[c] = monitoring ? rawInput[c][i] : z.dry.read(float(latencySamples));
         z.dry.push(rawInput[c][i]);
-        tap[c] = z.inputTap.read(float(latencySamples));
+        tap[c] = monitoring ? tapInput[c][i] : z.inputTap.read(float(latencySamples));
         z.inputTap.push(tapInput[c][i]);
         x[c] = work[c][i];
         detector = std::max(detector, std::abs(x[c]));
         float scIn =
             scChannels && sc ? sc[std::min(c, scChannels - 1)][atSample] : 0;
-        float delayed = z.side.read(float(latencySamples));
+        float delayed = monitoring ? scIn : z.side.read(float(latencySamples));
         z.side.push(scIn);
         scDet = std::max(scDet, std::abs(delayed));
       }
@@ -712,10 +756,12 @@ void Engine::process(float *const *data, int channels, int count,
           (throwEnd < 0 || clock < throwEnd);
       if (sendThrow)
         --throwRemaining;
+      std::array<float,2> widthReference{};
       for (int c = 0; c < channels; ++c) {
         auto &z = channel[c];
         if (cp[2].on)
           x[c] += (parInput ? tap[c] : source[c]) * parGain * cp[2].mix;
+        widthReference[c]=x[c];
         z.doubler.push(source[c]);
         if (doubleOn) {
           float doubled = 0;
@@ -735,6 +781,12 @@ void Engine::process(float *const *data, int channels, int count,
           }
           x[c] += doubled * doubleMix;
         }
+      }
+      float widthBefore=0,widthAfter=0;
+      for(int c=0;c<channels;++c){widthBefore+=widthReference[c]*widthReference[c];widthAfter+=x[c]*x[c];}
+      float widthGain=levelMatch[11].tick(widthBefore/channels,widthAfter/channels,sr,matching[3] && doubleOn)*trims[3];
+      for(int c=0;c<channels;++c){
+        auto& z=channel[c]; x[c]*=widthGain;
         if (stadiumOn) {
           float carrier = (c == 0 ? carrierL : carrierR) * stadiumWidth +
                           (carrierL + carrierR) * .5f * (1 - stadiumWidth),
@@ -750,6 +802,7 @@ void Engine::process(float *const *data, int channels, int count,
           x[c] += crowd * stadiumMix;
         }
       }
+      throwSendGain = modern ? coef(3,sr)*throwSendGain+(1-coef(3,sr))*(sendThrow?1.f:0.f) : (sendThrow?1.f:0.f);
       std::array<float, 2> wet{}, delayFeed{};
       for (int b = 0; b < 5; ++b) {
         auto &q = fx[b];
@@ -761,7 +814,7 @@ void Engine::process(float *const *data, int channels, int count,
           auto &z = channel[c];
           float spread = (b == 4 && throwType != 1)
                              ? 1
-                             : 1 + (c == 1 ? .035f : -.035f) * q.width;
+                             : 1 + (c == 1 ? (modern?.003f:.035f) : (modern?-.003f:-.035f)) * q.width;
           float r = z.delays[b].read(dt * spread);
           if (b == 4 && clock - killedAt < dt * spread)
             r = 0;
@@ -770,7 +823,7 @@ void Engine::process(float *const *data, int channels, int count,
             filtered[c] = z.reverbs[b == 0 ? 0 : 1].tick(filtered[c]);
           send[c] = x[c] * q.send * (q.on ? 1.f : 0.f);
           if (b == 4)
-            send[c] *= sendThrow ? 1.f : 0.f;
+            send[c] *= throwSendGain;
           if (b == 3)
             send[c] += delayFeed[c] * delayToVerb;
         }
@@ -813,7 +866,8 @@ void Engine::process(float *const *data, int channels, int count,
       else
         routeGain = std::min(1.f, routeGain + 1 / (sr * .01f));
       for (int c = 0; c < channels; ++c) {
-        float d = x[c] * dryDuck, w = wet[c] * fxMix * duckG * globalGate;
+        float d = x[c] * dryDuck, w = wet[c] * fxMix * duckG * globalGate * trims[4];
+        if(pumpOn) { d *= trims[5]; w *= trims[5]; }
         if (pumpTarget < .5f || pumpTarget > 1.5f)
           d *= pump;
         if (pumpTarget > .5f)
