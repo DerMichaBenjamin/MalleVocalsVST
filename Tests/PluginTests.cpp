@@ -97,6 +97,7 @@ int main() {
       require(png.writeImageToStream(image, stream), "PNG snapshot");
     };
     saveImage("simple.png");
+    p.setValue("quality.on",0);
     auto spaceBefore=p.state.copyState().createCopy();
     button(*editor,"Hall / Delay einstellen")->onClick();
     require(spaceBefore.isEquivalentTo(p.state.copyState()),"opening Simple room panel is audio/state neutral");
@@ -106,6 +107,7 @@ int main() {
       saveImage("hall-delay.png",panel);panelFound=true;panel->dismiss();break;
     }
     require(panelFound,"native Simple room panel opens");
+    p.setValue("quality.on",1);
     b->onClick();
     require(before.isEquivalentTo(p.state.copyState()),
             "view switch preserves all state");

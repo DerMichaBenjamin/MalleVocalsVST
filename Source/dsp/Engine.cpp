@@ -684,7 +684,8 @@ void Engine::process(float *const *data, int channels, int count,
           for(int c=0;c<channels;++c)after+=x[c]*x[c];
           bool listen=(module==4 && dsListen>.5f)||(module==7 && resDelta>.5f);
           bool nodeActive=module==0?inputOn:module==2?cp[0].on:module==3?cp[1].on:module==5?eqOn:module==6?cp[3].on:module==7?resOn:module==8?airOn:module==9?satOn:false;
-          float compensation=levelMatch[size_t(module)].tick(before/channels,after/channels,sr,matching[size_t(sectionId)] && nodeActive && !listen);
+          float manualGain=module==2?cp[0].m:module==3?cp[1].m:module==9?satOut:1.f;
+          float compensation=levelMatch[size_t(module)].tick(before*manualGain*manualGain/channels,after/channels,sr,matching[size_t(sectionId)] && nodeActive && !listen);
           // One trim per section, after its final node in the actual reordered chain.
           if(last && module!=4)compensation*=trims[size_t(sectionId)];
           for(int c=0;c<channels;++c)x[c]*=compensation;

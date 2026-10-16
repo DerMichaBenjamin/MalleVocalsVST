@@ -705,8 +705,10 @@ void resolveInto(const Values &b, Values &v) {
   float a = get("druck.amount");
   add("fet.threshold", -d.compression * a * (modern?1.3f:1.f));
   add("level.threshold", -d.compression * .55f * a * (modern?1.2f:1.f));
-  add("fet.makeup", d.compression * .25f * a);
-  add("level.makeup", d.compression * .15f * a);
+  if(!(modern && enabled("druck.match.on"))) {
+    add("fet.makeup", d.compression * .25f * a);
+    add("level.makeup", d.compression * .15f * a);
+  }
   add("fet.ratio", (d.ratio - 4) * a);
   add("fet.attack", (d.attack - .5f) * a);
   add("fet.release", (d.release - 80) * a);

@@ -23,6 +23,25 @@ int main(){try{
     e.process(ptr,1,256,nullptr,0,{});if(pos>48000*3)for(float x:a)out+=x*x;
   }
   float delta=10*std::log10(out/in);std::cout<<"Matched compressor RMS difference: "<<delta<<" dB\n";check(std::abs(delta)<1,"gain comparison within 1 dB");
+  auto steadyRms=[](Values settings){
+    Engine engine;engine.prepare(48000,256,1);engine.setParameters(settings);
+    std::array<float,256> block{};float* audio[]={block.data()};double energy=0;int samples=0;
+    for(int pos=0;pos<48000*4;pos+=256){
+      for(int i=0;i<256;++i)block[i]=.2f*std::sin(2*malle::pi*220*(pos+i)/48000.f);
+      engine.process(audio,1,256,nullptr,0,{});
+      if(pos>48000*3)for(float x:block){energy+=x*x;++samples;}
+    }
+    return float(std::sqrt(energy/samples));
+  };
+  p[index("fet.makeup")]=6;
+  float manualDb=db(steadyRms(p)/(.2f/std::sqrt(2.f)));
+  std::cout<<"Manual compressor makeup with matching: "<<manualDb<<" dB\n";
+  check(std::abs(manualDb-6)<.5f,"manual compressor makeup remains effective");
+  p=clean();p[index("monitor.on")]=1;p[index("sat.on")]=1;p[index("sat.mix")]=.7f;
+  p[index("waerme.match.on")]=1;p[index("sat.output")]=-6;
+  float satDb=db(steadyRms(p)/(.2f/std::sqrt(2.f)));
+  std::cout<<"Manual saturation output with matching: "<<satDb<<" dB\n";
+  check(std::abs(satDb+6)<.5f,"manual saturation output remains effective");
   // Modern diffuser actually raises initial echo density, has bounded finite tails,
   // and uses a decay control independent from the maximum-tail truncation.
   auto response=[](bool modern,float decay){Reverb r;r.prepare(48000);r.configure(.48f,decay,6500,.8f,modern);std::array<double,2> energy{};int nonzero=0;
