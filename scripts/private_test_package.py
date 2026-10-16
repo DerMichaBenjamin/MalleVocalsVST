@@ -44,7 +44,7 @@ readme = '''Malle Vocals 0.4.0 Alpha / Rohstoff Audio / Micha Benjamin
    Sektionspegel und Output bleiben separat. Auto-Ausgleich ist kein Limiter.
    Manuelle Compressor-Makeup-/Saturation-Output-Werte bleiben wirksam.
 6. "Hall / Delay einstellen" oeffnet die normalen vier Wege direkt aus Simple.
-   "Neue Hall-Engine" aktiviert die neuen Dauer-/Typ-Parameter bei Legacy.
+   "Party-Klang 0.4" aktiviert die neue Abstimmung samt Dauer/Typ bei Legacy.
    Throw ist ein eigener Weg; Loslassen schliesst nur den Send, nicht den Tail.
 
 Beide Plattformen sind Entwicklungs-/Testversionen, keine Verkaufsfreigabe.
