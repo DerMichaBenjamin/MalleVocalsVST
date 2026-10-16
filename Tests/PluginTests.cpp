@@ -32,6 +32,7 @@ int main() {
         catalog.undo.clearUndoHistory();
       }
     }
+    std::cerr<<"Native preset catalog passed"<<std::endl;
     MalleProcessor p;
     p.prepareToPlay(48000, 256);
     require(p.getLatencySamples()==0,"fresh instance recording latency zero");
@@ -118,6 +119,18 @@ int main() {
     require(bankSaveButton && bankSaveButton->getParentComponent()->isVisible(),"crowd bank actions visible in advanced");
     saveImage("stadium.png");
     button(*editor,"Klang & Dynamik")->onClick();
+    {
+      auto temporary=std::make_unique<MalleProcessor>();
+      auto temporaryEditor=std::unique_ptr<juce::AudioProcessorEditor>(temporary->createEditor());
+      button(*temporaryEditor,"Hall / Delay einstellen")->onClick();
+      juce::Component::SafePointer<juce::CallOutBox> popup;
+      for(int i=desktop.getNumComponents()-1;i>=0;--i)if(auto* c=dynamic_cast<juce::CallOutBox*>(desktop.getComponent(i))){popup=c;break;}
+      require(popup!=nullptr,"lifetime fixture opens actual popup");
+      temporaryEditor.reset();
+      require(popup==nullptr || popup->getChildComponent(0)->getNumChildComponents()==0,"closing editor detaches popup parameters before processor destruction");
+      temporary.reset();
+    }
+    std::cerr<<"Native UI/views/popup lifetime passed"<<std::endl;
     auto file = juce::File::getSpecialLocation(juce::File::tempDirectory)
                     .getNonexistentChildFile("malle-fixture", ".wav");
     juce::WavAudioFormat fmt;
@@ -186,6 +199,7 @@ int main() {
     legacyDaw.setStateInformation(legacyProject.getData(),int(legacyProject.getSize()));
     require(legacyDaw.getValue("monitor.on")==0 && legacyDaw.getValue("quality.on")==0 && legacyDaw.getValue("druck.match.on")==0,"old DAW projects retain legacy DSP and mix latency");
     oldFile.deleteFile();
+    std::cerr<<"Native banks and legacy migration passed"<<std::endl;
     p.getStateInformation(saved);
     file.deleteFile();
     MalleProcessor recalled;

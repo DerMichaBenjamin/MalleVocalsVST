@@ -73,6 +73,7 @@ private:
 class MacroCard : public Card {
 public:
   MacroCard(MalleProcessor &, int);
+  ~MacroCard() override;
   void resized() override;
 
 private:
@@ -81,6 +82,7 @@ private:
   std::unique_ptr<ValueControl> amount, trim;
   std::unique_ptr<ParamToggle> match;
   juce::TextButton spaceDetails{"Hall / Delay einstellen"};
+  std::function<void()> closePopup;
   std::unique_ptr<ParamToggle> on, resOn, airOn;
   std::unique_ptr<ParamChoice> variant, mode, rate;
   std::unique_ptr<ValueControl> res, air;

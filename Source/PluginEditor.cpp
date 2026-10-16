@@ -217,6 +217,7 @@ public:
       }
     }
   }
+  void detachParameters() {controls.clear();}
   ~SpaceControls() override {setLookAndFeel(nullptr);}
 };
 }
@@ -230,7 +231,14 @@ MacroCard::MacroCard(MalleProcessor &p, int n)
     addAndMakeVisible(spaceDetails);
     spaceDetails.onClick=[this]{
 
-      juce::CallOutBox::launchAsynchronously(std::make_unique<SpaceControls>(proc),spaceDetails.getScreenBounds(),nullptr);
+      if(closePopup)closePopup();
+      auto controls=std::make_unique<SpaceControls>(proc);
+      juce::Component::SafePointer<SpaceControls> panel(controls.get());
+      auto& callout=juce::CallOutBox::launchAsynchronously(std::move(controls),spaceDetails.getScreenBounds(),nullptr);
+      juce::Component::SafePointer<juce::CallOutBox> popup(&callout);
+      // The modal callback can outlive its editor. Detach all parameter
+      // references synchronously before the processor may be destroyed.
+      closePopup=[panel,popup]{if(panel)panel->detachParameters();if(popup)popup->dismiss();};
     };
   }
   amount =
@@ -265,6 +273,7 @@ MacroCard::MacroCard(MalleProcessor &p, int n)
     addAndMakeVisible(*rate);
   }
 }
+MacroCard::~MacroCard() {if(closePopup)closePopup();}
 void MacroCard::resized() {
   int w = getWidth(), h = getHeight();
   on->setBounds(w - 70, 10, 55, 26);
