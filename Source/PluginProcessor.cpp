@@ -63,6 +63,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout MalleProcessor::layout() {
   return l;
 }
 namespace {
+bool isRoutingParameter(const std::string& id) {
+  return id.rfind("route.",0)==0 || id=="duck.source" || id=="parallel.tap" || id=="pump.mode" || id=="pump.target";
+}
+bool isCrowdAssetParameter(const std::string& id) {
+  if(id=="stadium.slot" || id=="stadium.loopSmooth")return true;
+  for(int slot=0;slot<malle::crowdSlots;++slot)for(auto field:{"root","loop","fade","level"})
+    if(id==malle::crowdParameter(slot,field))return true;
+  return false;
+}
 bool decodeCrowdData(const juce::String& encoded,juce::MemoryBlock& data) {
   auto bytes=encoded.upToFirstOccurrenceOf(".",false,false).getLargeIntValue();
   if(bytes<44 || bytes>48*1024*1024 || encoded.length()>68*1024*1024)return false;
@@ -192,7 +201,8 @@ void MalleProcessor::applyPreset(int n) {
     bool key = id.rfind("tune.root", 0) == 0 ||
                id.rfind("tune.scale", 0) == 0 || id.rfind("note.", 0) == 0;
     bool input = id == "input";
-    bool routing = id.rfind("duck.", 0) == 0;
+    bool routing = isRoutingParameter(id);
+    if(isCrowdAssetParameter(id))continue;
     if ((key && bool(state.state.getProperty("lock.key"))) ||
         (input && bool(state.state.getProperty("lock.input"))) ||
         (routing && bool(state.state.getProperty("lock.routing"))))
@@ -390,7 +400,7 @@ bool MalleProcessor::loadPreset(const juce::File &f) {
     if (child.isValid()) {
       bool key = pd.id == "tune.root" || pd.id == "tune.scale" ||
                  pd.id.rfind("note.", 0) == 0;
-      bool input = pd.id == "input", routing = pd.id.rfind("duck.", 0) == 0;
+      bool input = pd.id == "input", routing = isRoutingParameter(pd.id);
       if ((key && bool(state.state.getProperty("lock.key"))) ||
           (input && bool(state.state.getProperty("lock.input"))) ||
           (routing && bool(state.state.getProperty("lock.routing"))))

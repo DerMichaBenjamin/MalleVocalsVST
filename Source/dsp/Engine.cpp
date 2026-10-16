@@ -145,6 +145,7 @@ void Engine::reset() {
   routeGain = 1;
   routeChanging = false;
   lastKill = false;
+  lastPreview = false;
   killedAt = -1000000000;
   for (int i = 0; i < 11; ++i)
     order[i] = i;
@@ -360,6 +361,8 @@ void Engine::process(float *const *data, int channels, int count,
               verbAmount = value("throw.verb.amount");
   const bool verbOn = value("throw.verb.on") > .5f,
              kill = value("throw.kill") > .5f, preview = audition.load();
+  if(preview && !lastPreview) crowdPlayer.reset();
+  lastPreview=preview;
   if (kill && !lastKill) {
     killedAt = clock;
     throwRemaining = 0;
@@ -701,7 +704,7 @@ void Engine::process(float *const *data, int channels, int count,
           std::clamp((globalTail - totalInactive) / globalFade, 0.f, 1.f);
       auto carrier = crowdPlayer.next(samp,sr,
           std::pow(2.f,-sampleRoot/12.f)*(1+.04f*stadiumSize),sampleLoop>.5f,
-          sampleFade,smoothCrowdLoop,sampleLoop<.5f && env<1e-5f);
+          sampleFade,smoothCrowdLoop,sampleLoop<.5f && env<1e-5f && !preview);
       float carrierL=carrier[0]*sampleGain,carrierR=carrier[1]*sampleGain;
       phase += 1 / sr;
       bool sendThrow =

@@ -80,7 +80,7 @@ private:
       pendingOrder = order;
   float routeGain = 1, creativeMix = 0;
   bool routeChanging = false;
-  bool lastKill = false;
+  bool lastKill = false, lastPreview = false;
   long long killedAt = -1000000000;
   void detectPitch();
 };

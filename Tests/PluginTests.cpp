@@ -55,6 +55,9 @@ int main() {
     require(p.routing() == originalRoute, "routing undo exact");
     require(p.undo.redo(), "routing redo");
     require(p.routing()[8] == 0, "routing redo exact");
+    auto lockedRoute=p.routing();
+    p.applyPreset(0);
+    require(p.routing()==lockedRoute,"routing lock preserves actual module order");
     p.deesserPreset(1);
     require(p.getValue("deess.low") == 2200 && p.getValue("deess.high") == 6500,
             "SCH preset band");
@@ -129,6 +132,8 @@ int main() {
     require(bankLoaded.crowdSlotName(1)=="Leer / Testtextur","bank undo restores empty bank");
     bankLoaded.undo.redo();
     require(bankLoaded.crowdSlotName(1).contains("malle-fixture"),"bank redo restores samples");
+    bankLoaded.applyPreset(0);
+    require(bankLoaded.getValue("stadium.1.root")==5 && bankLoaded.getValue("stadium.1.level")==-9,"factory voicing retains imported asset metadata");
     p.clearCrowdSlot();
     require(p.crowdSlotName(1)=="Leer / Testtextur","clear slot");
     p.undo.undo();
