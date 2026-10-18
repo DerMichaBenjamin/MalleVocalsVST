@@ -4,7 +4,10 @@ Never run this in public CI or commit the resulting audio/package.
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
+import tempfile
+import xml.etree.ElementTree as ET
 import zipfile
 
 parser = argparse.ArgumentParser()
@@ -21,8 +24,13 @@ for item in (args.windows, args.macos):
     with zipfile.ZipFile(item) as archive:
         if archive.testzip():
             parser.error(f'Corrupt archive: {item}')
+bank_xml = ET.parse(args.bank).getroot()
+if bank_xml.tag != 'MalleCrowdBank' or bank_xml.get('schema') != '1':
+    parser.error('Invalid crowd bank')
 args.output.parent.mkdir(parents=True, exist_ok=True)
 readme = '''Malle Vocals 0.4.0 Alpha / Rohstoff Audio / Micha Benjamin
+ZIP-Paket repariert am 18.10.2026; Plugin-Binaries unveraendert.
+Das alte Paket vollstaendig durch dieses ersetzen und neu entpacken.
 
 1. Passende native ZIP aus Builds entpacken und VST3 installieren.
    Windows: VST3-Bundle nach C:\\Program Files\\Common Files\\VST3.
@@ -86,21 +94,40 @@ manifest = {
     'Builds/'+args.macos.name: hashlib.sha256(args.macos.read_bytes()).hexdigest(),
     'Crowd/Micha.mallecrowd': hashlib.sha256(args.bank.read_bytes()).hexdigest(),
 }
-with zipfile.ZipFile(args.output, 'w', zipfile.ZIP_DEFLATED) as archive:
-    for item in (args.windows, args.macos):
-        archive.write(item, 'Builds/' + item.name)
-    archive.write(args.bank, 'Crowd/Micha.mallecrowd')
-    provenance=args.bank.parent/'CrowdBank_Quellen_und_Messungen.json'
-    if provenance.is_file():archive.write(provenance,'Crowd/'+provenance.name)
-    archive.writestr('BITTE_ZUERST_LESEN.txt', readme)
-    if args.report is not None:
-        archive.write(args.report,'Pruefbericht_0.4.md')
-    archive.writestr('SHA256.json', json.dumps(manifest, indent=2))
-    archive.writestr('Install_Crowd_Windows.cmd', windows)
-    info = zipfile.ZipInfo('Install_Crowd_macOS.command')
-    info.create_system = 3
-    info.external_attr = (0o100755 << 16)
-    info.compress_type = zipfile.ZIP_DEFLATED
-    archive.writestr(info, macos)
+fd, temporary = tempfile.mkstemp(prefix=args.output.name+'.', suffix='.partial', dir=args.output.parent)
+os.close(fd)
+try:
+    with zipfile.ZipFile(temporary, 'w', zipfile.ZIP_DEFLATED) as archive:
+        for item in (args.windows, args.macos):
+            archive.write(item, 'Builds/' + item.name)
+        archive.write(args.bank, 'Crowd/Micha.mallecrowd')
+        provenance=args.bank.parent/'CrowdBank_Quellen_und_Messungen.json'
+        if provenance.is_file():archive.write(provenance,'Crowd/'+provenance.name)
+        archive.writestr('BITTE_ZUERST_LESEN.txt', readme)
+        if args.report is not None:
+            archive.write(args.report,'Pruefbericht_0.4.md')
+        archive.writestr('SHA256.json', json.dumps(manifest, indent=2))
+        archive.writestr('Install_Crowd_Windows.cmd', windows)
+        info = zipfile.ZipInfo('Install_Crowd_macOS.command')
+        info.create_system = 3
+        info.external_attr = (0o100755 << 16)
+        info.compress_type = zipfile.ZIP_DEFLATED
+        archive.writestr(info, macos)
+    # Never expose an unfinished archive to an uploader or a second process.
+    # Verification must happen after ZipFile.close writes the central directory.
+    with open(temporary, 'rb') as completed:
+        os.fsync(completed.fileno())
+    with zipfile.ZipFile(temporary) as verified:
+        bad = verified.testzip()
+        if bad:
+            raise ValueError(f'Corrupt output member: {bad}')
+        for name, expected in manifest.items():
+            if hashlib.sha256(verified.read(name)).hexdigest() != expected:
+                raise ValueError(f'Output hash mismatch: {name}')
+    os.replace(temporary, args.output)
+finally:
+    if os.path.exists(temporary):
+        os.unlink(temporary)
 print(args.output)
+print(args.output.stat().st_size, 'bytes; closed archive, CRC and payload hashes verified')
 print(hashlib.sha256(args.output.read_bytes()).hexdigest())
