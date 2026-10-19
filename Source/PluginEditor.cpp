@@ -1023,7 +1023,7 @@ void MalleEditor::paint(juce::Graphics &g) {
   g.drawText("R O H S T O F F   A U D I O", 20, 10, 300, 22,
              juce::Justification::left);
   g.setFont(juce::FontOptions(12));
-  g.drawText("by Micha Benjamin / 0.4.0 ALPHA", 20, 32, 300, 19,
+  g.drawText("by Micha Benjamin / " JucePlugin_VersionString " ALPHA", 20, 32, 300, 19,
              juce::Justification::left);
   g.restoreState();
   for (int x : {7, getWidth() - 12})
