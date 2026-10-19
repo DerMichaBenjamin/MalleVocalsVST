@@ -93,6 +93,12 @@ int main() {
     require(p.getValue("deess.mode") == 1, "wideband preset");
     require(p.undo.undo(), "deesser preset undo");
     require(p.getValue("deess.mode") == 0, "deesser undo mode");
+    p.undo.beginNewTransaction("0.5 details");
+    p.setValue("klang.colour",-.35f);p.setValue("stadium.pitch",-5);p.setValue("duck.threshold",-45);
+    p.state.copyState();p.undo.beginNewTransaction();
+    require(p.undo.undo(),"new character controls undo");
+    require(std::abs(p.getValue("stadium.pitch"))<1e-6f,"crowd pitch undone");
+    require(p.undo.redo() && p.getValue("stadium.pitch")==-5,"crowd pitch redo");
     juce::MemoryBlock saved;
     p.getStateInformation(saved);
     MalleProcessor restored;

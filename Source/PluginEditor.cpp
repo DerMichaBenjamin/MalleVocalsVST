@@ -243,8 +243,11 @@ MacroCard::MacroCard(MalleProcessor &p, int n)
       juce::Component::SafePointer<SpaceControls> panel(controls.get());
       auto* parent=getTopLevelComponent();
       auto target=parent->getLocalArea(&spaceDetails,spaceDetails.getLocalBounds());
+      auto scroll=std::make_unique<juce::Viewport>();
+      scroll->setViewedComponent(controls.release(),true);
+      scroll->setSize(std::min(816,parent->getWidth()-50),std::min(665,parent->getHeight()-110));
       // Embed in the plugin window: no separate desktop/display is required.
-      auto& callout=juce::CallOutBox::launchAsynchronously(std::move(controls),target,parent);
+      auto& callout=juce::CallOutBox::launchAsynchronously(std::move(scroll),target,parent);
       juce::Component::SafePointer<juce::CallOutBox> popup(&callout);
       // The modal callback can outlive its editor. Detach all parameter
       // references synchronously before the processor may be destroyed.
@@ -263,7 +266,7 @@ MacroCard::MacroCard(MalleProcessor &p, int n)
            amount.get(), on.get(), variant.get()})
     addAndMakeVisible(c);
   if (n == 1) {
-    colour=std::make_unique<ValueControl>(p,"klang.colour","Dunkel / Hell");addAndMakeVisible(*colour);
+    colour=std::make_unique<ValueControl>(p,"klang.colour","Dunkel / Hell");colour->slider.setSliderStyle(juce::Slider::LinearHorizontal);addAndMakeVisible(*colour);
     res = std::make_unique<ValueControl>(p, "res.amount", "Resonanz");
     air = std::make_unique<ValueControl>(p, "air.high", "Air");
     resOn = std::make_unique<ParamToggle>(p, "res.on", "Res ON");
@@ -308,7 +311,15 @@ void MacroCard::resized() {
   auto a=amount->getBounds();a.setBottom(h-86);amount->setBounds(a);
   if(slot==4)spaceDetails.setBounds(112,h-51,w-126,34);
   if(duck){amount->setBounds(12,90,w-130,h-180);duck->setBounds(w-115,95,103,h-185);}
-  if(colour){auto r=amount->getBounds();r.setBottom(h-174);amount->setBounds(r);colour->setBounds(12,h-169,w-124,81);}
+  if(colour){
+    colour->setBounds(112,h-81,w-124,76);
+    resOn->setButtonText("Res");airOn->setButtonText("Air");
+    resOn->setBounds(w-110,94,48,24);airOn->setBounds(w-57,94,48,24);
+    res->label.setText("Res.",juce::dontSendNotification);
+    res->slider.setSliderStyle(juce::Slider::LinearVertical);air->slider.setSliderStyle(juce::Slider::LinearVertical);
+    res->slider.setTextBoxStyle(juce::Slider::TextBoxBelow,false,48,24);air->slider.setTextBoxStyle(juce::Slider::TextBoxBelow,false,48,24);
+    res->setBounds(w-112,120,50,h-211);air->setBounds(w-59,120,50,h-211);
+  }
 }
 ThrowPanel::ThrowPanel(MalleProcessor &p) : Card("THROW DELAY", true), proc(p) {
   type = std::make_unique<ParamChoice>(
@@ -429,7 +440,7 @@ void EqView::paint(juce::Graphics &g) {
   for (size_t i = 0; i < base.size(); ++i)
     base[i] = proc.getValue(malle::parameters()[i].id);
   auto effective = malle::resolve(base);
-  std::array<malle::Biquad, 4> filters;
+  std::array<malle::Biquad, 6> filters;
   for (int b = 0; b < 4; ++b) {
     int i = malle::index("eq0.freq") + b * 6;
     filters[b].set(
@@ -437,6 +448,10 @@ void EqView::paint(juce::Graphics &g) {
         effective[size_t(i + 2)], effective[size_t(i + 1)],
         float(proc.getSampleRate() > 0 ? proc.getSampleRate() : 48000));
   }
+  const float colour=effective[size_t(malle::index("macro.v2.on"))]>.5f?effective[size_t(malle::index("klang.colour"))]:0;
+  const float rate=float(proc.getSampleRate()>0?proc.getSampleRate():48000);
+  filters[4].set(4,250,.707f,-6*colour,rate);
+  filters[5].set(5,4500,.707f,8*colour,rate);
   juce::Path response;
   for (int x = 0; x < getWidth(); x += 3) {
     float freq = 30 * std::pow(20000.f / 30, float(x) / getWidth());

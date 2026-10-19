@@ -16,6 +16,7 @@ parser.add_argument('--macos', type=Path, required=True)
 parser.add_argument('--bank', type=Path, required=True)
 parser.add_argument('--output', type=Path, required=True)
 parser.add_argument('--report', type=Path)
+parser.add_argument('--version', default='0.5.0')
 args = parser.parse_args()
 for item in (args.windows, args.macos, args.bank):
     if not item.is_file():
@@ -28,12 +29,13 @@ bank_xml = ET.parse(args.bank).getroot()
 if bank_xml.tag != 'MalleCrowdBank' or bank_xml.get('schema') != '1':
     parser.error('Invalid crowd bank')
 args.output.parent.mkdir(parents=True, exist_ok=True)
-readme = '''Malle Vocals 0.4.0 Alpha / Rohstoff Audio / Micha Benjamin
-ZIP-Paket repariert am 18.10.2026; Plugin-Binaries unveraendert.
-Das alte Paket vollstaendig durch dieses ersetzen und neu entpacken.
+readme = '''Malle Vocals VERSION Alpha / Rohstoff Audio / Micha Benjamin
+Immer vollstaendig in einen neuen Ordner entpacken.
 
 1. Passende native ZIP aus Builds entpacken und VST3 installieren.
-   Windows: VST3-Bundle nach C:\\Program Files\\Common Files\\VST3.
+   Windows: gesamten Ordner "Malle Vocals.vst3" samt Contents aus der
+   Windows-ZIP nach C:\\Program Files\\Common Files\\VST3 kopieren.
+   Nicht nur die innere Datei aus Contents/x86_64-win kopieren.
    Mac: VST3 nach ~/Library/Audio/Plug-Ins/VST3,
         AU nach ~/Library/Audio/Plug-Ins/Components.
    Die Mac-ZIP separat entpacken: sie bewahrt Bundle-Rechte und Metadaten.
@@ -68,6 +70,9 @@ Diese Benutzerkopie enthaelt fuenf vorbereitete Ausschnitte deiner gelieferten
 Crowd-Dateien (einmal 7,5 s, viermal 10 s). Weder deren Grundton noch kommerzielle
 Weitergaberechte sind belegt. Nicht als lizenzierte Factory-Samplebank verbreiten.
 '''
+readme=readme.replace('VERSION',args.version)
+if args.version.startswith('0.5'):
+    readme+='\n0.5: In alten Projekten Makros 0.5 oben bewusst aktivieren. Pegelgleich in\nDruck/Klang/Waerme/Breite einschalten. Dunkel/Hell ist ein zusaetzlicher Tilt-EQ.\nFX-Ducking: 0% volle Effekte, 100% kein FX-Return bei erkanntem Gesang.\nCrowd Pitch bleibt im Aufnahme-Modus aktiv; es veraendert auch Abspieltempo\nund Formanten der Crowd-Textur. Fuer Breite ist ein Stereo-Ausgang notwendig.\n'
 windows = r'''@echo off
 setlocal
 set "malleBankDir=%APPDATA%\Rohstoff Audio\Malle Vocals"
@@ -105,7 +110,7 @@ try:
         if provenance.is_file():archive.write(provenance,'Crowd/'+provenance.name)
         archive.writestr('BITTE_ZUERST_LESEN.txt', readme)
         if args.report is not None:
-            archive.write(args.report,'Pruefbericht_0.4.md')
+            archive.write(args.report,'Pruefbericht_'+'.'.join(args.version.split('.')[:2])+'.md')
         archive.writestr('SHA256.json', json.dumps(manifest, indent=2))
         archive.writestr('Install_Crowd_Windows.cmd', windows)
         info = zipfile.ZipInfo('Install_Crowd_macOS.command')

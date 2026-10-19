@@ -57,5 +57,15 @@ int main(){try{
   for(int pos=0;pos<96000;pos+=256){a.fill(.1f);e.process(ptr,1,256,nullptr,0,{});if(pos>48000)for(int i=0;i<256;++i){double t=(pos+i)/48000.;float y=a[i]-.1f;double f=pitch==0?110:220;targetRe+=y*std::cos(2*pi*f*t);targetIm+=y*std::sin(2*pi*f*t);wrongRe+=y*std::cos(2*pi*(pitch==0?220:110)*t);wrongIm+=y*std::sin(2*pi*(pitch==0?220:110)*t);}}
   double ratio=std::hypot(targetRe,targetIm)/std::max(1e-9,std::hypot(wrongRe,wrongIm));std::cout<<"Crowd pitch="<<pitch<<" target/other="<<ratio<<"\n";require(ratio>8,"stadium pitch moves carrier octave");
  }
- std::cout<<"PASS: character, width, gain match, duck range and crowd pitch\n";
+ // Captured throw survives send release, and a grid change is crossfaded.
+ {Engine e;e.prepare(48000,128,2);auto v=neutral();v[index("throw.on")]=1;v[index("throw.trigger")]=1;v[index("throw.send")]=1;v[index("throw.return")]=.5f;v[index("throw.feedback")]=.55f;v[index("throw.type")]=2;v[index("throw.sync")]=0;v[index("throw.time")]=125;v[index("throw.verb.on")]=1;v[index("quality.on")]=1;
+  std::array<float,128>l{},r{};float* ptr[]{l.data(),r.data()};double tail=0;float jump=0,previous=0;
+  for(int pos=0;pos<96000;pos+=128){v[index("throw.trigger")]=pos<12032?1.f:0.f;if(pos>=36096)v[index("throw.time")]=250;e.setParameters(v);
+   for(int i=0;i<128;++i)l[i]=r[i]=pos+i<12000?.1f*std::sin(2*pi*220*(pos+i)/48000):0;
+   e.process(ptr,2,128,nullptr,0,{});
+   for(int i=0;i<128;++i){require(std::isfinite(l[i])&&std::isfinite(r[i]),"finite throw automation");if(pos>=24000)tail+=l[i]*l[i]+r[i]*r[i];if(pos>=35968&&pos<40000)jump=std::max(jump,std::abs(l[i]-previous));previous=l[i];}
+  }
+  std::cout<<"Throw after release tail energy="<<tail<<", grid-change jump="<<jump<<"\n";require(tail>.001,"throw tail survives release");require(jump<.08f,"throw grid change bounded");
+ }
+ std::cout<<"PASS: character, width, gain match, duck range, crowd pitch, throw tails and time change\n";
 }catch(const std::exception& e){std::cerr<<e.what()<<'\n';return 1;}}
