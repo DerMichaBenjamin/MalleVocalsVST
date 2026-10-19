@@ -97,8 +97,7 @@ ValueControl::ValueControl(MalleProcessor &p, std::string id,
   slider.setDoubleClickReturnValue(true, d.def);
   slider.getProperties().set("teal", isTeal);
   slider.setTooltip(d.section + ": " + d.name +
-                    ". Doppelklick: Reset. Shift: fein. Zahl editierbar." +
-                    ((id.find(".decay")!=std::string::npos || id=="reverb.type") ? " Party-Klang 0.4 muss aktiv sein." : ""));
+                    ". Doppelklick: Reset. Shift: fein. Zahl editierbar.");
   addAndMakeVisible(slider);
   attach =
       std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
@@ -195,9 +194,6 @@ public:
     look.setColour(juce::ComboBox::outlineColourId,juce::Colour(0xff586063));
     look.setColour(juce::PopupMenu::backgroundColourId,juce::Colour(0xff172023));
     setSize(800,665);
-    auto revision=std::make_unique<ParamToggle>(p,"quality.on","Party-Klang 0.4");
-    revision->setTooltip("Neue Makro-Kennlinien und Hall-Dauer/Typ. Aus: bisheriger Klang alter Projekte.");
-    addAndMakeVisible(*revision);revision->setBounds(592,7,194,27);controls.push_back(std::move(revision));
     for(int col=0;col<4;++col){
       std::string id=std::array<std::string,4>{"room","reverb","short","long"}[col];
       auto put=[&](std::unique_ptr<juce::Component> c,int y,int h){
@@ -448,7 +444,7 @@ void EqView::paint(juce::Graphics &g) {
         effective[size_t(i + 2)], effective[size_t(i + 1)],
         float(proc.getSampleRate() > 0 ? proc.getSampleRate() : 48000));
   }
-  const float colour=effective[size_t(malle::index("macro.v2.on"))]>.5f?effective[size_t(malle::index("klang.colour"))]:0;
+  const float colour=effective[size_t(malle::index("klang.colour"))];
   const float rate=float(proc.getSampleRate()>0?proc.getSampleRate():48000);
   filters[4].set(4,250,.707f,-6*colour,rate);
   filters[5].set(5,4500,.707f,8*colour,rate);
@@ -799,9 +795,6 @@ MalleEditor::MalleEditor(MalleProcessor &p)
   preview.onClick = [this] {
     proc.engine.audition.store(preview.getToggleState());
   };
-  modernSound=std::make_unique<ParamToggle>(p,"macro.v2.on","Makros 0.5");
-  modernSound->setTooltip("0.5: staerkere EQ-/Waerme-/Breite-Makros, Ducking bis 100%, Crowd-Filter und Delay-Zeitueberblendung. Fuer alte Projekte bewusst einschalten. Pegelgleich in den vier Sektionen aktivieren.");
-  addAndMakeVisible(*modernSound);
   monitor=std::make_unique<ParamChoice>(p,"monitor.on","Betrieb",juce::StringArray{"Mix / mit Pitch-Latenz","Aufnahme / 0 Samples"});
   // Param values are 1 for recording, 0 for mixing.
   addAndMakeVisible(*monitor);
@@ -926,7 +919,6 @@ void MalleEditor::resized() {
   proc.state.state.setProperty("ui.width",getWidth(),nullptr);
   proc.state.state.setProperty("ui.height",getHeight(),nullptr);
   monitor->setBounds(320,87,305,42);
-  modernSound->setBounds(645,98,180,27);
   simple.setBounds(w - 210, 15, 90, 31);
   advancedButton.setBounds(w - 115, 15, 98, 31);
   preset.setBounds(20, 57, w - 690, 34);

@@ -244,8 +244,8 @@ void Engine::process(float *const *data, int channels, int count,
   if (count <= 0)
     return;
   const int latencySamples = latency();
-  const bool modern = value("quality.on") > .5f;
-  const bool character = value("macro.v2.on") > .5f;
+  constexpr bool modern = true;
+  constexpr bool character = true;
   std::array<bool,4> matching{};
   std::array<float,6> trims{};
   int si=0;

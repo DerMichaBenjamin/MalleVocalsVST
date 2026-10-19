@@ -92,12 +92,10 @@ MalleProcessor::MalleProcessor()
       resolved(base) {
   for (auto &p : malle::parameters())
     raw.push_back(state.getRawParameterValue(p.id));
-  state.state.setProperty("schema", 5, nullptr);
+  state.state.setProperty("schema", 6, nullptr);
   state.state.setProperty("lock.key", true, nullptr);
   state.state.setProperty("lock.input", true, nullptr);
   state.state.setProperty("lock.routing", true, nullptr);
-  setValue("quality.on",1);
-  setValue("macro.v2.on",1);
   setValue("monitor.on",1);
   for(auto section : {"druck","klang","waerme","breite"})setValue(std::string(section)+".match.on",1);
   setValue("druck.amount",.45f);setValue("klang.amount",.55f);setValue("waerme.amount",.3f);setValue("raum.amount",.35f);
@@ -180,7 +178,7 @@ juce::AudioProcessorEditor *MalleProcessor::createEditor() {
 }
 void MalleProcessor::getStateInformation(juce::MemoryBlock &m) {
   auto tree = state.copyState();
-  tree.setProperty("schema", 5, nullptr);
+  tree.setProperty("schema", 6, nullptr);
   tree.setProperty("preset", currentPreset, nullptr);
   if (auto xml = tree.createXml())
     copyXmlToBinary(*xml, m);
@@ -189,7 +187,7 @@ void MalleProcessor::setStateInformation(const void *d, int n) {
   if (auto xml = getXmlFromBinary(d, n)) {
     auto tree = juce::ValueTree::fromXml(*xml);
     if (tree.hasType("MalleVocals") &&
-        int(tree.getProperty("schema", 2)) <= 5) {
+        int(tree.getProperty("schema", 2)) <= 6) {
       if (int(tree.getProperty("schema", 1)) < 2) {
         auto oldTune = tree.getChildWithProperty("id", "tune.on");
         auto creative = tree.getChildWithProperty("id", "creative.on");
@@ -209,8 +207,11 @@ void MalleProcessor::setStateInformation(const void *d, int n) {
         }
         tree.setProperty("schema", 4, nullptr);
       }
-      // Missing appended parameters in schema <=3 must load legacy DSP, never
-      // inherit new-instance recording or gain-match defaults.
+      // Old test states keep their values but always adopt current processing.
+      for(int i=tree.getNumChildren()-1;i>=0;--i) {
+        auto id=tree.getChild(i).getProperty("id").toString();
+        if(id=="quality.on" || id=="macro.v2.on")tree.removeChild(i,nullptr);
+      }
       for(auto& d : malle::parameters())if(!tree.getChildWithProperty("id",juce::String(d.id)).isValid()) {
         juce::ValueTree param("PARAM");param.setProperty("id",juce::String(d.id),nullptr);
         param.setProperty("value",d.def,nullptr);tree.addChild(param,-1,nullptr);
@@ -421,7 +422,7 @@ bool MalleProcessor::loadCrowdBank(const juce::File& file,juce::String& error) {
 void MalleProcessor::timerCallback() { restoreSample(); }
 void MalleProcessor::savePreset(const juce::File &f) {
   auto tree = state.copyState();
-  tree.setProperty("schema", 5, nullptr);
+  tree.setProperty("schema", 6, nullptr);
   if (auto x = tree.createXml())
     x->writeTo(f);
 }
@@ -436,7 +437,7 @@ bool MalleProcessor::loadPreset(const juce::File &f) {
   for (auto &pd : malle::parameters()) {
     auto child = t.getChildWithProperty("id", juce::String(pd.id));
     if(pd.id=="monitor.on")continue;
-    if(!child.isValid() && int(t.getProperty("schema",1))<5){setValue(pd.id,pd.def);continue;}
+    if(!child.isValid() && int(t.getProperty("schema",1))<6){setValue(pd.id,pd.def);continue;}
     if (child.isValid()) {
       bool key = pd.id == "tune.root" || pd.id == "tune.scale" ||
                  pd.id.rfind("note.", 0) == 0;

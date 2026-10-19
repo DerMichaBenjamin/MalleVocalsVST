@@ -131,14 +131,12 @@ int main() {
       require(png.writeImageToStream(image, stream), "PNG snapshot");
     };
     saveImage("simple.png");
-    p.setValue("quality.on",0);
     auto spaceBefore=p.state.copyState().createCopy();
     button(*editor,"Hall / Delay einstellen")->onClick();
     require(spaceBefore.isEquivalentTo(p.state.copyState()),"opening Simple room panel is audio/state neutral");
     auto* panel=findCallout(*editor);
     require(panel!=nullptr,"native Simple room panel opens inside plugin");
     saveImage("hall-delay.png",panel);panel->setVisible(false);panel->dismiss();
-    p.setValue("quality.on",1);
     b->onClick();
     require(before.isEquivalentTo(p.state.copyState()),
             "view switch preserves all state");
@@ -210,7 +208,7 @@ int main() {
     // Legacy 0.2 XML sample properties still restore into slot 1.
     auto old=p.state.copyState().createCopy();
     old.setProperty("schema",2,nullptr);
-    for(auto id:{"quality.on","monitor.on","druck.match.on","klang.match.on","waerme.match.on","breite.match.on","macro.v2.on","klang.colour","stadium.pitch","stadium.low","stadium.high","duck.threshold"})
+    for(auto id:{"monitor.on","druck.match.on","klang.match.on","waerme.match.on","breite.match.on","klang.colour","stadium.pitch","stadium.low","stadium.high","duck.threshold"})
       old.removeChild(old.getChildWithProperty("id",id),nullptr);
     old.setProperty("sample.data",old.getProperty("crowd.0.data"),nullptr);
     old.setProperty("sample.name",old.getProperty("crowd.0.name"),nullptr);
@@ -220,14 +218,13 @@ int main() {
     old.createXml()->writeTo(oldFile);
     MalleProcessor legacy;
     require(legacy.loadPreset(oldFile),"legacy preset loads");
-    require(legacy.getValue("monitor.on")==1 && legacy.getValue("quality.on")==0 && legacy.getValue("druck.match.on")==0,"legacy user preset DSP defaults; explicit recording mode preserved");
+    require(legacy.getValue("monitor.on")==1 && legacy.getValue("druck.match.on")==1,"old preset adopts new processing defaults; recording mode preserved");
     require(legacy.crowdSlotName(0).contains("malle-fixture"),"legacy sample migrates");
     juce::MemoryBlock legacyProject;
     juce::AudioProcessor::copyXmlToBinary(*old.createXml(),legacyProject);
     MalleProcessor legacyDaw;
     legacyDaw.setStateInformation(legacyProject.getData(),int(legacyProject.getSize()));
-    require(legacyDaw.getValue("monitor.on")==0 && legacyDaw.getValue("quality.on")==0 && legacyDaw.getValue("druck.match.on")==0,"old DAW projects retain legacy DSP and mix latency");
-    require(legacyDaw.getValue("macro.v2.on")==0 && legacy.getValue("macro.v2.on")==0,"legacy DAW and preset retain old character");
+    require(legacyDaw.getValue("monitor.on")==0 && legacyDaw.getValue("druck.match.on")==1,"old DAW projects adopt new processing; saved mix latency preserved");
     oldFile.deleteFile();
     std::cerr<<"Native banks and legacy migration passed"<<std::endl;
     p.getStateInformation(saved);

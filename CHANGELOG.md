@@ -1,6 +1,6 @@
 # 0.5.0 Alpha
 
-Staerkere Klang-/Waerme-/Breite-Makros mit Legacy-Schalter; Dunkel/Hell-Shelves; Pegelausgleich fuer De-Esser und Parallelweg; Simple-FX-Ducking bis 100%; Crowd Pitch/Filter; Delay-Zeitueberblendung und Mono-zu-Stereo-Buslayout. Details und Testgrenzen: docs/FEEDBACK_0.5.md.
+Staerkere Klang-/Waerme-/Breite-Makros als direkt geltender Standard; Dunkel/Hell-Shelves; Pegelausgleich fuer De-Esser und Parallelweg; Simple-FX-Ducking bis 100%; Crowd Pitch/Filter; Delay-Zeitueberblendung und Mono-zu-Stereo-Buslayout. Details und Testgrenzen: docs/FEEDBACK_0.5.md.
 
 # 0.4.0 Alpha — 16.10.2026
 

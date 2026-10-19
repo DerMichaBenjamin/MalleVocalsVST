@@ -144,7 +144,9 @@ int main() {
     p[index("throw.feedback")] = .5;
     p[index("throw.width")] = 0;
     p[index("throw.window")] = 10;
-    int imp = 256 * 80;
+    // Capture after the 3-ms send fade has opened, rather than exactly at its
+    // first sample (which is deliberately attenuated to prevent clicks).
+    int imp = 256 * 80 + 192;
     auto thrown = render(p, 0, 2, false, imp);
     Engine e;
     e.prepare(48000, 256, 1);

@@ -1,11 +1,12 @@
 # 0.5.0 Alpha: Klang, Wärme, Breite und Mischung
 
-Neue Instanzen und Factory-Presets aktivieren `Makros 0.5`. Vorhandene Projekte
-und Benutzerpresets behalten die bisherige Abstimmung. Zum bewussten Umstellen
-den Schalter oben einschalten und Pegelgleich für Druck/Klang/Wärme/Breite
-aktivieren. Für den neuen Hall außerdem `Party-Klang 0.4` im Hall-Panel aktivieren.
-Alle IDs bleiben erhalten; sechs neue Parameter sind angehängt, State-Schema 5.
-Simple/Advanced teilen Parameter und Audioverarbeitung. Ansichtswechsel laden nichts.
+Die neue Abstimmung gilt direkt, ohne Versions-/Legacy-Schalter. Die sechs
+Simple-Regler bleiben normale Klangregler derselben Engine wie Advanced.
+Pegelgleich ist für Druck/Klang/Wärme/Breite standardmäßig aktiv. Alte Teststände
+werden mit der neuen Verarbeitung geladen und können anders klingen.
+Vier neue Klangparameter plus Crowd-Pitch ergänzen den Zustand; die ehemaligen
+Versuchs-Umschalter quality.on/macro.v2.on wurden entfernt. State-Schema 6.
+Simple/Advanced teilen Parameter und Audioverarbeitung; Ansichtswechsel laden nichts.
 
 - **Klang:** Intensität verstärkt das gewählte Profil (Körper, Mitten, Präsenz,
   Höhen); `Dunkel / Hell` ergänzt breite Shelves bei 250 Hz und 4,5 kHz:
@@ -17,7 +18,7 @@ Simple/Advanced teilen Parameter und Audioverarbeitung. Ansichtswechsel laden ni
   Verzerrung: die Stufe ist noch nicht oversampled.
 - **Pegel:** Der Vergleich erfasst jetzt auch den zusätzlichen Parallelweg und
   den De-Esser. Letzterer liegt bei der Standardreihenfolge zwischen den
-  Kompressoren und EQ; sein Pegelverlust wird bislang nicht ausgeglichen.
+  Kompressoren und EQ; sein Pegelverlust wurde in 0.4 nicht ausgeglichen.
   In 0.5 wird er bei aktivem Klang-Pegelgleich mit erfasst. Makeup, Saturation-
   Output und Sektionspegel bleiben bewusste Pegeländerungen. Der Vergleich
   braucht etwa 1–2 Sekunden Signal; er ist kein Limiter, kein LUFS-Meter und

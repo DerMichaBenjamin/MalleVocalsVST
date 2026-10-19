@@ -3,7 +3,7 @@
 #include <stdexcept>
 using namespace malle;
 void require(bool b,const char* message){if(!b)throw std::runtime_error(message);}
-Values neutral(){auto p=defaults();for(size_t i=0;i<p.size();++i)if(parameters()[i].id.find(".on")!=std::string::npos)p[i]=0;p[index("monitor.on")]=1;p[index("macro.v2.on")]=1;return p;}
+Values neutral(){auto p=defaults();for(size_t i=0;i<p.size();++i)if(parameters()[i].id.find(".on")!=std::string::npos)p[i]=0;p[index("monitor.on")]=1;return p;}
 struct Result {double energy=0,side=0;std::array<double,3> re{},im{};};
 Result render(Values base,bool tone=false,int channels=2){
  Engine e;e.prepare(48000,256,channels);e.setParameters(resolve(base));
@@ -58,7 +58,7 @@ int main(){try{
   double ratio=std::hypot(targetRe,targetIm)/std::max(1e-9,std::hypot(wrongRe,wrongIm));std::cout<<"Crowd pitch="<<pitch<<" target/other="<<ratio<<"\n";require(ratio>8,"stadium pitch moves carrier octave");
  }
  // Captured throw survives send release, and a grid change is crossfaded.
- {Engine e;e.prepare(48000,128,2);auto v=neutral();v[index("throw.on")]=1;v[index("throw.trigger")]=1;v[index("throw.send")]=1;v[index("throw.return")]=.5f;v[index("throw.feedback")]=.55f;v[index("throw.type")]=2;v[index("throw.sync")]=0;v[index("throw.time")]=125;v[index("throw.verb.on")]=1;v[index("quality.on")]=1;
+ {Engine e;e.prepare(48000,128,2);auto v=neutral();v[index("throw.on")]=1;v[index("throw.trigger")]=1;v[index("throw.send")]=1;v[index("throw.return")]=.5f;v[index("throw.feedback")]=.55f;v[index("throw.type")]=2;v[index("throw.sync")]=0;v[index("throw.time")]=125;v[index("throw.verb.on")]=1;
   std::array<float,128>l{},r{};float* ptr[]{l.data(),r.data()};double tail=0;float jump=0,previous=0;
   for(int pos=0;pos<96000;pos+=128){v[index("throw.trigger")]=pos<12032?1.f:0.f;if(pos>=36096)v[index("throw.time")]=250;e.setParameters(v);
    for(int i=0;i<128;++i)l[i]=r[i]=pos+i<12000?.1f*std::sin(2*malle::pi*220*(pos+i)/48000):0;

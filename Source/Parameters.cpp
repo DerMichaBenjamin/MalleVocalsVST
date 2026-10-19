@@ -200,19 +200,17 @@ const std::vector<Param> &parameters() {
       add(crowdParameter(slot,"fade"), "Sample Fade", "Stadium", 1,500,30,"ms");
       add(crowdParameter(slot,"level"), "Sample Pegel", "Stadium", -24,12,0,"dB");
     }
-    // Append-only IDs: old projects retain the original engine and latency.
+    // Recording/mix mode is independent from the current effect algorithms.
     add("monitor.on", "Aufnahme: 0 Samples / Pitch aus", "Global", 0,1,0);
-    add("quality.on", "Neue Raum-Engine", "Global", 0,1,0);
     for(auto section : {"druck","klang","waerme","breite","raum","bewegung"}) {
       add(std::string(section)+".trim", "Sektion Pegel", section,-12,12,0,"dB");
       if(std::string(section)!="raum" && std::string(section)!="bewegung")
-        add(std::string(section)+".match.on", "Pegelvergleich", section,0,1,0);
+        add(std::string(section)+".match.on", "Pegelvergleich", section,0,1,1);
     }
     add("reverb.type", "Room / Plate / Hall", "reverb",0,2,1);
     add("reverb.decay", "Hall Dauer (RT60 Ziel)", "reverb",.2,8,1.6,"s");
     add("room.decay", "Raum Dauer (RT60 Ziel)", "room",.1,2,.45,"s");
     add("throw.verb.decay", "Throw Hall Dauer", "throw",.2,8,1.8,"s");
-    add("macro.v2.on", "Makros 0.5", "Global",0,1,0);
     add("klang.colour", "Dunkel / Hell", "klang",-1,1,0);
     add("stadium.pitch", "Crowd Pitch", "Stadium",-12,12,0,"st");
     add("stadium.low", "Crowd Low Cut", "Stadium",60,600,180,"Hz",true);
@@ -706,8 +704,8 @@ void resolveInto(const Values &b, Values &v) {
   auto profile = [&](std::string_view id) -> const VariantProfile & {
     return profiles()[size_t(std::clamp(int(get(id)), 0, 19))];
   };
-  const bool modern=enabled("quality.on");
-  const bool character=enabled("macro.v2.on");
+  constexpr bool modern=true;
+  constexpr bool character=true;
   auto &d = profile("druck.variant");
   float a = get("druck.amount");
   add("fet.threshold", -d.compression * a * (modern?1.3f:1.f));
@@ -821,8 +819,6 @@ const std::vector<Preset> &presets() {
 #include "ReferencePresets.inc"
     for(auto& preset : p) {
       auto& v=preset.values;
-      v[index("quality.on")]=1;
-      v[index("macro.v2.on")]=1;
       if(preset.category.find("Studie/")!=0){v[index("druck.amount")]=std::max(.4f,v[index("druck.amount")]);v[index("klang.amount")]=std::max(.45f,v[index("klang.amount")]);}
       for(auto section : {"druck","klang","waerme","breite"})
         v[index(std::string(section)+".match.on")]=1;

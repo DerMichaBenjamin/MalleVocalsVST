@@ -17,18 +17,22 @@ int main(){try {
  p.reset();float seamJump=0;previous=0;
  for(int i=0;i<19200;++i){auto y=p.next(&ramp,48000,1,true,20,true,false);if(i>4800)seamJump=std::max(seamJump,std::abs(y[0]-previous));previous=y[0];}
  require(seamJump<.01,"loop boundary crossfade limits seam jump");
- Sample positive,negative;positive.left.assign(4800,.25f);negative.left.assign(4800,-.25f);
+ Sample positive,negative;positive.left.resize(4800);negative.left.resize(4800);
+ for(int i=0;i<4800;++i){positive.left[size_t(i)]=.25f*std::sin(2*malle::pi*440*i/48000);negative.left[size_t(i)]=-positive.left[size_t(i)];}
  Engine e;e.prepare(48000,64,1);e.setSample(0,&positive);e.setSample(1,&negative);
  auto params=defaults();for(size_t i=0;i<params.size();++i)if(parameters()[i].id.find(".on")!=std::string::npos)params[i]=0;
  params[index("stadium.on")]=1;params[index("stadium.mix")]=1;params[index("stadium.vocoder")]=0;
  params[index("stadium.rough")]=0;params[index("stadium.loopSmooth")]=1;
+ params[index("stadium.size")]=0;
  std::array<float,64> block{};float* ptr[]{block.data()};double sumA=0,sumB=0;
  for(int t=0;t<48000;t+=64) {
    params[index("stadium.slot")]=t<24000?0.f:1.f;e.setParameters(params);
    for(int i=0;i<64;++i)block[size_t(i)]=.1f*std::sin(2*malle::pi*220*(t+i)/48000);
    e.process(ptr,1,64,nullptr,0,{});
-   if(t>18000&&t<23000)for(float v:block)sumA+=v;
-   if(t>42000)for(float v:block)sumB+=v;
+   for(int i=0;i<64;++i){float expected=std::sin(2*malle::pi*440*(t+i)/48000);
+     if(t>18000&&t<23000)sumA+=block[size_t(i)]*expected;
+     if(t>42000)sumB+=block[size_t(i)]*expected;
+   }
  }
  require(sumA>10&&sumB<-10,"automated slot changes select actual immutable carrier");
  std::cout<<"PASS: slot crossfade max jump "<<maxJump<<", loop seam "<<seamJump<<"\n";

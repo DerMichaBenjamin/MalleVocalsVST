@@ -142,7 +142,6 @@ private:
   bool ready = false;
   juce::Component canvas;
   std::unique_ptr<ParamChoice> monitor;
-  std::unique_ptr<ParamToggle> modernSound;
   int displayedCrowdSlot = -1;
   juce::TextButton simple{"Simple"}, advancedButton{"Advanced"}, undo{"Undo"},
       redo{"Redo"}, save{"Speichern"}, load{"Laden"}, favorite{"*"},

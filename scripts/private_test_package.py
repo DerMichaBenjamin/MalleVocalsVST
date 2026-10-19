@@ -55,7 +55,7 @@ Immer vollstaendig in einen neuen Ordner entpacken.
    Sektionspegel und Output bleiben separat. Auto-Ausgleich ist kein Limiter.
    Manuelle Compressor-Makeup-/Saturation-Output-Werte bleiben wirksam.
 6. "Hall / Delay einstellen" oeffnet die normalen vier Wege direkt aus Simple.
-   "Party-Klang 0.4" aktiviert die neue Abstimmung samt Dauer/Typ bei Legacy.
+   Die neue Abstimmung samt Dauer und Hall-Typ gilt direkt.
    Detailregler sind Basiswerte: die Simple-Intensitaet addiert ihre Makro-
    Zuordnung dazu. Send 0 im Panel kann daher noch einen Makro-Send haben.
    Throw ist ein eigener Weg; Loslassen schliesst nur den Send, nicht den Tail.
@@ -72,7 +72,7 @@ Weitergaberechte sind belegt. Nicht als lizenzierte Factory-Samplebank verbreite
 '''
 readme=readme.replace('VERSION',args.version)
 if args.version.startswith('0.5'):
-    readme+='\n0.5: In alten Projekten Makros 0.5 oben bewusst aktivieren. Pegelgleich in\nDruck/Klang/Waerme/Breite einschalten. Dunkel/Hell ist ein zusaetzlicher Tilt-EQ.\nFX-Ducking: 0% volle Effekte, 100% kein FX-Return bei erkanntem Gesang.\nCrowd Pitch bleibt im Aufnahme-Modus aktiv; es veraendert auch Abspieltempo\nund Formanten der Crowd-Textur. Fuer Breite ist ein Stereo-Ausgang notwendig.\n'
+    readme+='\n0.5: Die neue Abstimmung gilt direkt. Pegelgleich in\nDruck/Klang/Waerme/Breite ist standardmaessig aktiv. Dunkel/Hell ist ein Tilt-EQ.\nFX-Ducking: 0% volle Effekte, 100% kein FX-Return bei erkanntem Gesang.\nCrowd Pitch bleibt im Aufnahme-Modus aktiv; es veraendert auch Abspieltempo\nund Formanten der Crowd-Textur. Fuer Breite ist ein Stereo-Ausgang notwendig.\n'
 windows = r'''@echo off
 setlocal
 set "malleBankDir=%APPDATA%\Rohstoff Audio\Malle Vocals"
