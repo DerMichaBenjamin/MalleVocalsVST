@@ -85,7 +85,7 @@ private:
   std::function<void()> closePopup;
   std::unique_ptr<ParamToggle> on, resOn, airOn;
   std::unique_ptr<ParamChoice> variant, mode, rate;
-  std::unique_ptr<ValueControl> res, air;
+  std::unique_ptr<ValueControl> res, air, colour, duck;
 };
 class ThrowPanel : public Card {
 public:
@@ -164,7 +164,7 @@ private:
   juce::Component content;
   std::unique_ptr<ParamToggle> stadiumOn, tuneOn;
   std::unique_ptr<ParamChoice> texture, root, scale, sectionVariant;
-  std::unique_ptr<ValueControl> stadiumAmount, tuneAmount, input, output, fxMix;
+  std::unique_ptr<ValueControl> stadiumAmount, stadiumPitch, tuneAmount, input, output, fxMix;
   std::vector<std::unique_ptr<ValueControl>> controls;
   std::unique_ptr<juce::FileChooser> chooser;
   void populatePresets();

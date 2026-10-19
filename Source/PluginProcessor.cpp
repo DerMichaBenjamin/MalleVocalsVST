@@ -25,7 +25,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MalleProcessor::layout() {
               if (id == "druck.amount" || id == "klang.amount" ||
                   id == "waerme.amount" || id == "breite.amount" ||
                   id == "raum.amount" || id == "bewegung.amount" ||
-                  id == "fx.mix" || id == "stadium.mix" || id == "throw.return")
+                  id == "fx.mix" || id == "stadium.mix" || id == "throw.return" || id=="duck.amount" || id=="klang.colour")
                 return juce::String(v * 100, 0) + " %";
               return juce::String(v, malle::discrete(id)            ? 0
                                      : unit == "Hz"                 ? 0
@@ -53,7 +53,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout MalleProcessor::layout() {
               if (id == "druck.amount" || id == "klang.amount" ||
                   id == "waerme.amount" || id == "breite.amount" ||
                   id == "raum.amount" || id == "bewegung.amount" ||
-                  id == "fx.mix" || id == "stadium.mix" || id == "throw.return")
+                  id == "fx.mix" || id == "stadium.mix" || id == "throw.return" || id=="duck.amount" || id=="klang.colour")
                 return s.getFloatValue() / 100;
               return s.getFloatValue();
             });
@@ -92,11 +92,12 @@ MalleProcessor::MalleProcessor()
       resolved(base) {
   for (auto &p : malle::parameters())
     raw.push_back(state.getRawParameterValue(p.id));
-  state.state.setProperty("schema", 4, nullptr);
+  state.state.setProperty("schema", 5, nullptr);
   state.state.setProperty("lock.key", true, nullptr);
   state.state.setProperty("lock.input", true, nullptr);
   state.state.setProperty("lock.routing", true, nullptr);
   setValue("quality.on",1);
+  setValue("macro.v2.on",1);
   setValue("monitor.on",1);
   for(auto section : {"druck","klang","waerme","breite"})setValue(std::string(section)+".match.on",1);
   setValue("druck.amount",.45f);setValue("klang.amount",.55f);setValue("waerme.amount",.3f);setValue("raum.amount",.35f);
@@ -112,6 +113,7 @@ MalleProcessor::MalleProcessor()
 }
 MalleProcessor::~MalleProcessor() { stopTimer(); }
 void MalleProcessor::prepareToPlay(double sr, int block) {
+  monoSidechain.setSize(2,std::max(1,block));
   engine.prepare(sr, block, getMainBusNumOutputChannels());
   for(size_t i=0;i<base.size();++i)base[i]=raw[i]->load();
   malle::resolveInto(base,resolved);engine.setParameters(resolved);
@@ -121,7 +123,7 @@ bool MalleProcessor::isBusesLayoutSupported(const BusesLayout &l) const {
   auto in = l.getMainInputChannelSet(), out = l.getMainOutputChannelSet();
   return (in == juce::AudioChannelSet::mono() ||
           in == juce::AudioChannelSet::stereo()) &&
-         in == out &&
+         (in == out || (in==juce::AudioChannelSet::mono() && out==juce::AudioChannelSet::stereo())) &&
          (l.inputBuses.size() < 2 || l.inputBuses[1].isDisabled() ||
           l.inputBuses[1] == juce::AudioChannelSet::mono() ||
           l.inputBuses[1] == juce::AudioChannelSet::stereo());
@@ -153,6 +155,21 @@ void MalleProcessor::process(juce::AudioBuffer<float> &b, bool bypass) {
   auto side = getBusBuffer(b, true, 1);
   bool enabled = getBus(true, 1)->isEnabled();
   sidechainEnabled.store(enabled);
+  if(getMainBusNumInputChannels()==1 && main.getNumChannels()==2) {
+    // JUCE input/output buses can alias: preserve external SC before writing R.
+    for(int at=0;at<main.getNumSamples();) {
+      int n=std::min(monoSidechain.getNumSamples(),main.getNumSamples()-at);
+      if(enabled)for(int c=0;c<side.getNumChannels();++c)
+        monoSidechain.copyFrom(c,0,side,c,at,n);
+      main.copyFrom(1,at,main,0,at,n);
+      float* ptr[]{main.getWritePointer(0,at),main.getWritePointer(1,at)};
+      auto chunkTransport=tr;if(tr.hasPosition)chunkTransport.ppq+=at*tr.bpm/(60*getSampleRate());
+      engine.process(ptr,2,n,enabled?monoSidechain.getArrayOfReadPointers():nullptr,
+        enabled?side.getNumChannels():0,chunkTransport,bypass);
+      at+=n;
+    }
+    return;
+  }
   engine.process(main.getArrayOfWritePointers(), main.getNumChannels(),
                  main.getNumSamples(),
                  enabled ? side.getArrayOfReadPointers() : nullptr,
@@ -163,7 +180,7 @@ juce::AudioProcessorEditor *MalleProcessor::createEditor() {
 }
 void MalleProcessor::getStateInformation(juce::MemoryBlock &m) {
   auto tree = state.copyState();
-  tree.setProperty("schema", 4, nullptr);
+  tree.setProperty("schema", 5, nullptr);
   tree.setProperty("preset", currentPreset, nullptr);
   if (auto xml = tree.createXml())
     copyXmlToBinary(*xml, m);
@@ -172,7 +189,7 @@ void MalleProcessor::setStateInformation(const void *d, int n) {
   if (auto xml = getXmlFromBinary(d, n)) {
     auto tree = juce::ValueTree::fromXml(*xml);
     if (tree.hasType("MalleVocals") &&
-        int(tree.getProperty("schema", 2)) <= 4) {
+        int(tree.getProperty("schema", 2)) <= 5) {
       if (int(tree.getProperty("schema", 1)) < 2) {
         auto oldTune = tree.getChildWithProperty("id", "tune.on");
         auto creative = tree.getChildWithProperty("id", "creative.on");
@@ -404,7 +421,7 @@ bool MalleProcessor::loadCrowdBank(const juce::File& file,juce::String& error) {
 void MalleProcessor::timerCallback() { restoreSample(); }
 void MalleProcessor::savePreset(const juce::File &f) {
   auto tree = state.copyState();
-  tree.setProperty("schema", 4, nullptr);
+  tree.setProperty("schema", 5, nullptr);
   if (auto x = tree.createXml())
     x->writeTo(f);
 }
@@ -419,7 +436,7 @@ bool MalleProcessor::loadPreset(const juce::File &f) {
   for (auto &pd : malle::parameters()) {
     auto child = t.getChildWithProperty("id", juce::String(pd.id));
     if(pd.id=="monitor.on")continue;
-    if(!child.isValid() && int(t.getProperty("schema",1))<4){setValue(pd.id,pd.def);continue;}
+    if(!child.isValid() && int(t.getProperty("schema",1))<5){setValue(pd.id,pd.def);continue;}
     if (child.isValid()) {
       bool key = pd.id == "tune.root" || pd.id == "tune.scale" ||
                  pd.id.rfind("note.", 0) == 0;

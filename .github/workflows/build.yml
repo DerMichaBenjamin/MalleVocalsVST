@@ -40,7 +40,7 @@ jobs:
       - name: Upload plugin artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: MalleVocals-0.4.0-${{ runner.os }}
+          name: MalleVocals-0.5.0-${{ runner.os }}
           path: |
             packages/*.zip
             packages/*.sha256

@@ -212,6 +212,12 @@ const std::vector<Param> &parameters() {
     add("reverb.decay", "Hall Dauer (RT60 Ziel)", "reverb",.2,8,1.6,"s");
     add("room.decay", "Raum Dauer (RT60 Ziel)", "room",.1,2,.45,"s");
     add("throw.verb.decay", "Throw Hall Dauer", "throw",.2,8,1.8,"s");
+    add("macro.v2.on", "Makros 0.5", "Global",0,1,0);
+    add("klang.colour", "Dunkel / Hell", "klang",-1,1,0);
+    add("stadium.pitch", "Crowd Pitch", "Stadium",-12,12,0,"st");
+    add("stadium.low", "Crowd Low Cut", "Stadium",60,600,180,"Hz",true);
+    add("stadium.high", "Crowd High Cut", "Stadium",1500,14000,6500,"Hz",true);
+    add("duck.threshold", "Gesang erkannt ab", "Ducking",-60,-6,-38,"dB");
     return v;
   }();
   return p;
@@ -701,6 +707,7 @@ void resolveInto(const Values &b, Values &v) {
     return profiles()[size_t(std::clamp(int(get(id)), 0, 19))];
   };
   const bool modern=enabled("quality.on");
+  const bool character=enabled("macro.v2.on");
   auto &d = profile("druck.variant");
   float a = get("druck.amount");
   add("fet.threshold", -d.compression * a * (modern?1.3f:1.f));
@@ -720,16 +727,31 @@ void resolveInto(const Values &b, Values &v) {
   add("eq3.gain", k.air * a);
   add("air.high", std::max(0.f, k.air) * .06f * a);
   add("deess.threshold", -std::max(0.f, k.air) * a);
+  if(character) {
+    // Additional broad shelves preserve all manually edited band bases.
+    // Colour is bipolar; intensity still scales only the chosen profile.
+    add("eq0.gain", k.body*a*.8f);
+    add("eq2.gain", k.presence*a*.75f);
+    add("eq3.gain", k.air*a*1.5f);
+    // Sibilance remains independent; colour must not silently change it.
+    v[size_t(index("deess.threshold"))]=get("deess.threshold");
+  }
   auto &w = profile("waerme.variant");
   a = get("waerme.amount");
   add("sat.mix", w.warmth * a * (modern?2.f:1.f));
   add("sat.drive", w.drive * a * (modern?1.5f:1.f));
+  if(character) {
+    add("sat.drive", (12+w.drive)*a);
+    add("sat.mix", .65f*a);
+    add("sat.tone", -std::max(0.f,get("sat.tone")-3800.f)*a);
+  }
   auto &bwidth = profile("breite.variant");
   a = get("breite.amount");
   add("double.mix", bwidth.width * a * (modern?1.5f:1.f));
   add("double.time", (bwidth.time - 18) * a);
   add("double.voices", (bwidth.voices - 4) * a);
   add("double.width", (bwidth.stereo - 1) * a);
+  if(character){add("double.mix",.8f*a);add("double.pitch",12*a);}
   auto &r = profile("raum.variant");
   a = get("raum.amount") * (modern?2.5f:1.f);
   add("room.send", r.space * .12f * a);
@@ -800,6 +822,7 @@ const std::vector<Preset> &presets() {
     for(auto& preset : p) {
       auto& v=preset.values;
       v[index("quality.on")]=1;
+      v[index("macro.v2.on")]=1;
       if(preset.category.find("Studie/")!=0){v[index("druck.amount")]=std::max(.4f,v[index("druck.amount")]);v[index("klang.amount")]=std::max(.45f,v[index("klang.amount")]);}
       for(auto section : {"druck","klang","waerme","breite"})
         v[index(std::string(section)+".match.on")]=1;

@@ -26,6 +26,21 @@ int main() {
   juce::ScopedJuceInitialiser_GUI gui;
   try {
     {
+      MalleProcessor monoStereo;
+      auto layout=monoStereo.getBusesLayout();
+      layout.inputBuses.set(0,juce::AudioChannelSet::mono());
+      layout.inputBuses.set(1,juce::AudioChannelSet::mono());
+      layout.outputBuses.set(0,juce::AudioChannelSet::stereo());
+      require(monoStereo.setBusesLayout(layout),"mono input stereo output accepted with lead sidechain");
+      for(auto& d:malle::parameters())if(d.id.find(".on")!=std::string::npos)monoStereo.setValue(d.id,0);
+      monoStereo.setValue("monitor.on",1);monoStereo.prepareToPlay(48000,64);
+      juce::AudioBuffer<float> audio(2,129);juce::MidiBuffer midi;
+      for(int i=0;i<129;++i){audio.setSample(0,i,.1f);audio.setSample(1,i,.05f);}
+      monoStereo.processBlock(audio,midi);
+      for(int i=0;i<129;++i)require(std::abs(audio.getSample(0,i)-.1f)<1e-6f && std::abs(audio.getSample(1,i)-.1f)<1e-6f,"mono duplicated to stereo across oversized callback");
+      require(std::abs(monoStereo.engine.meters.sidechain.load()-.05f)<1e-6f,"mono stereo output never overwrites lead sidechain");
+    }
+    {
       MalleProcessor catalog;
       for (auto key : {"lock.key", "lock.input", "lock.routing"})
         catalog.state.state.setProperty(key, false, nullptr);
@@ -184,7 +199,7 @@ int main() {
     // Legacy 0.2 XML sample properties still restore into slot 1.
     auto old=p.state.copyState().createCopy();
     old.setProperty("schema",2,nullptr);
-    for(auto id:{"quality.on","monitor.on","druck.match.on","klang.match.on","waerme.match.on","breite.match.on"})
+    for(auto id:{"quality.on","monitor.on","druck.match.on","klang.match.on","waerme.match.on","breite.match.on","macro.v2.on","klang.colour","stadium.pitch","stadium.low","stadium.high","duck.threshold"})
       old.removeChild(old.getChildWithProperty("id",id),nullptr);
     old.setProperty("sample.data",old.getProperty("crowd.0.data"),nullptr);
     old.setProperty("sample.name",old.getProperty("crowd.0.name"),nullptr);
@@ -201,6 +216,7 @@ int main() {
     MalleProcessor legacyDaw;
     legacyDaw.setStateInformation(legacyProject.getData(),int(legacyProject.getSize()));
     require(legacyDaw.getValue("monitor.on")==0 && legacyDaw.getValue("quality.on")==0 && legacyDaw.getValue("druck.match.on")==0,"old DAW projects retain legacy DSP and mix latency");
+    require(legacyDaw.getValue("macro.v2.on")==0 && legacy.getValue("macro.v2.on")==0,"legacy DAW and preset retain old character");
     oldFile.deleteFile();
     std::cerr<<"Native banks and legacy migration passed"<<std::endl;
     p.getStateInformation(saved);

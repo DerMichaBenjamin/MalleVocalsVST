@@ -52,6 +52,7 @@ private:
   void restoreSample();
   std::vector<std::atomic<float> *> raw;
   malle::Values base, resolved;
+  juce::AudioBuffer<float> monoSidechain;
   std::vector<std::unique_ptr<malle::Sample>> retainedSamples;
   std::array<juce::String,malle::crowdSlots> loadedSamples;
   std::vector<juce::String> sampleKeys;

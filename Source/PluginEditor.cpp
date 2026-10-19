@@ -194,7 +194,7 @@ public:
     look.setColour(juce::ComboBox::backgroundColourId,juce::Colour(0xff111719));
     look.setColour(juce::ComboBox::outlineColourId,juce::Colour(0xff586063));
     look.setColour(juce::PopupMenu::backgroundColourId,juce::Colour(0xff172023));
-    setSize(800,535);
+    setSize(800,665);
     auto revision=std::make_unique<ParamToggle>(p,"quality.on","Party-Klang 0.4");
     revision->setTooltip("Neue Makro-Kennlinien und Hall-Dauer/Typ. Aus: bisheriger Klang alter Projekte.");
     addAndMakeVisible(*revision);revision->setBounds(592,7,194,27);controls.push_back(std::move(revision));
@@ -216,6 +216,12 @@ public:
         put(std::make_unique<ParamChoice>(p,id+".beats","Rhythmus",juce::StringArray{"1/16","1/8","1/8 punktiert","1/4","1/4 triolisch","1/2"},std::vector<float>{.25f,.5f,.75f,1.f,2.f/3.f,2.f}),470,52);
       }
     }
+    auto addFooter=[&](std::unique_ptr<juce::Component> c,int x,int y,int w,int h){addAndMakeVisible(*c);c->setBounds(x,y,w,h);controls.push_back(std::move(c));};
+    addFooter(std::make_unique<ParamToggle>(p,"duck.on","FX Ducking ON"),14,535,170,28);
+    addFooter(std::make_unique<ParamChoice>(p,"duck.source","Quelle",juce::StringArray{"Eigene Vocals","Externer Lead"}),14,574,174,60);
+    addFooter(std::make_unique<ValueControl>(p,"duck.amount","Ducking 0-100%",true),210,535,176,120);
+    addFooter(std::make_unique<ValueControl>(p,"duck.threshold","Gesang ab",true),406,535,176,120);
+    addFooter(std::make_unique<ValueControl>(p,"duck.release","Rueckkehr",true),602,535,176,120);
   }
   void detachParameters() {controls.clear();}
   ~SpaceControls() override {setLookAndFeel(nullptr);}
@@ -228,6 +234,7 @@ MacroCard::MacroCard(MalleProcessor &p, int n)
   addAndMakeVisible(*trim);
   if(n<4){match=std::make_unique<ParamToggle>(p,id+".match.on","Pegelgleich");addAndMakeVisible(*match);}
   if(n==4){
+    duck=std::make_unique<ValueControl>(p,"duck.amount","FX-Ducking",true);addAndMakeVisible(*duck);
     addAndMakeVisible(spaceDetails);
     spaceDetails.onClick=[this]{
 
@@ -256,6 +263,7 @@ MacroCard::MacroCard(MalleProcessor &p, int n)
            amount.get(), on.get(), variant.get()})
     addAndMakeVisible(c);
   if (n == 1) {
+    colour=std::make_unique<ValueControl>(p,"klang.colour","Dunkel / Hell");addAndMakeVisible(*colour);
     res = std::make_unique<ValueControl>(p, "res.amount", "Resonanz");
     air = std::make_unique<ValueControl>(p, "air.high", "Air");
     resOn = std::make_unique<ParamToggle>(p, "res.on", "Res ON");
@@ -299,6 +307,8 @@ void MacroCard::resized() {
   trim->setBounds(12,h-81,94,76);
   auto a=amount->getBounds();a.setBottom(h-86);amount->setBounds(a);
   if(slot==4)spaceDetails.setBounds(112,h-51,w-126,34);
+  if(duck){amount->setBounds(12,90,w-130,h-180);duck->setBounds(w-115,95,103,h-185);}
+  if(colour){auto r=amount->getBounds();r.setBottom(h-174);amount->setBounds(r);colour->setBounds(12,h-169,w-124,81);}
 }
 ThrowPanel::ThrowPanel(MalleProcessor &p) : Card("THROW DELAY", true), proc(p) {
   type = std::make_unique<ParamChoice>(
@@ -657,11 +667,12 @@ MalleEditor::MalleEditor(MalleProcessor &p)
   }
   stadiumOn = std::make_unique<ParamToggle>(p, "stadium.on", "ON");
   stadiumAmount = std::make_unique<ValueControl>(p, "stadium.mix", "Menge");
+  stadiumPitch = std::make_unique<ValueControl>(p,"stadium.pitch","Crowd Pitch");
   texture = std::make_unique<ParamChoice>(
       p, "stadium.slot", "Crowd-Platz",
       juce::StringArray{"1 - Leer", "2 - Leer", "3 - Leer", "4 - Leer", "5 - Leer", "6 - Leer", "7 - Leer"});
   for (auto *c : std::initializer_list<juce::Component *>{
-           stadiumOn.get(), stadiumAmount.get(), texture.get(), &wave, &import,
+           stadiumOn.get(), stadiumAmount.get(), stadiumPitch.get(), texture.get(), &wave, &import,
            &preview, &bankSave, &clearSample})
     stadium.addAndMakeVisible(c);
   tuneOn = std::make_unique<ParamToggle>(p, "tune.on", "ON");
@@ -769,8 +780,8 @@ MalleEditor::MalleEditor(MalleProcessor &p)
   preview.onClick = [this] {
     proc.engine.audition.store(preview.getToggleState());
   };
-  modernSound=std::make_unique<ParamToggle>(p,"quality.on","Party-Klang 0.4");
-  modernSound->setTooltip("Neue Makro-Kennlinien und diffusere Hall-Engine. Aus: bisheriger Klang alter Projekte; neue Hall-Dauer/Typ gelten nur bei An.");
+  modernSound=std::make_unique<ParamToggle>(p,"macro.v2.on","Makros 0.5");
+  modernSound->setTooltip("0.5: staerkere EQ-/Waerme-/Breite-Makros, Ducking bis 100%, Crowd-Filter und Delay-Zeitueberblendung. Fuer alte Projekte bewusst einschalten. Pegelgleich in den vier Sektionen aktivieren.");
   addAndMakeVisible(*modernSound);
   monitor=std::make_unique<ParamChoice>(p,"monitor.on","Betrieb",juce::StringArray{"Mix / mit Pitch-Latenz","Aufnahme / 0 Samples"});
   // Param values are 1 for recording, 0 for mixing.
@@ -857,8 +868,8 @@ void MalleEditor::rebuild() {
     return true;
   };
   for (auto &d : malle::parameters())
-    if (visibleSlotParameter(d.id) && d.id!="stadium.slot" && d.id!="stadium.mix" &&
-        (d.id!="stadium.texture" || proc.crowdSlotName(selectedSlot)=="Leer / Testtextur") && juce::String(d.section) == group && d.id.rfind("route.", 0) != 0 &&
+    if (visibleSlotParameter(d.id) && d.id!="stadium.slot" && d.id!="stadium.mix" && d.id!="stadium.pitch" &&
+        (d.id!="stadium.texture" || proc.crowdSlotName(selectedSlot)=="Leer / Testtextur") && (juce::String(d.section) == group || (group=="Klang EQ" && d.id=="klang.colour")) && d.id.rfind("route.", 0) != 0 &&
         (d.id.size() < 3 || d.id.substr(d.id.size() - 3) != ".on") &&
         d.id != "deess.preset" && d.id.find(".variant") == std::string::npos) {
       auto c = std::make_unique<ValueControl>(
@@ -961,7 +972,8 @@ void MalleEditor::resized() {
   }
   int sw = stadium.getWidth(), sh = stadium.getHeight();
   stadiumOn->setBounds(sw - 68, 9, 53, 25);
-  stadiumAmount->setBounds(8, 43, sw / 2 - 10, sh - 140);
+  stadiumAmount->setBounds(8, 43, sw / 2 - 10, (sh - 140)/2);
+  stadiumPitch->setBounds(8,43+(sh-140)/2,sw/2-10,(sh-140)/2);
   texture->setBounds(sw / 2, 43, sw / 2 - 13, 54);
   wave.setBounds(sw / 2, 106, sw / 2 - 14, std::max(25, sh - 210));
   import.setBounds(12, sh - 78, sw / 2 - 17, 28);
@@ -1035,7 +1047,7 @@ void MalleEditor::timerCallback() {
       "IN " + juce::String(malle::db(m.input.load()), 1) + " dB | OUT " +
       juce::String(malle::db(m.output.load()), 1) + " dB | GR FET " +
       juce::String(m.fet.load(), 1) + " / Level " +
-      juce::String(m.level.load(), 1) + " dB | " + sc + " | " + (proc.getValue("monitor.on")>.5f ? "AUFNAHME: Pitch aus / 0 Samples" : "MIX: "+juce::String(proc.getLatencySamples())+" Samples") + " | " + proc.sampleName;
+      juce::String(m.level.load(), 1) + " dB | " + sc + " | " + (proc.getMainBusNumOutputChannels()==1?"MONO: fuer Breite Stereo-Ausgang nutzen | ":"") + (proc.getValue("monitor.on")>.5f ? "AUFNAHME: Pitch aus / 0 Samples" : "MIX: "+juce::String(proc.getLatencySamples())+" Samples") + " | " + proc.sampleName;
   juce::MemoryBlock baseline;
   auto encoded = proc.state.state.getProperty("preset.baseline").toString();
   bool modified = false;

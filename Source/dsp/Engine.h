@@ -41,10 +41,12 @@ private:
   int chs = 2, latencySamples = 0;
   Values p;
   bool monitoring = false;
-  std::array<LevelMatch,12> levelMatch;
+  std::array<LevelMatch,13> levelMatch;
   float throwSendGain = 0;
+  std::array<float,5> previousDelay{}, targetDelay{}, delayBlend{};
   struct Channel {
     Biquad hp, lp, correct, dsLow, dsHigh, airLow, airHigh, satTone;
+    Biquad colourLow, colourHigh, crowdLow, crowdHigh;
     std::array<Biquad, 4> eq, eqDetect;
     std::array<Envelope, 4> eqEnv;
     Envelope airEnv, airBroadEnv;

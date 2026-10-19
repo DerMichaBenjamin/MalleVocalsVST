@@ -1,3 +1,5 @@
+Aktuell: **0.5.0 Alpha** – [Aenderungen, Bedienung und Pruefgrenzen](docs/FEEDBACK_0.5.md).
+
 # Malle Vocals — 0.4.0 Alpha
 
 **Rohstoff Audio / Micha Benjamin.** Ein tatsächlich implementiertes C++/JUCE-Audioeffektplugin in Entwicklung. Noch keine verkaufsfertige Vollversion und keine bestätigte Klanggleichheit mit kommerziellen Referenzen.

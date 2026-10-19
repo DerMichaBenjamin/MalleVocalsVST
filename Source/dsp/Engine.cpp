@@ -78,6 +78,7 @@ void Engine::prepare(double rate, int block, int channels) {
 void Engine::reset() {
   for(auto& m : levelMatch) m = {};
   throwSendGain = 0;
+  previousDelay.fill(0);targetDelay.fill(0);delayBlend.fill(1);
   pitchEngine.reset();
   creativeEngine.reset();
   for (auto &x : channel) {
@@ -89,6 +90,7 @@ void Engine::reset() {
     x.airLow.reset();
     x.airHigh.reset();
     x.satTone.reset();
+    x.colourLow.reset();x.colourHigh.reset();x.crowdLow.reset();x.crowdHigh.reset();
     x.airEnv = {};
     x.airBroadEnv = {};
     x.throwReverb.reset();
@@ -177,6 +179,10 @@ void Engine::setParameters(const Values &values) {
     x.airLow.set(1, 2500, .707f, 0, sr);
     x.airHigh.set(1, 9000, .707f, 0, sr);
     x.satTone.set(0, value("sat.tone"), .707f, 0, sr);
+    x.colourLow.set(4,250,.707f,-6*value("klang.colour"),sr);
+    x.colourHigh.set(5,4500,.707f,8*value("klang.colour"),sr);
+    x.crowdLow.set(1,value("stadium.low"),.707f,0,sr);
+    x.crowdHigh.set(0,value("stadium.high"),.707f,0,sr);
     for (int b = 0; b < 4; ++b) {
       int start = index("eq0.freq") + b * 6;
       auto g = [&](int i) { return p[size_t(start + i)]; };
@@ -239,6 +245,7 @@ void Engine::process(float *const *data, int channels, int count,
     return;
   const int latencySamples = latency();
   const bool modern = value("quality.on") > .5f;
+  const bool character = value("macro.v2.on") > .5f;
   std::array<bool,4> matching{};
   std::array<float,6> trims{};
   int si=0;
@@ -328,6 +335,7 @@ void Engine::process(float *const *data, int channels, int count,
               sampleLoop = p[size_t(crowdIndices[size_t(std::clamp(int(value("stadium.slot")),0,6))][1])],
               sampleFade = p[size_t(crowdIndices[size_t(std::clamp(int(value("stadium.slot")),0,6))][2])],
               sampleGain = gain(p[size_t(crowdIndices[size_t(std::clamp(int(value("stadium.slot")),0,6))][3])]);
+  const float crowdPitch=std::pow(2.f,value("stadium.pitch")/12.f);
   const int voices = int(value("double.voices")),
             root = int(value("tune.root")), scale = int(value("tune.scale"));
   std::array<bool, 12> allowed{};
@@ -347,6 +355,7 @@ void Engine::process(float *const *data, int channels, int count,
               pumpTarget = value("pump.target"), stutter = value("stutter"),
               globalTail = value("tail"), globalFade = value("fade"),
               delayToVerb = value("delay.reverb");
+  const float duckThreshold=gain(value("duck.threshold"));
   const float pumpThreshold = value("pump.threshold"),
               pumpRatio = value("pump.ratio"),
               pumpAttack = value("pump.attack"),
@@ -486,6 +495,8 @@ void Engine::process(float *const *data, int channels, int count,
                                            1.f)) -
                            1);
           }
+      if(eqOn && character)for(int c=0;c<channels;++c)
+        x[c]=channel[c].colourHigh.tick(channel[c].colourLow.tick(x[c]));
       return;
     }
     if (module == 6) {
@@ -683,7 +694,7 @@ void Engine::process(float *const *data, int channels, int count,
           direct(module, x);
           for(int c=0;c<channels;++c)after+=x[c]*x[c];
           bool listen=(module==4 && dsListen>.5f)||(module==7 && resDelta>.5f);
-          bool nodeActive=module==0?inputOn:module==2?cp[0].on:module==3?cp[1].on:module==5?eqOn:module==6?cp[3].on:module==7?resOn:module==8?airOn:module==9?satOn:false;
+          bool nodeActive=module==0?inputOn:module==2?cp[0].on:module==3?cp[1].on:module==4?(character && dsOn):module==5?eqOn:module==6?cp[3].on:module==7?resOn:module==8?airOn:module==9?satOn:false;
           float manualGain=module==2?cp[0].m:module==3?cp[1].m:module==9?satOut:1.f;
           float compensation=levelMatch[size_t(module)].tick(before*manualGain*manualGain/channels,after/channels,sr,matching[size_t(sectionId)] && nodeActive && !listen);
           // One trim per section, after its final node in the actual reordered chain.
@@ -723,6 +734,12 @@ void Engine::process(float *const *data, int channels, int count,
             duck = duckEnv.tick(external ? scDet : detector, duckA, duckR);
       float duckG = duckOn ? 1 / (1 + duck * 12 * duckAmount) : 1,
             dryDuck = duckOn ? 1 / (1 + duck * 12 * duckDry) : 1;
+      if(character && duckOn) {
+        // 0 = full return, 100% = silence while a vocal is above threshold.
+        // The existing attack/release envelope brings tails back in pauses.
+        float activity=std::clamp(duck/std::max(1e-6f,duckThreshold),0.f,1.f);
+        duckG=1-duckAmount*activity;dryDuck=1-duckDry*activity;
+      }
       double beat = tr.hasPosition
                         ? tr.ppq + (atSample - latencySamples) * beatsPerSample
                         : freePpq;
@@ -748,7 +765,7 @@ void Engine::process(float *const *data, int channels, int count,
       float globalGate =
           std::clamp((globalTail - totalInactive) / globalFade, 0.f, 1.f);
       auto carrier = crowdPlayer.next(samp,sr,
-          std::pow(2.f,-sampleRoot/12.f)*(1+.04f*stadiumSize),sampleLoop>.5f,
+          crowdPitch*std::pow(2.f,-sampleRoot/12.f)*(1+.04f*stadiumSize),sampleLoop>.5f,
           sampleFade,smoothCrowdLoop,sampleLoop<.5f && env<1e-5f && !preview);
       float carrierL=carrier[0]*sampleGain,carrierR=carrier[1]*sampleGain;
       phase += 1 / sr;
@@ -758,10 +775,16 @@ void Engine::process(float *const *data, int channels, int count,
       if (sendThrow)
         --throwRemaining;
       std::array<float,2> widthReference{};
+      float parallelBefore=0,parallelAfter=0;
+      for(int c=0;c<channels;++c)parallelBefore+=x[c]*x[c];
+      for(int c=0;c<channels;++c) {
+        if(cp[2].on)x[c]+=(parInput?tap[c]:source[c])*parGain*cp[2].mix;
+        parallelAfter+=x[c]*x[c];
+      }
+      float parallelMatch=levelMatch[12].tick(parallelBefore/channels,parallelAfter/channels,sr,character && matching[0] && cp[2].on);
       for (int c = 0; c < channels; ++c) {
         auto &z = channel[c];
-        if (cp[2].on)
-          x[c] += (parInput ? tap[c] : source[c]) * parGain * cp[2].mix;
+        x[c]*=parallelMatch;
         widthReference[c]=x[c];
         z.doubler.push(source[c]);
         if (doubleOn) {
@@ -771,14 +794,14 @@ void Engine::process(float *const *data, int channels, int count,
                                                    : c == 0
                                                        ? 1 - sign * doubleWidth
                                                        : 1 + sign * doubleWidth;
-            float omega = 2 * pi * (.6f + v * .13f),
+            float omega = 2 * pi * (character ? .19f+v*.071f : .6f + v * .13f),
                   amplitude = std::min(doubleTime * .6f,
                                        (std::pow(2.f, doublePitch / 1200) - 1) *
                                            1000 / omega);
-            float dt = (doubleTime + v * 2 +
-                        amplitude * std::sin(float(phase) * omega)) *
+            float dt = (doubleTime + v * (character?6.7f:2.f) +
+                        amplitude * std::sin(float(phase) * omega+(character?v*1.73f:0.f))) *
                        sr * .001f;
-            doubled += z.doubler.read(dt) * pan / voices;
+            doubled += z.doubler.read(dt) * pan / (character?std::sqrt(float(voices)*2):voices);
           }
           x[c] += doubled * doubleMix;
         }
@@ -797,9 +820,14 @@ void Engine::process(float *const *data, int channels, int count,
                                         stadiumR);
             voc += z.carrier[b].tick(carrier) * std::min(8.f, ve * 35);
           }
-          float crowd = carrier * env * 3 * (1 - stadiumVoc) + voc * stadiumVoc;
+          float crowd = carrier * env * (character?8.f:3.f) * (1 - stadiumVoc) + voc * stadiumVoc*(character?2.4f:1.f);
           crowd = std::tanh(crowd * (1 + stadiumRough * 8)) /
                   (1 + stadiumRough * 2);
+          if(character) {
+            crowd=z.crowdHigh.tick(z.crowdLow.tick(crowd));
+            // Softly restrain large carrier peaks without compressing the dry vocal.
+            crowd=.25f*std::tanh(crowd*4);
+          }
           x[c] += crowd * stadiumMix;
         }
       }
@@ -811,12 +839,21 @@ void Engine::process(float *const *data, int channels, int count,
         float dt =
             q.sync ? float(60 / bpm) * q.beats * (b == 4 ? throwFeel : 1) * sr
                    : q.time * .001f * sr;
+        if(character) {
+          if(targetDelay[b]==0)previousDelay[b]=targetDelay[b]=dt;
+          if(std::abs(targetDelay[b]-dt)>.01f){previousDelay[b]=targetDelay[b];targetDelay[b]=dt;delayBlend[b]=0;}
+          delayBlend[b]=std::min(1.f,delayBlend[b]+1/(sr*.03f));
+        }
         for (int c = 0; c < channels; ++c) {
           auto &z = channel[c];
           float spread = (b == 4 && throwType != 1)
                              ? 1
                              : 1 + (c == 1 ? (modern?.003f:.035f) : (modern?-.003f:-.035f)) * q.width;
           float r = z.delays[b].read(dt * spread);
+          if(character && delayBlend[b]<1) {
+            float blend=.5f-.5f*std::cos(pi*delayBlend[b]);
+            r=z.delays[b].read(previousDelay[b]*spread)*(1-blend)+r*blend;
+          }
           if (b == 4 && clock - killedAt < dt * spread)
             r = 0;
           filtered[c] = z.delayLP[b].tick(z.delayHP[b].tick(r));
