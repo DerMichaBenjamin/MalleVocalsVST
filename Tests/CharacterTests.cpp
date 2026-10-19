@@ -9,13 +9,13 @@ Result render(Values base,bool tone=false,int channels=2){
  Engine e;e.prepare(48000,256,channels);e.setParameters(resolve(base));
  Result r;std::array<float,256> l{},right{};float* ptr[]{l.data(),right.data()};
  for(int pos=0;pos<48000*6;pos+=256){
-  for(int i=0;i<256;++i){float t=float(pos+i)/48000;float env=.15f+.85f*std::pow(.5f+.5f*std::sin(2*pi*2*t),2.f);
-   l[i]=right[i]=tone?.3f*std::sin(2*pi*220*t):env*(.12f*std::sin(2*pi*220*t)+.06f*std::sin(2*pi*2800*t)+.03f*std::sin(2*pi*11000*t));}
+  for(int i=0;i<256;++i){float t=float(pos+i)/48000;float env=.15f+.85f*std::pow(.5f+.5f*std::sin(2*malle::pi*2*t),2.f);
+   l[i]=right[i]=tone?.3f*std::sin(2*malle::pi*220*t):env*(.12f*std::sin(2*malle::pi*220*t)+.06f*std::sin(2*malle::pi*2800*t)+.03f*std::sin(2*malle::pi*11000*t));}
   e.process(ptr,channels,256,nullptr,0,{});
   if(pos>=48000*4)for(int i=0;i<256;++i){require(std::isfinite(l[i])&&std::isfinite(right[i]),"finite output");float mono=channels==1?l[i]:(l[i]+right[i])*.5f;
    r.energy+=(l[i]*l[i]+(channels==2?right[i]*right[i]:l[i]*l[i]))*.5;
    if(channels==2)r.side+=std::pow((l[i]-right[i])*.5,2);
-   for(int j=0;j<3;++j){double ph=2*pi*std::array<float,3>{220,2800,11000}[j]*(pos+i)/48000.;r.re[j]+=mono*std::cos(ph);r.im[j]+=mono*std::sin(ph);}
+   for(int j=0;j<3;++j){double ph=2*malle::pi*std::array<float,3>{220,2800,11000}[j]*(pos+i)/48000.;r.re[j]+=mono*std::cos(ph);r.im[j]+=mono*std::sin(ph);}
   }
  }
  return r;
@@ -46,22 +46,22 @@ int main(){try{
   std::array<double,2> energy{};
   for(int amount=0;amount<2;++amount){Engine e;e.prepare(48000,256,1);auto v=neutral();v[index("short.on")]=1;v[index("short.send")]=1;v[index("short.return")]=1;v[index("short.sync")]=0;v[index("short.time")]=100;v[index("duck.on")]=1;v[index("duck.source")]=external?1.f:0.f;v[index("duck.amount")]=float(amount);e.setParameters(v);
    std::array<float,256>a{},sc{};float* ptr[]{a.data()};const float* side[]{sc.data()};
-   for(int pos=0;pos<96000;pos+=256){for(int i=0;i<256;++i)a[i]=sc[i]=.1f*std::sin(2*pi*220*(pos+i)/48000);e.process(ptr,1,256,external?side:nullptr,external?1:0,{});if(pos>48000)for(int i=0;i<256;++i){float d=a[i]-.1f*std::sin(2*pi*220*(pos+i)/48000);energy[amount]+=d*d;}}
+   for(int pos=0;pos<96000;pos+=256){for(int i=0;i<256;++i)a[i]=sc[i]=.1f*std::sin(2*malle::pi*220*(pos+i)/48000);e.process(ptr,1,256,external?side:nullptr,external?1:0,{});if(pos>48000)for(int i=0;i<256;++i){float d=a[i]-.1f*std::sin(2*malle::pi*220*(pos+i)/48000);energy[amount]+=d*d;}}
   }
   std::cout<<"Ducking external="<<external<<" wet ratio="<<energy[1]/energy[0]<<"\n";require(energy[0]>1e-6&&energy[1]<energy[0]*.001,"100 percent ducks wet while retaining dry");
  }
  // The pitch parameter must alter the imported carrier, not the dry voice.
- Sample carrier;carrier.sampleRate=48000;carrier.left.resize(48000);for(int i=0;i<48000;++i)carrier.left[i]=.1f*std::sin(2*pi*110*i/48000);
+ Sample carrier;carrier.sampleRate=48000;carrier.left.resize(48000);for(int i=0;i<48000;++i)carrier.left[i]=.1f*std::sin(2*malle::pi*110*i/48000);
  for(float pitch:{0.f,12.f}){Engine e;e.prepare(48000,256,1);e.setSample(&carrier);auto v=neutral();v[index("stadium.on")]=1;v[index("stadium.mix")]=1;v[index("stadium.pitch")]=pitch;v[index("stadium.size")]=0;v[index("stadium.vocoder")]=0;v[index("stadium.rough")]=0;e.setParameters(v);
   std::array<float,256>a{};float* ptr[]{a.data()};double targetRe=0,targetIm=0,wrongRe=0,wrongIm=0;
-  for(int pos=0;pos<96000;pos+=256){a.fill(.1f);e.process(ptr,1,256,nullptr,0,{});if(pos>48000)for(int i=0;i<256;++i){double t=(pos+i)/48000.;float y=a[i]-.1f;double f=pitch==0?110:220;targetRe+=y*std::cos(2*pi*f*t);targetIm+=y*std::sin(2*pi*f*t);wrongRe+=y*std::cos(2*pi*(pitch==0?220:110)*t);wrongIm+=y*std::sin(2*pi*(pitch==0?220:110)*t);}}
+  for(int pos=0;pos<96000;pos+=256){a.fill(.1f);e.process(ptr,1,256,nullptr,0,{});if(pos>48000)for(int i=0;i<256;++i){double t=(pos+i)/48000.;float y=a[i]-.1f;double f=pitch==0?110:220;targetRe+=y*std::cos(2*malle::pi*f*t);targetIm+=y*std::sin(2*malle::pi*f*t);wrongRe+=y*std::cos(2*malle::pi*(pitch==0?220:110)*t);wrongIm+=y*std::sin(2*malle::pi*(pitch==0?220:110)*t);}}
   double ratio=std::hypot(targetRe,targetIm)/std::max(1e-9,std::hypot(wrongRe,wrongIm));std::cout<<"Crowd pitch="<<pitch<<" target/other="<<ratio<<"\n";require(ratio>8,"stadium pitch moves carrier octave");
  }
  // Captured throw survives send release, and a grid change is crossfaded.
  {Engine e;e.prepare(48000,128,2);auto v=neutral();v[index("throw.on")]=1;v[index("throw.trigger")]=1;v[index("throw.send")]=1;v[index("throw.return")]=.5f;v[index("throw.feedback")]=.55f;v[index("throw.type")]=2;v[index("throw.sync")]=0;v[index("throw.time")]=125;v[index("throw.verb.on")]=1;v[index("quality.on")]=1;
   std::array<float,128>l{},r{};float* ptr[]{l.data(),r.data()};double tail=0;float jump=0,previous=0;
   for(int pos=0;pos<96000;pos+=128){v[index("throw.trigger")]=pos<12032?1.f:0.f;if(pos>=36096)v[index("throw.time")]=250;e.setParameters(v);
-   for(int i=0;i<128;++i)l[i]=r[i]=pos+i<12000?.1f*std::sin(2*pi*220*(pos+i)/48000):0;
+   for(int i=0;i<128;++i)l[i]=r[i]=pos+i<12000?.1f*std::sin(2*malle::pi*220*(pos+i)/48000):0;
    e.process(ptr,2,128,nullptr,0,{});
    for(int i=0;i<128;++i){require(std::isfinite(l[i])&&std::isfinite(r[i]),"finite throw automation");if(pos>=24000)tail+=l[i]*l[i]+r[i]*r[i];if(pos>=35968&&pos<40000)jump=std::max(jump,std::abs(l[i]-previous));previous=l[i];}
   }
