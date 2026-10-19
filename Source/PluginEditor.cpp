@@ -683,6 +683,10 @@ MalleEditor::MalleEditor(MalleProcessor &p)
   stadiumOn = std::make_unique<ParamToggle>(p, "stadium.on", "ON");
   stadiumAmount = std::make_unique<ValueControl>(p, "stadium.mix", "Menge");
   stadiumPitch = std::make_unique<ValueControl>(p,"stadium.pitch","Crowd Pitch");
+  for(auto* c:{stadiumAmount.get(),stadiumPitch.get()}){
+    c->slider.setSliderStyle(juce::Slider::LinearHorizontal);
+    c->slider.setTextBoxStyle(juce::Slider::TextBoxRight,false,60,24);
+  }
   texture = std::make_unique<ParamChoice>(
       p, "stadium.slot", "Crowd-Platz",
       juce::StringArray{"1 - Leer", "2 - Leer", "3 - Leer", "4 - Leer", "5 - Leer", "6 - Leer", "7 - Leer"});
