@@ -1,0 +1,16 @@
+2026-10-19T21:31:28.1603752Z 1/6 Test #1: DSP ..............................   Passed   15.71 sec
+2026-10-19T21:31:29.7773481Z 2/6 Test #2: PluginStateAndUI .................   Passed    1.62 sec
+2026-10-19T21:31:33.2424218Z 3/6 Test #3: MeasuredDSP ......................   Passed    3.46 sec
+2026-10-19T21:31:34.1604728Z 4/6 Test #4: CrowdBankDSP .....................   Passed    0.92 sec
+2026-10-19T21:31:36.0679922Z 5/6 Test #5: FeedbackRegression ...............   Passed    1.91 sec
+2026-10-19T21:31:43.0341855Z 6/6 Test #6: CharacterRegression ..............   Passed    6.97 sec
+2026-10-19T21:31:43.0351585Z 100% tests passed out of 6
+2026-10-19T21:31:43.0352617Z Total Test time (real) =  30.63 sec
+2026-10-19T21:29:15.6761550Z 1/6 Test #1: DSP ..............................   Passed   10.43 sec
+2026-10-19T21:29:18.3043810Z 2/6 Test #2: PluginStateAndUI .................   Passed    2.63 sec
+2026-10-19T21:29:21.0082290Z 3/6 Test #3: MeasuredDSP ......................   Passed    2.70 sec
+2026-10-19T21:29:22.2719730Z 4/6 Test #4: CrowdBankDSP .....................   Passed    1.26 sec
+2026-10-19T21:29:24.0784400Z 5/6 Test #5: FeedbackRegression ...............   Passed    1.81 sec
+2026-10-19T21:29:29.5323070Z 6/6 Test #6: CharacterRegression ..............   Passed    5.45 sec
+2026-10-19T21:29:29.5525510Z 100% tests passed out of 6
+2026-10-19T21:29:29.5568760Z Total Test time (real) =  24.29 sec

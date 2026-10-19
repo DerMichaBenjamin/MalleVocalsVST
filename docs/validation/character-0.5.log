@@ -1,0 +1,10 @@
+Colour endpoint high/low contrast=23.1895 dB, RMS delta=-0.00164598 dB
+Warmth harmonic residual=0.0414192, RMS delta=0.000440703 dB
+Dual-mono widened side/total=-12.5844 dB
+Pressure incl. parallel on/off RMS=-0.0566214 dB
+Ducking external=0 wet ratio=0
+Ducking external=1 wet ratio=0
+Crowd pitch=0 target/other=2641.2
+Crowd pitch=12 target/other=1844.45
+Throw after release tail energy=0.199856, grid-change jump=6.8523e-05
+PASS: character, width, gain match, duck range, crowd pitch, throw tails and time change

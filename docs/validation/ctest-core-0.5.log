@@ -1,0 +1,15 @@
+Test project /workspace/scratch/527cf12be981/repo/build-core
+    Start 1: DSP
+1/5 Test #1: DSP ..............................   Passed   11.95 sec
+    Start 2: MeasuredDSP
+2/5 Test #2: MeasuredDSP ......................   Passed    3.63 sec
+    Start 3: CrowdBankDSP
+3/5 Test #3: CrowdBankDSP .....................   Passed    0.84 sec
+    Start 4: FeedbackRegression
+4/5 Test #4: FeedbackRegression ...............   Passed    1.80 sec
+    Start 5: CharacterRegression
+5/5 Test #5: CharacterRegression ..............   Passed    7.15 sec
+
+100% tests passed out of 5
+
+Total Test time (real) =  25.39 sec

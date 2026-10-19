@@ -1,0 +1,2 @@
+mode=0 frames=1200128 peak_dbfs=-13.2888 rms_dbfs=-25.9511 mono_fold_db=-0.472324 finite=true allocations=0
+mode=1 frames=1200128 peak_dbfs=-12.8524 rms_dbfs=-22.4706 mono_fold_db=-0.829443 finite=true allocations=0

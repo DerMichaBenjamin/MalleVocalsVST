@@ -1,0 +1,57 @@
+{
+  "version": "0.5.0-alpha",
+  "source_commit": "849ca06f31ebda9a4b0a3a9d2ca55a8287dd28e5",
+  "workflow_run": 39327352799,
+  "jobs": {
+    "windows": 118316508329,
+    "macos": 118316507715
+  },
+  "native_suites_passed": 6,
+  "local_core_suites_passed": 5,
+  "additional_offline_renders": 47,
+  "daw_tests": [],
+  "human_listening_tests": [],
+  "binaries": {
+    "Windows": {
+      "bytes": 12610789,
+      "sha256": "0765d8e543213a16ab2db0c96aa0dc5b9357d1d67b132da8829818920fe0cbce",
+      "binaries": [
+        {
+          "path": "MalleVocals-0.5.0-Windows/Standalone/Malle Vocals.exe",
+          "architecture": "x64"
+        },
+        {
+          "path": "MalleVocals-0.5.0-Windows/VST3/Malle Vocals.vst3/Contents/x86_64-win/Malle Vocals.vst3",
+          "architecture": "x64"
+        }
+      ]
+    },
+    "Darwin": {
+      "bytes": 30642978,
+      "sha256": "8e3a1e89faf95adb0e1286701a083f77a81dcc6acff71e02dc6876450c0c52e5",
+      "binaries": [
+        {
+          "path": "MalleVocals-0.5.0-Darwin/VST3/Malle Vocals.vst3/Contents/MacOS/Malle Vocals",
+          "architecture": [
+            "x86_64",
+            "arm64"
+          ]
+        },
+        {
+          "path": "MalleVocals-0.5.0-Darwin/Standalone/Malle Vocals.app/Contents/MacOS/Malle Vocals",
+          "architecture": [
+            "x86_64",
+            "arm64"
+          ]
+        },
+        {
+          "path": "MalleVocals-0.5.0-Darwin/AU/Malle Vocals.component/Contents/MacOS/Malle Vocals",
+          "architecture": [
+            "x86_64",
+            "arm64"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,6 +1,6 @@
 Aktuell: **0.5.0 Alpha** – [Aenderungen, Bedienung und Pruefgrenzen](docs/FEEDBACK_0.5.md).
 
-# Malle Vocals — 0.4.0 Alpha
+# Malle Vocals — 0.5.0 Alpha
 
 **Rohstoff Audio / Micha Benjamin.** Ein tatsächlich implementiertes C++/JUCE-Audioeffektplugin in Entwicklung. Noch keine verkaufsfertige Vollversion und keine bestätigte Klanggleichheit mit kommerziellen Referenzen.
 
@@ -24,7 +24,7 @@ cmake --build build-core --parallel 3
 ctest --test-dir build-core --output-on-failure
 ```
 
-Aktuelle gebaute Testpakete, Architekturprüfung, Screenshots und genaue Prüfgrenzen: [Validierung 0.3.0](docs/VALIDATION_0.3.0.md).
+Aktuelle gebaute Testpakete, Architekturprüfung, Screenshots und genaue Prüfgrenzen: [Validierung 0.5.0](docs/VALIDATION_0.5.0.md).
 
 ## Download / Installation
 
@@ -39,7 +39,7 @@ Mac-Testbuilds sind nur ad hoc signiert, nicht mit Developer ID notarisiert. Das
 3. EQ-Punkte ziehen: Frequenz/Gain, Mausrad: Q. Alle Detailwerte im Bereich „Klang EQ“. Zahlen lassen sich direkt editieren; Doppelklick setzt den Regler zurück.
 4. Crowd-Platz 1–7 auswählen und über „Sample / Bank laden“ oder Drag-and-drop auf Sample/Wellenform laden; vorhören. Eine `.mallecrowd`-Datei lädt eine vollständige Bank. „Bank speichern“ exportiert die eingebetteten Samples und die Einstellungen pro Platz; „Platz leeren“ ist rückgängig machbar. Bis eigene Samples vorliegen, erklingen ausdrücklich synthetische Testtexturen. Stadium selbst aktivieren und Menge dosieren.
 5. Für externe Lead-Steuerung im Host Sidechain anlegen und Ducking auf Extern stellen. Die Statuszeile meldet fehlendes Signal.
-6. Throw halten oder `throw.trigger` automatisieren. Loslassen schließt den latenzausgerichteten Send, spätestens endet er am Send-Fenster. Die Fahne läuft weiter. Throw-Mix ist der eigene Return; Gesamt-FX-Mix skaliert zusätzlich alle parallelen Effektreturns. Optionaler Throw-Hall folgt ausschließlich dem Throw-Delay.
+6. Throw halten oder `throw.trigger` automatisieren. Loslassen schließt den latenzausgerichteten Send, spätestens endet er am Send-Fenster. Die Fahne läuft weiter. Throw-Mix ist der eigene Return; Gesamt-FX-Mix skaliert zusätzlich die fünf Raum-/Delay-/Throw-Returns. Optionaler Throw-Hall folgt ausschließlich dem Throw-Delay.
 7. Eigene Presets speichern/laden; Tonart, Input und Routing werden standardmäßig geschützt. Undo/Redo, Presetsuche und Favoriten sind vorhanden.
 
 8. Advanced: Direktmodule links per Drag-and-drop umordnen; orange Linie markiert gültige Ziele. Parallelwege bleiben getrennte Returns; die Liste macht daraus keine serielle Kette.
@@ -47,12 +47,14 @@ Mac-Testbuilds sind nur ad hoc signiert, nicht mit Developer ID notarisiert. Das
 
 Siehe [Funktions- und Teststand](docs/STATUS.md), [Architektur und Automationsvertrag](docs/ARCHITECTURE.md), [Referenzprüfung](docs/REFERENCE_RESEARCH.md) und [Changelog](CHANGELOG.md).
 
-## Aufnahme und Pegelvergleich (0.4)
+## Aufnahme und Pegelvergleich
 
 Neue Instanzen starten im Aufnahme-Modus mit **0 Samples Plugin-Latenz**. Tune und kreative Pitch/Formant-Verarbeitung werden dabei ausdrücklich umgangen; ihr Zustand bleibt erhalten. Mix-Modus aktiviert wieder die bisherige Pitch-Engine mit etwa 240 ms. Modus möglichst bei gestopptem Transport wechseln; der Host muss seine Latenzkompensation neu berechnen. Audiointerface und DAW-Puffer bleiben zusätzliche Latenzquellen.
 
-Simple: **Pegelgleich** vergleicht langsam die RMS-Energie bei Druck, Klang, Wärme und Breite. Alle sechs Sektionen besitzen einen eigenen Pegelregler. Hall und Pumpen werden bewusst nicht dynamisch zurückgeregelt. **Hall / Delay einstellen** öffnet die vier normalen Wege mit ihren wichtigsten Parametern. Alte Projekte laden mit Legacy-DSP und bisheriger Latenz.
+Simple: **Pegelgleich** vergleicht langsam die RMS-Energie bei Druck, Klang, Wärme und Breite. Alle sechs Sektionen besitzen einen eigenen Pegelregler. Hall und Pumpen werden bewusst nicht dynamisch zurückgeregelt. **Hall / Delay einstellen** öffnet die vier normalen Wege mit ihren wichtigsten Parametern. Die neue Verarbeitung gilt direkt, ohne Legacy-Schalter. Alte Teststände können anders klingen.
 
 Details und Prüfgrenzen: [Feedback 0.4](docs/FEEDBACK_0.4.md).
 
-**Geprüfte 0.4-Testpakete:** [VALIDATION_0.4.0.md](docs/VALIDATION_0.4.0.md).
+**Geprüfte 0.5-Testpakete:** [VALIDATION_0.5.0.md](docs/VALIDATION_0.5.0.md).
+
+0.5: Dunkel/Hell-Balance, staerkere Waerme/Breite, Simple-FX-Ducking 0–100%, Crowd Pitch/Filter und Delay-Zeitueberblendung. [Bedienung und Grenzen](docs/FEEDBACK_0.5.md).
