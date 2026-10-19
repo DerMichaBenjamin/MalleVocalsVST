@@ -22,6 +22,11 @@ juce::CallOutBox* findCallout(juce::Component& root) {
   }
   return nullptr;
 }
+int parameterControls(juce::Component& root) {
+  int count=dynamic_cast<ValueControl*>(&root)!=nullptr || dynamic_cast<ParamChoice*>(&root)!=nullptr || dynamic_cast<ParamToggle*>(&root)!=nullptr ? 1 : 0;
+  for(auto* child:root.getChildren())count+=parameterControls(*child);
+  return count;
+}
 int main() {
   juce::ScopedJuceInitialiser_GUI gui;
   try {
@@ -151,7 +156,7 @@ int main() {
       juce::Component::SafePointer<juce::CallOutBox> popup(findCallout(*temporaryEditor));
       require(popup!=nullptr,"lifetime fixture opens actual popup");
       temporaryEditor.reset();
-      require(popup==nullptr || popup->getChildComponent(0)->getNumChildComponents()==0,"closing editor detaches popup parameters before processor destruction");
+      require(popup==nullptr || parameterControls(*popup)==0,"closing editor detaches all nested popup parameters before processor destruction");
       temporary.reset();
     }
     std::cerr<<"Native UI/views/popup lifetime passed"<<std::endl;
